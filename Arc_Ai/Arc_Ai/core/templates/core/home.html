@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+</head>
+<body>
+    <div id="sidebar">
+        <div id="sidebar_icns_grp">
+            <img class="sidebar_icns" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <img class="sidebar_icns" src="{% static 'Images/Notification.png' %}" alt="Notification">
+            <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
+        </div>
+    </div>
+    <div id="header">
+        <div>
+            <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+        </div>
+        <div id="header_nav" class="text_white">
+            <p><a href="{% url 'home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+            <p><a href="{% url 'organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+            <p><a href="{% url 'saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+            <p><a href="{% url 'email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+        </div>
+        <div>
+            <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
+        </div>
+    </div>
+    <script>
+        fetch('/api/get_name')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").innerText = data.name;
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
