@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email</title>
+    <title>Saved</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
 </head>
 <body>
@@ -27,6 +27,30 @@
         </div>
         <div>
             <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
+        </div>
+    </div>
+    <div id="content">
+        <h1 class="titles">Folders</h1>
+        <div id="folder_items">
+        {% for folder in folders %}
+            <p class="folders">{{ folder }}</p>
+        {% endfor %}
+        </div>
+        
+        <h1 class="titles">Files</h1>
+        <div id="file_items">
+        {% for file in files %}
+            <p class="file">{{ file }}</p>
+            <hr class="long-line">
+        {% endfor %}
+        </div>
+
+        <h1 class="titles">Trash</h1>
+        <div id="file_items">
+        {% for trash_file in trash %}
+            <p class="file">{{ trash_file }}</p>
+            <hr class="long-line">
+        {% endfor %}
         </div>
     </div>
 </body>
