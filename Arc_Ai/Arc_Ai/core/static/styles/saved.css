@@ -1,0 +1,25 @@
+#content {
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+    margin-left: 150px;
+    margin-right: 70px;
+}
+
+#folder_items {
+    display: grid; /* Use CSS Grid for layout */
+    grid-template-rows: repeat(2, auto); /* Create 2 rows with automatic height */
+    grid-auto-flow: column; /* Add new items in columns */
+    gap: 20px; /* Add spacing between items */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    padding: 10px; /* Optional: Add padding for spacing */
+    margin-left: 60px;
+    margin-right: 60px;
+    max-height: 300px; /* Set a maximum height for the container */
+}
+
+#file_items {
+    max-height: calc(51px * 10); /* Set the maximum height of the container */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px; /* Optional: Add padding for spacing */
+}

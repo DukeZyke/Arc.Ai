@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saved</title>
-    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <title>Email</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/email.css' %}?v=1.0">
 </head>
 <body>
     <div id="sidebar">
@@ -20,37 +21,44 @@
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
         <div id="header_nav" class="text_white">
-            <p><a href="{% url 'home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
-            <p><a href="{% url 'organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-            <p><a href="{% url 'saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-            <p><a href="{% url 'email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
         </div>
         <div>
             <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
         </div>
     </div>
     <div id="content">
-        <h1 class="titles">Folders</h1>
-        <div id="folder_items">
-        {% for folder in folders %}
-            <p class="folders">{{ folder }}</p>
-        {% endfor %}
-        </div>
-        
-        <h1 class="titles">Files</h1>
-        <div id="file_items">
-        {% for file in files %}
-            <p class="file">{{ file }}</p>
-            <hr class="long-line">
-        {% endfor %}
-        </div>
+        <h1>Online Users</h1>
+        <div id="online_users">
+            {% for user in online_users %}
+                <div class="user-container">
+                    <div class="user-circle"></div>
+                    <p class="user-name">{{ user }}</p>
+                </div>
+            {% endfor %}
+        </div>  
+        <h2>Emails</h2>
+        <div id="email_items">
+            {% for email in emails %}
+                <div class="email-item">
 
-        <h1 class="titles">Trash</h1>
-        <div id="file_items">
-        {% for trash_file in trash %}
-            <p class="file">{{ trash_file }}</p>
-            <hr class="long-line">
-        {% endfor %}
+                    <img class="email-icon" src="{{ email.sender_icon.url }}" alt="{{ email.sender_name }}'s Icon">
+
+                    <div class="email-details">
+                        <p class="email-name">{{ email.sender_name }}</p>
+                        <p class="email-title margintop-5 marginbottom-5">{{ email.title }}</p>
+                        <p class="email-content margintop-5">{{ email.content }}</p>
+                    </div>
+
+                    <div class="email-timestamp">
+                        <p class="email-time">{{ email.timestamp }}</p>
+                    </div>
+
+                </div>
+            {% endfor %}
         </div>
     </div>
 </body>

@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import Email
 
 def login(request):
     return render(request, 'core/login.html')
@@ -26,4 +27,10 @@ def saved(request):
     })
 
 def email(request):
-    return render(request, 'core/email.html')
+    online_users = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy"]  # Simulated online users
+    emails = Email.objects.all()  # Fetch all emails from the database
+
+    return render(request, 'core/email.html', {
+        'online_users': online_users,
+        'emails': emails,
+    })
