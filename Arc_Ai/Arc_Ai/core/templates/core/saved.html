@@ -21,10 +21,10 @@
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
         <div id="header_nav" class="text_white">
-            <p><a href="{% url 'home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
-            <p><a href="{% url 'organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-            <p><a href="{% url 'saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-            <p><a href="{% url 'email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
         </div>
         <div>
             <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">

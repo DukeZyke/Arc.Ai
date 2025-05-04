@@ -1,0 +1,373 @@
+/*  Divider  */
+.header-with-line{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    }
+
+.Title{
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: 48px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    margin: 0;
+    margin-left: 50px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    }
+
+.divider {
+    flex-grow: 1;
+    margin-right: 100px;
+    margin-bottom: 20px;
+    height: 1px;
+    border-width: 1px;
+    background-color: #353A5624;
+    }
+/* Container All */
+.contentorg {
+    margin-left: 70px;
+    padding: 20px;
+    height: auto;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Continue Working */
+.continue-working {
+    margin-bottom: 40px;
+}
+
+.continue-card {
+    display: flex;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+.project-status-container {
+    position: relative; /* Set relative positioning for stacking */
+    width: 291px; /* Adjust width as needed */
+    height: 394px; /* Adjust height as needed */
+    background: #ffffff; /* Background color for the container */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for card effect */
+    z-index: 1; /* Base z-index */
+    overflow: hidden; /* Ensure content doesn't overflow */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; 
+    margin-left: 200px; 
+}
+
+.project-logo {
+    margin-left: -70%;
+    position:relative; /* Position it absolutely relative to the container */
+    z-index: 2; /* Ensure it appears above the container background */
+}
+
+.project-logo img {
+    margin-top: 20px; /* Adjust to control vertical spacing */
+    width: 50px; /* Adjust size of the image */
+    height: 50px; /* Adjust size of the image */
+    padding: 5px; /* Optional: Add padding around the image */
+}
+
+.FileInfo{
+    margin-left: 10px;
+}
+
+.under-image {
+    position: absolute; /* Position it absolutely relative to the parent container */
+    width: 318px; /* Set width for the card */
+    height: 394px; /* Set height for the card */
+    background: #ffffff; /* Optional: Add a background color */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: inset 0 4px 100px rgba(0, 0, 0, 0.2);
+    z-index: 1; /* Place it below the project-preview */
+    overflow: hidden; /* Ensure content doesn't overflow */
+}
+
+.under-image img {
+    width: 100%; /* Make the image fill the container's width */
+    height: 100%; /* Make the image fill the container's height */
+    object-fit: cover; /* Scale the image proportionally to cover the container */
+    border-radius: inherit; /* Match the container's border radius */
+}
+
+.project-details {
+    flex-grow: 1;
+    margin-bottom: -20px; /* Add spacing below the details */
+}
+
+.details-row {
+    display: flex;
+    justify-content: space-between; /* Space out the items */
+    align-items: flex-start; /* Align items at the top */
+    margin-top: 5px; /* Add spacing above the row */
+}
+
+.details-row div {
+    flex: 1; /* Allow equal space for each column */
+    margin-right: 20px; /* Add spacing between columns */
+}
+
+.details-row div:last-child {
+    margin-right: 0; /* Remove margin for the last column */
+}
+
+.continue-btn {
+    background-color: #353A56; /* Button background color */
+    color: white; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 35px;
+}
+
+.continue-btn:hover {
+    background-color: #2a2f45; /* Darker shade on hover */
+}
+
+.project-details h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: -5px;
+}
+
+.project-details p {
+    font-size: 16px;
+    margin: 2px 0;
+}
+
+.status {
+    color: orange;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.space{
+    margin-top: 100px;
+}
+
+/*  */
+
+
+
+
+/* Other Project  */
+.card-section {
+    margin: 40px 60px;
+    max-width: auto;
+    padding-bottom: 10px;
+  }
+  
+  .card-container {
+    display: flex;
+    gap: 0px;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    cursor:grab;
+    overflow-x: scroll;
+    padding-bottom: 10px;
+  }
+  
+  .project-container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 20px;
+  }
+  .project-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .project-card {
+    width: 291px;
+    height: 394px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1),     /* base shadow */
+              -6px 0 10px rgba(0, 0, 0, 0.2),   /* left */
+                6px 0 10px rgba(0, 0, 0, 0.2);   /* right */
+    flex-shrink: 0;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .card-header {
+    background-color: #353A56;
+    padding: 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .card-header img {
+    width: 70px;
+    height: 70px;
+    
+  }
+  
+  
+  
+  .card-body {
+    padding: 15px;
+    margin-bottom: auto;
+  }
+  
+  .card-body h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+  
+  .card-body p {
+    margin: 5px 0;
+    font-size: 14px;
+    font-weight: 300;
+    width: 258px;
+    height: 19px;
+    top: 318.5px;
+    left: 76px;
+  
+  }
+   
+  .project-details {
+    display: flex;
+    flex-direction: column  ;
+    gap: 10px; 
+  }
+  
+  .date-group {
+    display: inline-flex;
+    gap: 0;
+  }
+  
+  
+  
+  .status {
+    color: orange;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 32px !important;
+    margin-top: 20px!important;
+  }
+  
+/* --- Schedule Section --- */
+.schedule-container {
+  margin: 40px 60px;
+}
+
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  position: relative;
+}
+
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #353A56;
+}
+
+.time-labels {
+  position: absolute;
+  top: -5px;
+  left: 105px; /* Adjust to align with the grid */
+  display: grid;
+  grid-template-columns: repeat(24, 1fr); /* 24 rows for 24 hours */
+  grid-template-rows: 1fr; /* Each label takes the same width */
+  gap: 15.2px; /* No extra spacing between rows */
+  font-size: 12px;
+  color: #888888;
+  text-align: center; /* Center-align the text */
+  z-index: 2;
+}
+
+.time-slots {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr); /* 7 rows for days */
+  grid-template-columns: repeat(24, 1fr); /* 24 columns for hours */
+  position: relative;
+  z-index: 2;
+  background: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: calc(100% / 24) calc(100% / 7); /* Adjust grid size */
+  border: 1px solid #ddd; /* Border around the grid */
+}
+
+
+
+.schedule-bars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  grid-template-columns: repeat(24, 1fr);
+}
+
+.bar {
+  margin-top: 15px;
+  border-radius: 50px;
+  height: 50%;
+}
+
+.schedule-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center horizontally */
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #353A56;
+  position: relative; /* Keep it relative to the parent container */
+  margin: 0 auto; /* Center the element within the container */
+  width: fit-content; /* Ensure the width only fits the content */
+}
+
+.nav-btn {
+  background: #353A56;
+  color: white;
+  border: none;
+  width: 35px;
+  border-radius: 50px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  background: #2a2f45;
+}
+  
