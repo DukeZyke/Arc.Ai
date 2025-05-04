@@ -85,196 +85,37 @@
             <div class="card-section">
                 <div class="card-container">
                   <!-- Repeat this card as needed -->
+                  {% for project in projects %}
+                  <!-- Repeat this card as needed -->
                    <div class="project-container">
-                      <div class="project-card">
+                      <div class="project-card">  
                           <div class="card-header">
-                            <img src="{% static 'Images/projlogo.png' %}" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);"  />
+                            <img src="{% static 'Images/icon1.png' %}" alt="icon" />
+                            <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
                           </div>
                           <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
+                            <h3>{{project.name}}</h3>
                             <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
+              
+                              <p>{{project.project_id}}</p>
                               <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
+                              <p>{{project.start_date}}</p>
+                              <p>{{project.finish_date}}</p>
                               </div>
                             </div>
-                            <p class="status" Style="color: #6AFF3C">Completed</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);" />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);" />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status" style="color: rgb(201, 46, 46);">Late</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);"  />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);" />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon"style="filter: brightness(0) invert(1);"  />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);" />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon"style="filter: brightness(0) invert(1);"  />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon" />
-                            <img src="icon2.png" alt="icon" style="filter: brightness(0) invert(1);" />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
-                          </div>
-                        </div>
-                   </div> 
-                   <div class="project-container">
-                      <div class="project-card">
-                          <div class="card-header">
-                            <img src="icon1.png" alt="icon"/>
-                            <img src="icon2.png" alt="icon"style="filter: brightness(0) invert(1);" />
-                          </div>
-                          <div class="card-body">
-                            <h3>New Employee Onboarding System Design</h3>
-                            <div class="project-details">
-                              <p>Project ID: HR-2024-ONB-01</p>
-                              <div class="dategroup">
-                              <p>Start Date: 2024/11/10</p>
-                              <p>Finished Date: -</p>
-                              </div>
-                            </div>
-                            <p class="status">Ongoing</p>
+              
+                            {% if project.project_status == 'Completed' %}
+                            <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
+                            {% elif project.project_status == 'Ongoing' %}
+                            <p class="status" style="color: orange">{{project.project_status}}</p>
+                            {% elif project.project_status == 'Missing' %}
+                            <p class="status" style="color: red">{{project.project_status}}</p>
+                            {% endif %}
+              
                           </div>
                         </div>
                    </div>
+                   {% endfor %}
                   <!-- Duplicate above block for more cards -->
                 </div>
               </div>
@@ -343,47 +184,37 @@
     
 
     <script>
-        const container = document.querySelector('.card-container');
-    
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-    
-        // Function to calculate dynamic scroll speed based on container width
-        function getScrollSpeed() {
-            const containerWidth = container.offsetWidth;
-            return containerWidth / 500; // Adjust the divisor to control sensitivity
-        }
-    
-        container.addEventListener('mousedown', (e) => {
-            isDown = true;
-            container.classList.add('active');
-            startX = e.pageX - container.offsetLeft;
-            scrollLeft = container.scrollLeft;
-        });
-    
-        container.addEventListener('mouseleave', () => {
-            isDown = false;
-            container.classList.remove('active');
-        });
-    
-        container.addEventListener('mouseup', () => {
-            isDown = false;
-            container.classList.remove('active');
-        });
-    
-        container.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - container.offsetLeft;
-            const walk = (x - startX) * getScrollSpeed(); // Use dynamic scroll speed
-            container.scrollLeft = scrollLeft - walk;
-        });
-    
-        // Optional: Recalculate scroll speed on window resize or zoom
-        window.addEventListener('resize', () => {
-            getScrollSpeed();
-        });
+        const container = document.querySelector('.card-container');  //cards
+      
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+      
+      container.addEventListener('mousedown', (e) => {
+        isDown = true;
+        container.classList.add('active');
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+      });
+      
+      container.addEventListener('mouseleave', () => {
+        isDown = false;
+        container.classList.remove('active');
+      });
+      
+      container.addEventListener('mouseup', () => {
+        isDown = false;
+        container.classList.remove('active');
+      });
+      
+      container.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const walk = (x - startX) * 1; // Adjust scroll speed here
+        container.scrollLeft = scrollLeft - walk;
+      });
+      
     </script>
 
     <script>

@@ -9,3 +9,54 @@ class Email(models.Model):
     
     def __str__(self):
         return self.title
+    
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    project_id = models.CharField(max_length=20, unique=True, blank=True)
+    start_date = models.DateField(max_length=20)
+    finish_date = models.DateField(max_length=20)
+    project_status = models.CharField(max_length=50)
+
+    def save(self, *args, **kwargs):
+        if not self.project_id:
+            last_project = Project.objects.order_by('-id').first()
+            if last_project and last_project.project_id:
+                try:
+                    # Extract the numeric part and increment it
+                    last_number = int(last_project.project_id.split('-')[-1])
+                    next_number = last_number + 1
+                except:
+                    next_number = 1
+            else:
+                next_number = 1
+
+            self.project_id = f"{next_number:02d}"  # e.g., 01, 02, etc.
+        super().save(*args, **kwargs)
+
+class PersonalInformation(models.Model):
+    name = models.CharField(max_length=100, default='Enter your name')
+    email = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+    contact_number = models.CharField(max_length=20)
+    age = models.CharField(max_length=3)
+    birth_date = models.DateField(max_length=20)
+    gender = models.CharField(max_length=10)
+    user_title = models.CharField(max_length=30)
+
+class EmployeeAward(models.Model):
+    award_classif = models.CharField(max_length=100)
+    award_title = models.CharField(max_length=100)
+    award_desc = models.CharField(max_length=200)
+    award_date = models.DateField()
+
+    ICONS = {
+        'a': 'assets/img/Award_Trophy.png',
+        'b': 'assets/img/Award_Teamwork.png',
+        'c': 'assets/img/Award_Star.png',
+    }
+
+    def get_award_icon(self):
+        return self.ICONS.get(self.award_classif.lower(), 'assets/img/Award_Trophy.png')
+
+    def __str__(self):
+        return f'{self.award_title} ({self.award_date})'
