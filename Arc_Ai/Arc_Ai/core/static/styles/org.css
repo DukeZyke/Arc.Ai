@@ -81,21 +81,45 @@
 }
 
 .under-image {
-    position: absolute; /* Position it absolutely relative to the parent container */
-    width: 318px; /* Set width for the card */
-    height: 394px; /* Set height for the card */
-    background: #ffffff; /* Optional: Add a background color */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: inset 0 4px 100px rgba(0, 0, 0, 0.2);
-    z-index: 1; /* Place it below the project-preview */
-    overflow: hidden; /* Ensure content doesn't overflow */
+  position: absolute; /* Position it absolutely relative to the parent container */
+  width: 318px; /* Set width for the card */
+  height: 394px; /* Set height for the card */
+  background: #1e1c1c; /* Dark background color */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: inset 0 4px 100px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+  z-index: 1; /* Place it below the project-preview */
+  overflow: hidden; /* Ensure content doesn't overflow */
+}
+
+.under-image::after {
+  content: ''; /* Add a pseudo-element for the gradient */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0)); /* Dark gradient effect */
+  border-radius: inherit; /* Match the container's border radius */
+  z-index: 2; /* Ensure it appears above the background but below the content */
+  pointer-events: none; /* Allow clicks to pass through */
 }
 
 .under-image img {
+  width: 100%; /* Make the image fill the container's width */
+  height: 100%; /* Make the image fill the container's height */
+  object-fit: cover; /* Scale the image proportionally to cover the container */
+  border-radius: inherit; /* Match the container's border radius */
+  z-index: 0; /* Ensure the image is below the gradient */
+}
+
+.background-image{
+    position: absolute; /* Position it absolutely relative to the parent container */
     width: 100%; /* Make the image fill the container's width */
     height: 100%; /* Make the image fill the container's height */
     object-fit: cover; /* Scale the image proportionally to cover the container */
     border-radius: inherit; /* Match the container's border radius */
+    z-index: 0; /* Place it below other elements */
+    background-color: #1e1c1c;
 }
 
 .project-details {
