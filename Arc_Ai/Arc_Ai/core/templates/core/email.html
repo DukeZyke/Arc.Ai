@@ -44,19 +44,13 @@
         <div id="email_items">
             {% for email in emails %}
                 <div class="email-item">
-
-                    <img class="email-icon" src="{{ email.sender_icon.url }}" alt="{{ email.sender_name }}'s Icon">
-
+                    <img class="email-icon" alt="{{ email.sender_name }}'s Icon">
                     <div class="email-details">
-                        <p class="email-name">{{ email.sender_name }}</p>
-                        <p class="email-title margintop-5 marginbottom-5">{{ email.title }}</p>
-                        <p class="email-content margintop-5">{{ email.content }}</p>
+                        <p class="email-name margin-0">{{ email.sender_name }}</p>
+                        <p class="email-title margin-0">{{ email.title }}</p>
+                        <p class="email-content margin-0">{{ email.content }}</p>
                     </div>
-
-                    <div class="email-timestamp">
-                        <p class="email-time">{{ email.timestamp }}</p>
-                    </div>
-
+                    <p class="email-timestamp">{{ email.timestamp }}</p>
                 </div>
             {% endfor %}
         </div>
