@@ -1,0 +1,170 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBFR Profile Page</title>
+    <link rel ="stylesheet" href="{% static 'Styles/profilepage.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class ="logo">
+            <img src="{% static 'Images/Logo.png' %}" alt ="Site Icon" class="arclogo"/>
+        </div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Organization</a>
+            <a href="#">Saved</a>
+            <a href="#">Email</a>
+            <button class="logout">Log out</button>
+        </nav>
+    </header>
+
+    <section class="MainProfile">
+        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+        <div class="userInfo">
+            <h1 class="username">{{personal_information.name}}</h1>
+            <h3 class="email">{{personal_information.email}}</h3>
+            <h3 class="user-title">{{personal_information.user_title}}</h3>
+        </div>
+            <a href="#">
+                <box-icon name='cog' class="setting-icon"></box-icon>
+            </a>
+    </section>
+
+    <section class="PersonalInformation">
+        <div class="header-with-line">
+            <h1 class="Title">Personal Information</h1>
+            <hr class="divider"/>
+        </div>
+
+        <div class="info-grid">
+            <div class="info">
+                <span class="label">Email:</span>
+                <span class="value">{{personal_information.email}}</span>
+            </div>
+            <div class="info">
+                <span class="label">Address:</span>
+                <span class="value">{{personal_information.address}}</span>
+            </div>
+            <div class="info">
+                <span class="label">Contact Number:</span>
+                <span class="value">{{personal_information.contact_number}}</span>
+            </div>
+            <div class="info">
+                <span class="label">Age:</span>
+                <span class="value">{{personal_information.age}}</span>
+            </div>
+            <div class="info">
+                <span class="label">Birth Date:</span>
+                <span class="value">{{personal_information.birth_date}}</span>
+            </div>
+            <div class="info">
+                <span class="label">Gender:</span>
+                <span class="value">{{personal_information.gender}}</span>
+            </div>
+        </div>
+    </section>
+    <div class="sidebar">
+        <div class="sidebarOptions">
+        <a href="#"><box-icon name='cog' type='solid' class="sidebarsetting"></box-icon>
+        </a>
+
+        <a href="#"><box-icon name='menu' class="sidebarmenu"></box-icon>
+        </a>
+
+        <a href="#"><box-icon name='bell' class="sidebarnotif"></box-icon>
+        </a>
+        </div>
+    </div>
+
+    <section class="ProjectHistory">
+        <div class="header-with-line2">
+            <h1 class="Title2">Project History</h1>
+            <hr class="divider2"/>
+        </div>
+
+        <div class="card-section">
+  <div class="card-container">
+
+    {% for project in projects %}
+    <!-- Repeat this card as needed -->
+     <div class="project-container">
+        <div class="project-card">
+            <div class="card-header">
+              <img src="{% static 'Images/icon1.png' %}" alt="icon" />
+              <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
+            </div>
+            <div class="card-body">
+              <h3>{{project.name}}</h3>
+              <div class="project-details">
+
+                <p>{{project.project_id}}</p>
+                <div class="dategroup">
+                <p>{{project.start_date}}</p>
+                <p>{{project.finish_date}}</p>
+                </div>
+              </div>
+
+              {% if project.project_status == 'Completed' %}
+              <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
+              {% elif project.project_status == 'Ongoing' %}
+              <p class="status" style="color: orange">{{project.project_status}}</p>
+              {% elif project.project_status == 'Missing' %}
+              <p class="status" style="color: red">{{project.project_status}}</p>
+              {% endif %}
+
+            </div>
+          </div>
+     </div>
+     {% endfor %}
+  </div>
+</div>
+
+    </section>
+
+    
+<section class="EmployeeAwards">
+    <div class="header-with-line3">
+        <h1 class="Title3">Employee Awards</h1>
+        <hr class="divider3"/>
+    </div>
+
+    <div class="awards-container">
+        {% for employee_award in employee_awards %}
+            <div class="award">
+                <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
+                <div class="award-text">
+                    <h2 class="award-title">{{ employee_award.award_title }}</h2>
+                    <p class="award-desc">{{ employee_award.award_desc }}</p>
+                    <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p style="width: 100%;
+                max-width: 1000px;
+                padding: 40px;
+                margin: 100px auto;
+                box-sizing: border-box;
+                text-align: center;
+                font-size: 1.5rem;
+                color: #555;">
+                No awards yet.
+            </p>
+        {% endfor %}
+    </div>
+</section>
+
+  
+      <div>
+        <hr class="divider4"/>
+      </div>
+  
+      <div class="MoreOptions"> <a href="#" class="Title4">More Options</a>
+      </div>
+      <script src="{% static 'js/profilepage.js' %}"></script>
+</body>
+</html>

@@ -13,6 +13,11 @@
         <div id="container">
             <div id="form_container">
                 <h1 class="titles">Sign In</h1>
+
+                {% for message in messages %}
+                <h5 style="color: red;">{{message}}</h5>
+                {% endfor %}
+
                 <form id="form" method="post" action="{% url 'core:login' %}">
                     {% csrf_token %}
                     <div id="signin_form">
@@ -31,11 +36,11 @@
                     </div>
                     <div id="social_media">
                         <button class="continue_with_button" type="button" onclick="window.location.href='/register/'">
-                            <img class="button_images" src="{% static 'images/Google.png' %}" alt="Google">
+                            <img class="button_images" src="{% static 'Images/Google.png' %}" alt="Google">
                             <span>Sign in with Google</span>
                         </button>
                         <button class="continue_with_button margin-top" type="button" onclick="window.location.href='/forgot-password/'">
-                            <img class="button_images" src="{% static 'images/Facebook.png' %}" alt="Facebook">
+                            <img class="button_images" src="{% static 'Images/Facebook.png' %}" alt="Facebook">
                             <span>Sign in with Facebook</span>
                         </button>
                     </div>
