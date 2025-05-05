@@ -15,8 +15,8 @@
             <img src="{% static 'Images/Logo.png' %}" alt ="Site Icon" class="arclogo"/>
         </div>
         <nav>
-            <a href="#">About Us</a>
-            <a href="#">Log In</a>
+            <a href="#about">About Us</a>
+            <a href="{% url 'core:login' %}">Log In</a>
             <button class="Get-started">Get Started</button>
         </nav>
     </header>
@@ -29,7 +29,7 @@
         Arc.ai emphasizes hierarchical access control and role-based permissions to streamline the way documents are stored, shared, and collaborated on within professional environments. It replaces traditional email chains and scattered cloud drives with a unified platform for structured file flow and collaboration.
       </p>
       <div class="signUp">
-        <a href="#" class="signup-btn">Sign Up </a>
+        <a href="{% url 'core:signup' %}" class="signup-btn">Sign Up </a>
     </div>
     </div>
     <div class="hero-image">
@@ -92,7 +92,7 @@
   </section>
 
   <div class="hero-divider"></div>
-  <section class="about-arcai">
+  <section id=  "about" class="about-arcai">
     <div class="about-container">
       <!-- Left Side: Text -->
       <div class="about-text">
