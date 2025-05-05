@@ -12,7 +12,7 @@
 
   <div id="sidebar">
     <div id="sidebar_content" class="hidden">
-        <p>Profile</p>
+        <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
         <p><a href="{% url 'core:home' %}">Home</a></p>
         <p><a href="{% url 'core:organization' %}">Organization</a></p>
         <p><a href="{% url 'core:saved' %}">Saved</a></p>
@@ -69,19 +69,23 @@
         </div>
     </div>
 </div>
+
     <div id="header">
         <div>
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
         <div id="header_nav" class="text_white">
-            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+          <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+          <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+          <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+          <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+          <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
         </div>
         <div>
             <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
         </div>
     </div>
+    
     <div class="contentorg">
         <section class="continue-working">
             <div class="header-with-line">
@@ -233,232 +237,7 @@
             </div>
         </section>
   </div> 
-    
-    
-
-    <script>
-        const container = document.querySelector('.card-container');  //cards
-      
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      
-      container.addEventListener('mousedown', (e) => {
-        isDown = true;
-        container.classList.add('active');
-        startX = e.pageX - container.offsetLeft;
-        scrollLeft = container.scrollLeft;
-      });
-      
-      container.addEventListener('mouseleave', () => {
-        isDown = false;
-        container.classList.remove('active');
-      });
-      
-      container.addEventListener('mouseup', () => {
-        isDown = false;
-        container.classList.remove('active');
-      });
-      
-      container.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - container.offsetLeft;
-        const walk = (x - startX) * 1; // Adjust scroll speed here
-        container.scrollLeft = scrollLeft - walk;
-      });
-      
-    </script>
-
-    <script>
-        // Make each time slot toggle active state when clicked
-        document.querySelectorAll('.time-slot').forEach(slot => {
-          slot.addEventListener('click', () => {
-            slot.classList.toggle('active');
-          });
-        });
-      </script>
-
-      <script>
-        const weekLabel = document.getElementById('week-label');
-        const prevWeekBtn = document.getElementById('prev-week');
-        const nextWeekBtn = document.getElementById('next-week');
-        const scheduleBarsContainer = document.querySelector('.schedule-bars');
-    
-        // Example week data with schedule bars
-        const weeks = [
-            {
-                label: 'March 25-31',
-                bars: [
-                    { gridRow: 3, gridColumn: '2 / 5', color: '#353A56' },
-                    { gridRow: 5, gridColumn: '6 / 10', color: '#6AFF3C' },
-                ],
-            },
-            {
-                label: 'April 1-5',
-                bars: [
-                    { gridRow: 6, gridColumn: '15 / 24', color: '#353A56' },
-                    { gridRow: 4, gridColumn: '4 / 8', color: '#6AFF3C' },
-                    { gridRow: 5, gridColumn: '8 / 12', color: '#FFD700' },
-                ],
-            },
-            {
-                label: 'April 6-12',
-                bars: [
-                    { gridRow: 2, gridColumn: '3 / 7', color: '#FF5733' },
-                    { gridRow: 6, gridColumn: '5 / 9', color: '#33FF57' },
-                ],
-            },
-            {
-                label: 'April 13-19',
-                bars: [
-                    { gridRow: 3, gridColumn: '1 / 4', color: '#FFC300' },
-                    { gridRow: 7, gridColumn: '6 / 10', color: '#DAF7A6' },
-                ],
-            },
-            {
-                label: 'April 20-26',
-                bars: [
-                    { gridRow: 4, gridColumn: '2 / 5', color: '#C70039' },
-                    { gridRow: 5, gridColumn: '7 / 11', color: '#900C3F' },
-                ],
-            },
-        ];
-    
-        let currentWeekIndex = 1; // Start at "April 1-5"
-    
-        // Function to update the week label and schedule bars
-        function updateWeek() {
-            // Update the week label
-            weekLabel.textContent = weeks[currentWeekIndex].label;
-    
-            // Clear existing bars
-            scheduleBarsContainer.innerHTML = '';
-    
-            // Add new bars for the selected week
-            weeks[currentWeekIndex].bars.forEach(bar => {
-                const barElement = document.createElement('div');
-                barElement.classList.add('bar');
-                barElement.style.gridRow = bar.gridRow;
-                barElement.style.gridColumn = bar.gridColumn;
-                barElement.style.backgroundColor = bar.color;
-                scheduleBarsContainer.appendChild(barElement);
-            });
-        }
-    
-        // Navigate to the previous week
-        prevWeekBtn.addEventListener('click', () => {
-            if (currentWeekIndex > 0) {
-                currentWeekIndex--;
-                updateWeek();
-            }
-        });
-    
-        // Navigate to the next week
-        nextWeekBtn.addEventListener('click', () => {
-            if (currentWeekIndex < weeks.length - 1) {
-                currentWeekIndex++;
-                updateWeek();
-            }
-        });
-    
-        // Initialize the week label and schedule bars
-        updateWeek();
-    </script>
-
-        {% comment %} SideBar Script {% endcomment %}
-
-        <script>
-          const navIcon = document.getElementById("nav_icon");
-          const sidebar = document.getElementById("sidebar");
-          const sidebarContent = document.getElementById("sidebar_content");
-          const navItems = document.querySelectorAll(".nav_item p");
-      
-          // Function to toggle sidebar expansion
-          const toggleSidebar = () => {
-              sidebar.classList.toggle("expanded");
-      
-              if (sidebar.classList.contains("expanded")) {
-                  sidebarContent.classList.remove("hidden");
-                  navItems.forEach((item) => {
-                      item.style.display = "block";
-                  });
-              } else {
-                  sidebarContent.classList.add("hidden");
-                  navItems.forEach((item) => {
-                      item.style.display = "none";
-                  });
-              }
-          };
-      
-          // Add click event to the navigation icon
-          navIcon.addEventListener("click", (event) => {
-              event.stopPropagation(); // Prevent click from propagating to the document
-              toggleSidebar();
-          });
-      
-          // Add click event to the "Navigate" <p> text
-          document.querySelector(".nav_item p").addEventListener("click", (event) => {
-              event.stopPropagation(); // Prevent click from propagating to the document
-              toggleSidebar();
-          });
-      
-          // Close sidebar when clicking outside
-          document.addEventListener("click", (event) => {
-              if (!sidebar.contains(event.target)) {
-                  sidebar.classList.remove("expanded");
-                  sidebarContent.classList.add("hidden");
-                  navItems.forEach((item) => {
-                      item.style.display = "none";
-                  });
-              }
-          });
-      
-          // Initially hide the <p> elements
-          navItems.forEach((item) => {
-              item.style.display = "none";
-          });
-      </script>
-  
-      {% comment %} Notification Pop-Up Script {% endcomment %}
-      <script>
-        const notificationIcon = document.querySelector('.sidebar_icns[src*="Notification.png"]');
-        const notificationPopup = document.getElementById('notification_popup');
-        const detailedNotification = document.getElementById('detailed_notification');
-        const notificationItems = document.querySelectorAll('.notification_item');
-        const closeNotificationPopup = document.getElementById('close_notification_popup');
-        const closeDetailedNotification = document.getElementById('close_detailed_notification');
-        const notificationDetail = document.getElementById('notification_detail');
-
-        // Function to update the position of detailed notification
-        const updateDetailedNotificationPosition = () => {
-          const notificationPopupWidth = notificationPopup.classList.contains("hidden") ? 0 : notificationPopup.offsetWidth;
-          detailedNotification.style.left = `${220 + 20 + notificationPopupWidth + 20}px`; // Sidebar width + gap + notification popup width + gap
-        };
-    
-        // Show notification pop-up
-        notificationIcon.addEventListener('click', () => {
-            notificationPopup.classList.remove('hidden'); // Show notification pop-up
-        });
-    
-        // Close notification pop-up
-        closeNotificationPopup.addEventListener('click', () => {
-            notificationPopup.classList.add('hidden'); // Hide notification pop-up
-        });
-    
-        // Show detailed notification without hiding the notification pop-up
-        notificationItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const detail = item.getAttribute('data-detail');
-                notificationDetail.textContent = detail;
-                detailedNotification.classList.remove('hidden'); // Show detailed notification
-            });
-        });
-    
-        // Close detailed notification
-        closeDetailedNotification.addEventListener('click', () => {
-            detailedNotification.classList.add('hidden'); // Hide detailed notification
-        });
-    </script>
+    <script src="{% static 'js/org.js' %}"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
 </body>
 </html>
