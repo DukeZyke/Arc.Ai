@@ -1,0 +1,329 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: #333;
+    background-color: #fff;  padding-top: 80px; 
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    background-color: #353A56;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+   
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 30px;
+  
+  }
+  
+  .arclogo {
+    width: 190px;
+    height: auto;
+    flex-shrink: 0;
+  }
+
+
+  
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+  }
+  
+  nav a {
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: white;
+  }
+  
+  .Get-started {
+    margin-left: auto;
+    height: 32px;
+    width: 130px;
+    background-color: white;
+    color: #353A56;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 25px;
+    font-size: 20px;
+    padding:5px;
+    font-weight: bold;
+  }
+/*------------------------------------------------------------------------------*/
+/*-------------------------------Hero Section----------------------------------*/ 
+  .hero-divider {
+    width: 90%;
+    height: 2px;
+    background-color: #353a56;
+    margin: 2rem 4rem 2rem 4rem;
+  }
+  
+  .hero {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 2rem;
+    margin: 2rem 2rem;
+  }
+
+  
+  .hero-content {
+    max-width: 600px;
+  }
+  
+  .hero h1 {
+    font-size: 60px;
+    margin-bottom: 1rem
+  }
+  
+  .brand {
+    color: #4b2aad;
+  }
+  
+  .subtitle {
+    font-weight: bold;
+    margin-bottom: 2rem;
+    font-size: 28px;
+  }
+  
+  .description {
+    font-size: 20px;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .signUp{
+    font-size: 20px;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    margin-top: 3rem;
+    font-weight: bold;
+  }
+  
+  .signup-btn {
+    text-decoration: none;
+    font-size: 30px;
+    color: black;
+  }
+
+  .signup-btn:after{
+    content: "⟶";
+    margin-left: 10px;
+    font-weight: 200;
+  }
+  
+  .hero-image img {
+    max-width: 600px;
+    width: 100%;
+    height: auto;
+    margin-top: auto;
+  }
+  /*------------------------------------------------------------------------------*/
+  /*-------------------------------Features Section------------------------------*/
+  .features {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .features-intro {
+    text-align: center;
+    font-size: 46px;
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+    font-style: italic;
+    font-weight: 300    ;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    text-align: left;
+  }
+
+  .feature-box img{
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+  
+  .feature-box {
+    padding: 0 1.5rem;
+    border-left: 2px solid #353a56;
+    text-align: center;
+  }
+  
+  .feature-box:first-child {
+    border-left: none;
+  }
+  
+  .feature-box h3 {
+    font-size: 32px;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+  
+  .feature-box p {
+    font-size: 1rem;
+    font-weight: 300;
+  }
+  /*------------------------------------------------------------------------------*/
+  /*-------------------------------Institution Section----------------------------*/
+  .institution-section {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 2rem;
+  }
+  
+  .institution-title {
+    text-align: center;
+    font-size: 46px;
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: 7rem;
+  }
+  
+  .institution-grid {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 2rem;
+    align-items: start;
+    position: relative;
+  }
+  
+  .institution-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    border-right: 2px solid #353a56;
+    padding-right: 1rem;
+  }
+  
+  .institution-left h3 {
+    text-align: right;
+    margin: 2rem 0 5rem 0;
+    font-size: 30px;
+    font-weight: 700;
+  }
+  
+  .institution-right {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    margin-left: 1rem
+  }
+  
+  .institution-right p {
+    margin: 0;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 1.6;
+  }
+/*------------------------------------------------------------------------------*/
+/*-------------------------------About Section----------------------------------*/
+  .about-arcai {
+    margin: 0rem 2rem 0rem 2rem;
+    padding: 3rem 2rem;
+    background-color: #fff;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .about-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  
+  .about-text {
+    flex: 1 1 45%;
+    min-width: 280px;
+  }
+  
+  .about-text h2 {
+    font-size: 54px;
+    font-style: italic;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
+  
+  .about-text p {
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .submitted p{
+    font-weight: 700;
+    font-size: 20px;
+    font-style: normal;
+    margin-top: 2rem;
+  }
+  
+  .dev-grid {
+    flex: 1 1 45%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    justify-items: center;
+    align-items: center;
+    margin-top: 7rem;
+  }
+  
+  .dev-card {
+    text-align: center;
+  }
+  
+  .dev-card img {
+    width: 170px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dev-card p {
+    margin: 0;
+    font-size: 20px;
+  }
+  
+  .dev-card span {
+    font-weight: 300;
+  }
+
+  /* .wave-footer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  margin:0;
+}
+
+.wave-footer svg {
+  display: block;
+  width: 100%;
+  height: 100px;
+  margin:0;
+} */

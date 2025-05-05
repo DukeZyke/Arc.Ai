@@ -7,7 +7,6 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    margin-top: 20px;
 }
 
 .user-container {
@@ -30,36 +29,73 @@
     text-align: center; /* Center align the text */
 }
 
-.email-item {
-    display: flex;
-    flex-direction: row;
+.email-content {
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; /* Adjust font size */
+    color: #333; /* Optional: Add a color for the content */
+    margin-bottom: 5px; /* Add spacing below the content */
+    word-wrap: break-word; /* Ensure long words break to the next line */
 }
 
+.email-item {
+    display: flex; /* Use Flexbox for row layout */
+    flex-direction: row; /* Arrange items in a row */
+    align-items: center; /* Vertically align items */
+}
+
+#email_items {
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: column; /* Stack emails vertically */
+    gap: 20px; /* Add spacing between emails */
+    margin-left: 60px;
+    margin-right: 60px;
+    max-height: calc(10 * 100px); /* Limit to 10 emails (assuming each email is ~100px tall) */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
 .email-icon {
-    width: 20px;
-    height: 20px;
-    margin-left: 5px;
-    vertical-align: middle;
-    margin-right: 130px;
+    width: 50px; /* Adjust size of the icon */
+    height: 50px;
+    margin-right: 15px; /* Add spacing between the icon and details */
+    border-radius: 50%; /* Optional: Make the icon circular */
 }
 
 .email-details {
     display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #000; 
-    text-align: center;
+    flex-direction: column; /* Stack name, title, and content vertically */
+    flex-grow: 1; /* Allow details to take up remaining space */
 }
 
 .email-timestamp {
-    font-family: 'Inter', sans-serif; /* Font styling */
-    font-size: 12px; /* Font size */
-    color: #000; /* Text color */
-    text-align: center; /* Center align the text */
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #888; /* Use a lighter color for the timestamp */
+    margin-left: 15px; /* Add spacing between details and timestamp */
+    white-space: nowrap; /* Prevent the timestamp from wrapping */
 }
 
+.email-name {
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px; /* Adjust font size */
+    font-weight: bold;
+    margin-bottom: 5px; /* Add spacing below the name */
+}
+.email-title {
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; /* Adjust font size */
+    color: #007BFF; /* Optional: Add a color for the title */
+    margin-bottom: 5px; /* Add spacing below the title */
+}
+.email-content {
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; /* Adjust font size */
+    color: #333; /* Optional: Add a color for the content */
+    margin-bottom: 5px; /* Add spacing below the content */
+    word-wrap: break-word; /* Ensure long words break to the next line */
+}
 .margin-0 {
     margin: 0;
 }
