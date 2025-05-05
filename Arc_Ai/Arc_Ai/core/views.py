@@ -90,3 +90,6 @@ def email(request):
         'online_users': online_users,
         'emails': emails,
     })
+
+def landingpage(request):
+    return render(request, 'core/landingpage.html')
