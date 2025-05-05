@@ -9,13 +9,66 @@
     <link rel="stylesheet" href="{% static 'styles/org.css' %}">
 </head>
 <body>
-    <div id="sidebar">
-        <div id="sidebar_icns_grp">
-            <img class="sidebar_icns" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+
+  <div id="sidebar">
+    <div id="sidebar_content" class="hidden">
+        <p>Profile</p>
+        <p><a href="{% url 'core:home' %}">Home</a></p>
+        <p><a href="{% url 'core:organization' %}">Organization</a></p>
+        <p><a href="{% url 'core:saved' %}">Saved</a></p>
+        <p><a href="{% url 'core:email' %}">Email</a></p>
+    </div>
+    <hr class="divider_sidebar"/>
+
+    <div class="notification_container">
+      <!-- Notification Pop-Up -->
+        <div id="notification_popup" class="hidden">
+          <div id="notification_list">
+              <h2>Notifications</h2>
+              <ul>
+                  <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                      <p>Schedule Update</p>
+                      <span>Yesterday</span>
+                  </li>
+                  <li class="notification_item" data-detail="Another meeting detail here.">
+                      <p>Schedule Update</p>
+                      <span>Yesterday</span>
+                  </li>
+                  <li class="notification_item" data-detail="Another meeting detail here.">
+                    <p>Schedule Update</p>
+                    <span>Yesterday</span>
+                  </li>
+                  <li class="notification_item" data-detail="Another meeting detail here.">
+                    <p>Schedule Update</p>
+                    <span>Yesterday</span>
+                  </li>
+              </ul>
+          </div>
+          <button id="close_notification_popup">Close</button>
+      </div>
+      <!-- Detailed Notification -->
+      <div id="detailed_notification" class="hidden">
+          <h2 id="notification_title">Schedule Update</h2>
+          <p id="notification_detail"></p>
+          <button id="close_detailed_notification">Close</button>
+      </div>
+    </div>
+
+    <div id="sidebar_icns_grp">
+        <div class="nav_item">
+            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <p>Navigate</p>
+        </div>
+        <div class="nav_item">
             <img class="sidebar_icns" src="{% static 'Images/Notification.png' %}" alt="Notification">
+            <p>Notification</p>
+        </div>
+        <div class="nav_item">
             <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
+            <p>Settings</p>
         </div>
     </div>
+</div>
     <div id="header">
         <div>
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
@@ -480,6 +533,101 @@
     
         // Initialize the week label and schedule bars
         updateWeek();
+    </script>
+
+        {% comment %} SideBar Script {% endcomment %}
+
+        <script>
+          const navIcon = document.getElementById("nav_icon");
+          const sidebar = document.getElementById("sidebar");
+          const sidebarContent = document.getElementById("sidebar_content");
+          const navItems = document.querySelectorAll(".nav_item p");
+      
+          // Function to toggle sidebar expansion
+          const toggleSidebar = () => {
+              sidebar.classList.toggle("expanded");
+      
+              if (sidebar.classList.contains("expanded")) {
+                  sidebarContent.classList.remove("hidden");
+                  navItems.forEach((item) => {
+                      item.style.display = "block";
+                  });
+              } else {
+                  sidebarContent.classList.add("hidden");
+                  navItems.forEach((item) => {
+                      item.style.display = "none";
+                  });
+              }
+          };
+      
+          // Add click event to the navigation icon
+          navIcon.addEventListener("click", (event) => {
+              event.stopPropagation(); // Prevent click from propagating to the document
+              toggleSidebar();
+          });
+      
+          // Add click event to the "Navigate" <p> text
+          document.querySelector(".nav_item p").addEventListener("click", (event) => {
+              event.stopPropagation(); // Prevent click from propagating to the document
+              toggleSidebar();
+          });
+      
+          // Close sidebar when clicking outside
+          document.addEventListener("click", (event) => {
+              if (!sidebar.contains(event.target)) {
+                  sidebar.classList.remove("expanded");
+                  sidebarContent.classList.add("hidden");
+                  navItems.forEach((item) => {
+                      item.style.display = "none";
+                  });
+              }
+          });
+      
+          // Initially hide the <p> elements
+          navItems.forEach((item) => {
+              item.style.display = "none";
+          });
+      </script>
+  
+      {% comment %} Notification Pop-Up Script {% endcomment %}
+      <script>
+        const notificationIcon = document.querySelector('.sidebar_icns[src*="Notification.png"]');
+        const notificationPopup = document.getElementById('notification_popup');
+        const detailedNotification = document.getElementById('detailed_notification');
+        const notificationItems = document.querySelectorAll('.notification_item');
+        const closeNotificationPopup = document.getElementById('close_notification_popup');
+        const closeDetailedNotification = document.getElementById('close_detailed_notification');
+        const notificationDetail = document.getElementById('notification_detail');
+
+        // Function to update the position of detailed notification
+        const updateDetailedNotificationPosition = () => {
+          const notificationPopupWidth = notificationPopup.classList.contains("hidden") ? 0 : notificationPopup.offsetWidth;
+          detailedNotification.style.left = `${220 + 20 + notificationPopupWidth + 20}px`; // Sidebar width + gap + notification popup width + gap
+        };
+    
+        // Show notification pop-up
+        notificationIcon.addEventListener('click', () => {
+            notificationPopup.classList.remove('hidden'); // Show notification pop-up
+        });
+    
+        // Close notification pop-up
+        closeNotificationPopup.addEventListener('click', () => {
+            notificationPopup.classList.add('hidden'); // Hide notification pop-up
+        });
+    
+        // Show detailed notification without hiding the notification pop-up
+        notificationItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const detail = item.getAttribute('data-detail');
+                notificationDetail.textContent = detail;
+                detailedNotification.classList.remove('hidden'); // Show detailed notification
+            });
+        });
+    
+        // Close detailed notification
+        closeDetailedNotification.addEventListener('click', () => {
+            detailedNotification.classList.add('hidden'); // Hide detailed notification
+        });
     </script>
 </body>
 </html>

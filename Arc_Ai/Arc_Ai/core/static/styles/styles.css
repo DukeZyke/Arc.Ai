@@ -75,7 +75,7 @@ body {
     margin-right: 30px;
 }
 
-                                            /* Sidebar */
+/* Sidebar */
 #sidebar {
     background: #ffffff;
     width: 70px;
@@ -83,19 +83,212 @@ body {
     position: fixed;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     align-items: center;
     box-shadow: 2px 0px 18.1px 0px rgba(0, 0, 0, 0.25);
+    transition: width 0.3s ease;
+    justify-content: flex-end;
+    z-index: 1000;
+}
+
+#sidebar.expanded {
+    width: 200px;
+    justify-content: flex-end;
+}
+
+#sidebar_content p {
+    font-size: 14px;
+    margin: 0; /* Remove unnecessary margins */
+    color: #000;
+    text-align: left; /* Align text to the left */
+    position: relative;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease, color 0.3s ease; /* Smooth transition for visibility and color */
+    white-space: nowrap; /* Prevent text from wrapping */
+    font-family: 'Arial', sans-serif;
+}
+
+#sidebar_content.hidden {
+    display: none; /* Hide the sidebar content when collapsed */
+}
+
+#sidebar_content p {
+    opacity: 1; /* Show text when sidebar is expanded */
+    margin-bottom: 10px;
+    text-decoration: none;
+}
+
+#sidebar_content a {
+    text-decoration: none;
+    color: inherit;
+}
+
+#sidebar_content p:hover {
+    color: #353A56; /* Change text color on hover */
+}
+
+#sidebar_content p::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #ccc; /* Light gray color for the line */
+    transition: width 0.3s ease;
+}
+
+#sidebar_content p:hover::after {
+    width: 100%; /* Underline effect on hover */
+}
+
+/* Divider styling */
+.divider_sidebar {
+    width: 80%; /* Adjust width as needed */
+    height: 1px; /* Thin line */
+    background-color: #ccc; /* Light gray color for the line */
+    border: none; /* Remove default border */
+    margin: 10px auto; /* Add spacing and center the line */
+}
+
+
+/* Sidebar Icons Group */
+#sidebar_icns_grp {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    order: 2; /* Ensure it stays at the bottom */
+    margin-bottom: 20px; /* Adds spacing from the bottom */
 }
 
 #sidebar_icns_grp {
     display: flex;
     flex-direction: column;
-    gap: 60px;
-    margin-left: 5%;
-    margin-bottom: 50px;
+    gap: 30px;
+    order: 2; /* Ensure it stays at the bottom */
+    margin-bottom: 20px; /* Adds spacing from the bottom */
 }
 
+.nav_item {
+    display: flex;
+    flex-direction: row; /* Align items in a row */
+    align-items: center; /* Vertically center the icon and text */
+    position: relative;
+    cursor: pointer;
+    gap: 10px; /* Add spacing between the icon and text */
+}
+
+.nav_item p {
+    font-size: 14px;
+    margin: 0; /* Remove unnecessary margins */
+    color: #000;
+    text-align: left; /* Align text to the left */
+    position: relative;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease; /* Smooth transition for visibility */
+    white-space: nowrap; /* Prevent text from wrapping */
+    font-family: 'Arial', sans-serif;
+}
+
+#sidebar.expanded .nav_item p {
+    opacity: 1; /* Show text when sidebar is expanded */
+}
+
+.nav_item:hover p {
+    color: #353A56;
+}
+
+.nav_item p::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 1px;
+    background-color: #ccc;
+    transition: width 0.3s ease;
+}
+
+#sidebar.expanded .nav_item:hover p::after {
+    width: 100%;
+}
+
+.sidebar_icns {
+    width: 35px;
+    cursor: pointer;
+}
+
+/* Notification Pop-Up */
+#notification_popup {
+    position: fixed;
+    bottom: 20px;
+    left: calc(70px + 20px); /* Adjust based on the collapsed sidebar width */
+    width: 400px;
+    height: 446px;
+    background: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    border-radius: 10px;
+    transition: left 0.3s ease; /* Smooth transition when sidebar expands */
+    z-index: 1000; /* Ensure it stays above other elements */
+    display: flex;
+    flex-direction: column;
+}
+
+#notification_popup.hidden {
+    display: none;
+}
+
+#notification_list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.notification_item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+}
+
+.notification_item:hover {
+    background-color: #f5f5f5;
+}
+
+/* When Sidebar is Expanded */
+#sidebar.expanded #notification_popup {
+    left: calc(200px + 20px); /* Adjust based on the expanded sidebar width */
+}
+
+#sidebar.expanded #detailed_notification {
+    left: calc(240px + 20px + 400px + 20px); /* Adjust based on the expanded sidebar width */
+}
+
+.hidden {
+    display: none; /* Hide the element when this class is applied */
+}
+
+/* Detailed Notification */
+#detailed_notification {
+    position: fixed;
+    bottom: 20px;
+    left: calc(108px + 20px + 400px + 20px); /* Default position */
+    width: 400px;
+    height: 446px;
+    background: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    border-radius: 10px;
+    transition: left 0.3s ease; /* Smooth transition when position changes */
+    z-index: 1000;
+}
+
+#detailed_notification.hidden {
+    display: none;
+}
+
+/* Dunno */
 #result {
     font-size: 200px;
 }
