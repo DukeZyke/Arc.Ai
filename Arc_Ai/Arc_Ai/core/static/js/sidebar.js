@@ -48,6 +48,8 @@
     navItems.forEach((item) => {
         item.style.display = "none";
     });
+
+    
 const notificationIcon = document.querySelector('.sidebar_icns[src*="Notification.png"]');
 const notificationPopup = document.getElementById('notification_popup');
 const detailedNotification = document.getElementById('detailed_notification');
@@ -55,17 +57,31 @@ const notificationItems = document.querySelectorAll('.notification_item');
 const closeNotificationPopup = document.getElementById('close_notification_popup');
 const closeDetailedNotification = document.getElementById('close_detailed_notification');
 const notificationDetail = document.getElementById('notification_detail');
+const notificationParagraph = document.getElementById('notification_paragraph');
+
+// Function to toggle notification pop-up visibility
+const toggleNotificationPopup = () => {
+    if (notificationPopup.classList.contains('hidden')) {
+        console.log('Showing notification pop-up');
+        notificationPopup.classList.remove('hidden'); // Show notification pop-up
+    } else {
+        console.log('Hiding notification pop-up');
+        notificationPopup.classList.add('hidden'); // Hide notification pop-up
+        detailedNotification.classList.add('hidden'); 
+    }
+};
+
+// Add click event to both the notification icon and paragraph
+notificationIcon.addEventListener('click', toggleNotificationPopup);
+notificationParagraph.addEventListener('click', toggleNotificationPopup);
 
 // Function to update the position of detailed notification
 const updateDetailedNotificationPosition = () => {
-    const notificationPopupWidth = notificationPopup.classList.contains("hidden") ? 0 : notificationPopup.offsetWidth;
+    const notificationPopupWidth = notificationPopup.classList.contains('hidden') ? 0 : notificationPopup.offsetWidth;
+    console.log('Notification Popup Width:', notificationPopupWidth); // Debugging
     detailedNotification.style.left = `${220 + 20 + notificationPopupWidth + 20}px`; // Sidebar width + gap + notification popup width + gap
+    console.log('Detailed Notification Left:', detailedNotification.style.left); // Debugging
 };
-
-// Show notification pop-up
-notificationIcon.addEventListener('click', () => {
-    notificationPopup.classList.remove('hidden'); // Show notification pop-up
-});
 
 // Close notification pop-up
 closeNotificationPopup.addEventListener('click', () => {
