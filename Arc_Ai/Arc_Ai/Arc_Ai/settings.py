@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.conf import settings
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -169,3 +173,5 @@ LOGIN_URL = 'core:login' # URL for login page
 LOGOUT_URL = 'logout' # URL for logout page
 LOGIN_REDIRECT_URL = '/home/' # URL to redirect after login
 ACCOUNT_LOGOUT_REDIRECT_URL = 'core:login' # URL to redirect after logout
+
+GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
