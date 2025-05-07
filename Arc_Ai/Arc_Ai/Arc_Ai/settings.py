@@ -39,6 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',  # Your core app
+
+    'django.contrib.sites',  # Required for allauth
+    'allauth',  # Required for allauth
+    'allauth.account',  # Required for allauth
+    'allauth.socialaccount',  # Required for allauth
+    'allauth.socialaccount.providers.google',  # Google provider for allauth
+    # 'allauth.socialaccount.providers.facebook',  # Facebook provider for allauth
 ]
 
 MIDDLEWARE = [
@@ -49,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',  # Required for allauth
 ]
 
 ROOT_URLCONF = 'Arc_Ai.urls'
@@ -63,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
             ],
         },
     },
@@ -100,6 +110,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SITE_ID = 1  # Required for allauth
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -136,4 +148,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTHENTICATION_BACKENDS = [
     'core.accounts.backends.EmailBackend',  # Your custom backend
     'django.contrib.auth.backends.ModelBackend',  # Keep default as fallback
+
+    'allauth.account.auth_backends.AuthenticationBackend',  # Required for allauth / Google Login
+
+    # Add other backends if needed
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '808716703581-59101hglg290bq2gagv28filru7j8q59.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    },
+}
+
+
+LOGIN_URL = 'core:login' # URL for login page
+LOGOUT_URL = 'logout' # URL for logout page
+LOGIN_REDIRECT_URL = '/home/' # URL to redirect after login
+ACCOUNT_LOGOUT_REDIRECT_URL = 'core:login' # URL to redirect after logout

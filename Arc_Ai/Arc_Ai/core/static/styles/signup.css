@@ -232,9 +232,10 @@ body {
 .titles {
     color: #000;
     font-family: 'Inter', sans-serif;
-    font-style: normal;
+    font-style: normal; 
     font-weight: 200;
     line-height: normal;
+    margin: 8px 0;
 }
 
 .sidebar_icns {
@@ -389,7 +390,7 @@ button:hover {
 
 #footer {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 4px;
 }
 
 #footer p {
