@@ -38,6 +38,9 @@ def profilepage(request):
         'employee_awards' : employee_awards,
         })
 
+def landingpage(request):
+    return render(request, 'core/landingpage.html')
+
 def login(request):
     if request.method == 'POST':
         email = request.POST['email']
