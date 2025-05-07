@@ -110,6 +110,9 @@ def organization(request):
         'employee_awards' : employee_awards,
         })
 
+def landingpage(request):
+    return render(request, 'core/landingpage.html')
+
 def saved(request):
 # Simulated backend data
     folders = [f"Folder {i}" for i in range(1, 21)]  # 20 folders
@@ -135,6 +138,21 @@ def email(request):
 
 
 def google_drive_auth(request):
+    # Check if the user is logged in
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to authorize Google Drive.")
+        return redirect('core:login')
+
+    # Check if credentials are already stored in the session
+    creds_data = request.session.get('credentials')
+    if creds_data:
+        creds = Credentials(**creds_data)
+        if creds.valid:
+            # Credentials are valid, no need to reauthorize
+            messages.success(request, "Google Drive is already authorized.")
+            return redirect('core:saved')
+
+    # If no valid credentials, initiate the Google OAuth flow
     flow = Flow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_FILE,
         scopes=SCOPES,
