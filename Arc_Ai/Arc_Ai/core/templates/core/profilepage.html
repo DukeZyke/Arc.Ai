@@ -127,36 +127,36 @@
     </section>
 
     
-<section class="EmployeeAwards">
-    <div class="header-with-line3">
-        <h1 class="Title3">Employee Awards</h1>
-        <hr class="divider3"/>
-    </div>
+    <section class="EmployeeAwards">
+        <div class="header-with-line3">
+            <h1 class="Title3">Employee Awards</h1>
+            <hr class="divider3"/>
+        </div>
 
-    <div class="awards-container">
-        {% for employee_award in employee_awards %}
-            <div class="award">
-                <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
-                <div class="award-text">
-                    <h2 class="award-title">{{ employee_award.award_title }}</h2>
-                    <p class="award-desc">{{ employee_award.award_desc }}</p>
-                    <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
+        <div class="awards-container">
+            {% for employee_award in employee_awards %}
+                <div class="award">
+                    <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
+                    <div class="award-text">
+                        <h2 class="award-title">{{ employee_award.award_title }}</h2>
+                        <p class="award-desc">{{ employee_award.award_desc }}</p>
+                        <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
+                    </div>
                 </div>
-            </div>
-        {% empty %}
-            <p style="width: 100%;
-                max-width: 1000px;
-                padding: 40px;
-                margin: 100px auto;
-                box-sizing: border-box;
-                text-align: center;
-                font-size: 1.5rem;
-                color: #555;">
-                No awards yet.
-            </p>
-        {% endfor %}
-    </div>
-</section>
+            {% empty %}
+                <p style="width: 100%;
+                    max-width: 1000px;
+                    padding: 40px;
+                    margin: 100px auto;
+                    box-sizing: border-box;
+                    text-align: center;
+                    font-size: 1.5rem;
+                    color: #555;">
+                    No awards yet.
+                </p>
+            {% endfor %}
+        </div>
+    </section>
 
   
       <div>
