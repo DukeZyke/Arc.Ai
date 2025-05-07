@@ -1,4 +1,7 @@
 {% load static %}
+{% load socialaccount %}
+{% providers_media_js %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,11 +54,11 @@
                         <p>Continue With</p>
                     </div>
                     <div id="social_media">
-                        <button class="continue_with_button" type="button" onclick="window.location.href='/register/'">
+                        <button class="continue_with_button" type="button" onclick="window.location.href='{% provider_login_url 'google' %}'">
                             <img class="button_images" src="{% static 'Images/Google.png' %}" alt="Google">
-                            <span>Sign up with Google</span>
+                            <span>Sign in with Google</span>
                         </button>
-                        <button class="continue_with_button margin-top" type="button" onclick="window.location.href='/forgot-password/'">
+                        <button class="continue_with_button margin-top" type="button" onclick="window.location.href='/register/'">
                             <img class="button_images" src="{% static 'Images/Facebook.png' %}" alt="Facebook">
                             <span>Sign up with Facebook</span>
                         </button>
