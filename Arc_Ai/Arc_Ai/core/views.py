@@ -4,6 +4,11 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from .models import Email, Project, PersonalInformation, EmployeeAward
 
+def signup_details(request):
+    return render(request, 'core/signup_details.html', {
+        'range': range(1, 16)  # Pass numbers 1 to 15 to the template
+    })
+
 def profilepage(request):
     projects = Project.objects.all()
     personal_information = PersonalInformation.objects.first()

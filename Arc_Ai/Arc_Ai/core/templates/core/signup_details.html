@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Additional Info</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/signup_details.css' %}?v=1.0">
+    <script src="{% static 'scripts/signup_details.js' %}" defer></script>
+</head>
+<body>
+    <div id="login_cntr">
+        <div id="container">
+            <div id="form_container">
+                <h1 class="titles">Sign In</h1>
+
+                {% for message in messages %}
+                <h5 style="color: red;">{{message}}</h5>
+                {% endfor %}
+
+                <form id="form" method="post" action="{% url 'core:login' %}">
+                    {% csrf_token %}
+                    <div id="signin_form">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                    </div>
+                    <div id="footer">
+                        <button id="login_button" type="submit">Login</button>
+                        <p>Continue With</p>
+                    </div>
+                    <div id="social_media">
+                        <button class="continue_with_button" type="button" onclick="window.location.href='/register/'">
+                            <img class="button_images" src="{% static 'Images/Google.png' %}" alt="Google">
+                            <span>Sign in with Google</span>
+                        </button>
+                        <button class="continue_with_button margin-top" type="button" onclick="window.location.href='/forgot-password/'">
+                            <img class="button_images" src="{% static 'Images/Facebook.png' %}" alt="Facebook">
+                            <span>Sign in with Facebook</span>
+                        </button>
+                    </div>
+                </form>
+                <a class="titles margin-top-50" href="{% url 'core:signup' %}">Sign Up?</a></p>
+            </div>
+            <div id="logo_container" class="gap">
+                <div id="select_profile">
+                    <div id="active_profile_pic">
+                        <img id="selected_profile_pic" src="{% static 'Images/Profile.png' %}">
+                    </div>
+                    <p>Select Profile Picture</p>
+                    <div class="profile_pic_cntr">
+                        <!-- Add 15 clickable images -->
+                        {% for i in range %}
+                            {% with "Images/Profile" as base_path %}
+                            <img class="profile_pic_option" src="{% static base_path %}{{ i }}.png" alt="Profile Picture {{ i }}" onclick="selectProfilePicture(this)">
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+                    
+                <div id="main_logo">
+                    <img id="welcome_logo" src="{% static 'Images/LogoV2.png' %}" alt="Arc.Ai Logo">
+                    <h2>Hierarchy-Based Online Repository</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
