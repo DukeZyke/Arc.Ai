@@ -7,7 +7,7 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.landingpage, name='landingpage'),
+    path('', views.signup_details, name='signup_details'),
     path('landingpage/', views.landingpage, name='landingpage'),
     path('login/', views.login, name='login'),
     path('signup/', views.signup, name='signup'),

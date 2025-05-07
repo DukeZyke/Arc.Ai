@@ -30,6 +30,11 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 
+def signup_details(request):
+    return render(request, 'core/signup_details.html', {
+        'range': range(1, 16)  # Pass numbers 1 to 15 to the template
+    })
+
 def profilepage(request):
     projects = Project.objects.all()
     personal_information = PersonalInformation.objects.first()
@@ -40,6 +45,9 @@ def profilepage(request):
         'personal_information' : personal_information,
         'employee_awards' : employee_awards,
         })
+
+def landingpage(request):
+    return render(request, 'core/landingpage.html')
 
 def login(request):
     if request.method == 'POST':
