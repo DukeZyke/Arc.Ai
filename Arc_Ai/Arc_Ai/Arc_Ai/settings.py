@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.conf import settings
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -137,3 +141,5 @@ AUTHENTICATION_BACKENDS = [
     'core.accounts.backends.EmailBackend',  # Your custom backend
     'django.contrib.auth.backends.ModelBackend',  # Keep default as fallback
 ]
+
+GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')

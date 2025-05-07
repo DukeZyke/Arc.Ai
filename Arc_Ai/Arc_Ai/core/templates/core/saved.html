@@ -38,13 +38,39 @@
         {% endfor %}
         </div>
         
-        <h2>Files</h2>
-        <div id="file_items">
-        {% for file in files %}
-            <p class="file">{{ file }}</p>
-            <hr class="long-line">
-        {% endfor %}
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h1 class="titles">Files</h1>
+            
+            <!-- Horizontal Line Between Folders and Dropdown -->
+            <div class="horizontal-line"></div>
+            
+            <!-- Dropdown Button -->
+            <img src="{% static 'Images/dots.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdown()" style="width: 40px; height: 40px; cursor: pointer;">
+            <div class="dropdown-content" id="myDropdown">
+                <a href="{% url 'core:google_drive_auth' %}">AUTHORIZE</a>
+                <hr class="dropdown-divider">
+        
+                <!-- File Upload -->
+                <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file" multiple required>
+                    <button type="submit">Upload</button>
+                </form>
+                
+            </div>
         </div>
+
+        <ul>
+        {% for file in files %}
+            <li>
+            <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank">
+                {{ file.name }}
+            </a>
+            </li>
+        {% empty %}
+            <li>No files uploaded yet.</li>
+        {% endfor %}
+        </ul>
 
         <h3>Trash</h3>
         <div id="file_items">
@@ -55,4 +81,25 @@
         </div>
     </div>
 </body>
+
+<script>
+    function toggleDropdown() {
+        document.getElementById("myDropdown").classList.toggle("show");
+    }
+    
+    // Optional: Close the dropdown if clicking outside
+    window.onclick = function(event) {
+        // Check if click was NOT on the image
+        if (!event.target.classList.contains('dropdown-icon')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+    </script>
+    
 </html>
