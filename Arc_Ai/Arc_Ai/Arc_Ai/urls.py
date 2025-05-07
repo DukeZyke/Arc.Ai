@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from core.views import CustomSignupView  # Correct import
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
+
+    path('accounts/', include('allauth.urls')),  # Include allauth URLs
+    # Custom signup URL
+    path('accounts/signup/', CustomSignupView.as_view(), name='account_signup'),
+    # Other paths...
 ]

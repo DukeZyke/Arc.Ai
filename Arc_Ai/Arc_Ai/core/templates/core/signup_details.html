@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Additional Info</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/signup_details.css' %}?v=1.0">
+    <script src="{% static 'scripts/signup_details.js' %}" defer></script>
+</head>
+<body>
+    <div id="login_cntr">
+        <div id="container">
+            <div id="form_container">
+                {% for message in messages %}
+                <h5 style="color: red;">{{message}}</h5>
+                {% endfor %}
+
+                <form id="form" method="post" action="{% url 'core:login' %}">
+                    {% csrf_token %}
+                    <div id="signin_form">
+                        <h1 class="titles justify-center">Acount Setup</h1>
+                        <div class="form-group">
+                            <label for="first-name">First Name:</label>
+                            <input type="first-name" id="first-name" name="first-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="middle-initial">Middle initial:</label>
+                            <input type="middle-initial" id="middle-initial" name="middle-initial" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last Name:</label>
+                            <input type="last-name" id="last-name" name="last-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="complete-address">Complete Address:</label>
+                            <input type="complete-address" id="complete-address" name="complete-addess" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-number">Contact Number:</label>
+                            <input type="contact-number" id="contact-number" name="contact-number" required>
+                        </div>
+                        <div id="age-gender-container">
+                            <div class="form-group">
+                                <label for="age">Age:</label>
+                                <input type="number" id="age" name="age" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender:</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="" disabled selected>Select your gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="footer">
+                        <button id="login_button" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <div id="logo_container" class="gap">
+                <div id="select_profile">
+                    <div id="active_profile_pic">
+                        <img id="selected_profile_pic" src="{% static 'Images/Profile.png' %}">
+                    </div>
+                    <p>Select Profile Picture</p>
+                    <div class="profile_pic_cntr">
+                        <!-- Add 15 clickable images -->
+                        {% for i in range %}
+                            {% with "Images/Profile" as base_path %}
+                            <img class="profile_pic_option" src="{% static base_path %}{{ i }}.png" alt="Profile Picture {{ i }}" onclick="selectProfilePicture(this)">
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+                    
+                <div id="main_logo">
+                    <img id="welcome_logo" src="{% static 'Images/LogoV2.png' %}" alt="Arc.Ai Logo">
+                    <h2>Hierarchy-Based Online Repository</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

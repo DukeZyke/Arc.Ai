@@ -3,7 +3,16 @@ body {
     margin: 0;
     padding: 0;
 }
-
+p {
+    margin: 0;
+    padding: 4px;
+    color: rgb(255, 255, 255);
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 100;
+    line-height: normal;
+}
 /*================================================== ID's */
 
 #login_cntr {
@@ -17,9 +26,9 @@ body {
 #container {
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    width: 750px;
-    height: 500px;
+    justify-content: space-between;
+    width: 850px;
+    height: 650px;
     background: #fff;
     border-radius: 22px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);   
@@ -27,7 +36,7 @@ body {
 
 #form_container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 }
@@ -41,7 +50,7 @@ body {
     background: #353A56;
     box-shadow: -6px 0px 16.3px 0px rgba(0, 0, 0, 0.25);
     width: 400px;
-    height: 500px;
+    height: 650px;
 }
 
 #logo_container h1 {
@@ -55,16 +64,12 @@ body {
     margin: 0;
     margin-top: 100px;
 }
-
-#main_logo h1 { 
-    color: #FFF;
-    font-family: 'Inter', sans-serif;
-    font-size: 60px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    text-align: center;
-    margin: 0;
+#main_logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 20px;
 }
 
 #main_logo h2 {
@@ -91,6 +96,10 @@ body {
     line-height: normal;
 }
 
+#signin_form h1 {
+    margin-bottom: 100px;
+    margin-top: 0;
+}
 #login_button {
     background: #353A56;
     color: #FFF;
@@ -101,7 +110,7 @@ body {
 
 #welcome_logo {
     align-items: center;
-    width: 210px;
+    width: 300px;
     height: auto;
     margin-top: 60px;
     display: block;
@@ -117,9 +126,80 @@ body {
     font-size: 12px;
     color: #777;
 }
+#active_profile_pic {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 200px;
+    height: 200.83px;
+    border-radius: 100%;
+    background: #ffffff;
+}
 
+#selected_profile_pic {
+    width: 200px;
+    height: auto;
+}
+
+#select_profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+#age-gender-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 20px;
+}
+select#gender {
+    width: 100%; /* Full width */
+    padding: 5px; /* Add padding for better spacing */
+    font-size: 16px; /* Adjust font size */
+    border: 2px solid #ccc; /* Add a border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+    color: #333; /* Text color */
+    appearance: none; /* Remove default browser styling */
+    cursor: pointer; /* Change cursor to pointer */
+    margin-left: 10px;
+}
+
+/* Style the dropdown on focus */
+select#gender:focus {
+    border-color: #353A56; /* Highlight border on focus */
+    outline: none; /* Remove default outline */
+    background-color: #fff; /* Optional: Change background on focus */
+}
+
+/* Style the dropdown options */
+select#gender option {
+    font-size: 16px; /* Adjust font size */
+    padding: 5px; /* Add padding for better spacing */
+    background-color: #fff; /* Background color for options */
+    color: #333; /* Text color */
+}
 /*================================================== Classes */
+.profile_pic_cntr {
+    display: grid;
+    grid-template-columns: repeat(5, 70px); /* 5 items horizontally */
+    grid-template-rows: repeat(3, 70px); /* 3 items vertically */
+    justify-content: center;
+    align-content: center;
+    border-radius: 22px;
+    background: #353A56;
+    box-shadow: 0px 0px 16.3px 0px rgba(0, 0, 0, 0.25);
+    width: 400px;
+    height: 250px;
+}
 
+.profile_pic_option {
+    width: 60px;
+    height: auto;
+}
 .text_white {
     color: white;
     font-size: 20px;
@@ -130,10 +210,9 @@ body {
 .titles {
     color: #000;
     font-family: 'Inter', sans-serif;
-    font-style: normal; 
+    font-style: normal;
     font-weight: 200;
     line-height: normal;
-    margin: 8px 0;
 }
 
 .margin-top-50 {
@@ -213,4 +292,10 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+.justify-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

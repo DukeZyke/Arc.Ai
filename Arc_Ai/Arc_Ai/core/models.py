@@ -61,3 +61,9 @@ class EmployeeAward(models.Model):
 
     def __str__(self):
         return f'{self.award_title} ({self.award_date})'
+    
+
+class DriveFile(models.Model):
+    name = models.CharField(max_length=255)
+    file_id = models.CharField(max_length=255)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
