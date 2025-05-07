@@ -13,8 +13,6 @@
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">
-                <h1 class="titles">Sign In</h1>
-
                 {% for message in messages %}
                 <h5 style="color: red;">{{message}}</h5>
                 {% endfor %}
@@ -22,31 +20,47 @@
                 <form id="form" method="post" action="{% url 'core:login' %}">
                     {% csrf_token %}
                     <div id="signin_form">
+                        <h1 class="titles justify-center">Acount Setup</h1>
                         <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" required>
+                            <label for="first-name">First Name:</label>
+                            <input type="first-name" id="first-name" name="first-name" required>
                         </div>
                         <div class="form-group">
-                            <label for="password">Password:</label>
-                            <input type="password" id="password" name="password" required>
+                            <label for="middle-initial">Middle initial:</label>
+                            <input type="middle-initial" id="middle-initial" name="middle-initial" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last Name:</label>
+                            <input type="last-name" id="last-name" name="last-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="complete-address">Complete Address:</label>
+                            <input type="complete-address" id="complete-address" name="complete-addess" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-number">Contact Number:</label>
+                            <input type="contact-number" id="contact-number" name="contact-number" required>
+                        </div>
+                        <div id="age-gender-container">
+                            <div class="form-group">
+                                <label for="age">Age:</label>
+                                <input type="number" id="age" name="age" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender:</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="" disabled selected>Select your gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div id="footer">
-                        <button id="login_button" type="submit">Login</button>
-                        <p>Continue With</p>
-                    </div>
-                    <div id="social_media">
-                        <button class="continue_with_button" type="button" onclick="window.location.href='/register/'">
-                            <img class="button_images" src="{% static 'Images/Google.png' %}" alt="Google">
-                            <span>Sign in with Google</span>
-                        </button>
-                        <button class="continue_with_button margin-top" type="button" onclick="window.location.href='/forgot-password/'">
-                            <img class="button_images" src="{% static 'Images/Facebook.png' %}" alt="Facebook">
-                            <span>Sign in with Facebook</span>
-                        </button>
+                        <button id="login_button" type="submit">Submit</button>
                     </div>
                 </form>
-                <a class="titles margin-top-50" href="{% url 'core:signup' %}">Sign Up?</a></p>
             </div>
             <div id="logo_container" class="gap">
                 <div id="select_profile">

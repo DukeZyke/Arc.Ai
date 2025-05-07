@@ -50,13 +50,14 @@ class EmployeeAward(models.Model):
     award_date = models.DateField()
 
     ICONS = {
-        'a': 'assets/img/Award_Trophy.png',
-        'b': 'assets/img/Award_Teamwork.png',
-        'c': 'assets/img/Award_Star.png',
+        'a': 'Images/Award_Trophy.png',
+        'b': 'Images/Award_Teamwork.png',
+        'c': 'Images/Award_Star.png',
     }
 
+    @property
     def get_award_icon(self):
-        return self.ICONS.get(self.award_classif.lower(), 'assets/img/Award_Trophy.png')
+        return self.ICONS.get(self.award_classif.lower(), 'Images/Award_Trophy.png')
 
     def __str__(self):
         return f'{self.award_title} ({self.award_date})'

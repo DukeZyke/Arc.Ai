@@ -9,26 +9,94 @@
     <link rel="stylesheet" href="{% static 'styles/org.css' %}">
 </head>
 <body>
-    <div id="sidebar">
-        <div id="sidebar_icns_grp">
-            <img class="sidebar_icns" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
-            <img class="sidebar_icns" src="{% static 'Images/Notification.png' %}" alt="Notification">
-            <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
+
+  <div id="sidebar">
+    <div id="sidebar_content" class="hidden">
+        <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
+        <p><a href="{% url 'core:home' %}">Home</a></p>
+        <p><a href="{% url 'core:organization' %}">Organization</a></p>
+        <p><a href="{% url 'core:saved' %}">Saved</a></p>
+        <p><a href="{% url 'core:email' %}">Email</a></p>
+    </div>
+    <hr class="divider_sidebar"/>
+
+    <div class="notification_container">
+      <!-- Notification Pop-Up -->
+      <div id="notification_popup" class="hidden">
+        <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
+        <div id="notification_list">
+            <ul>
+                <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                    <p>Schedule Update <span>Yesterday</span></p>
+                    <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 202</p>
+                    <p class="posted-by">- Imee Duterte</p>
+                    
+                </li>
+                <li class="notification_item" data-detail="Another meeting detail here.">
+                    <p>Schedule Update <span>Yesterday</span></p>
+                    <p class="short-description">Another meeting detail here General meeting at 10:30AM on Jan 3, 202 General meet</p>
+                    <p class="posted-by">- John Doe</p>
+                </li>
+                <li class="notification_item" data-detail="Another meeting detail here.">
+                    <p>Schedule Update <span>Yesterday</span></p>
+                    <p class="short-description">Another meeting detail here</p>
+                    <p class="posted-by">- Sarah Marcos</p>
+                </li>
+                <li class="notification_item" data-detail="Another meeting detail here.">
+                    <p>Schedule Update <span>Yesterday</span></p>
+                    <p class="short-description">Another meeting detail here</p>
+                    <p class="posted-by">- Ginno Arostique</p>
+                </li>
+                <li class="notification_item" data-detail="Another meeting detail here.">
+                    <p>Schedule Update <span>Yesterday</span></p>
+                    <p class="short-description">Another meeting detail here</p>
+                    <p class="posted-by">- Ginno Arostique</p>
+                </li>
+            </ul>
         </div>
     </div>
+      <!-- Detailed Notification -->
+      <div id="detailed_notification" class="hidden">
+          <h2 id="notification_title">Schedule Update</h2><p class="notification_date">Yesterday, January 29, 2025</p>
+          <button id="close_detailed_notification" class="close-btn">&times;</button>
+          <p id="notification_detail"></p>
+          <p class="posted-by">- Imee Duterte, Team Head</p>
+          <button class="respond-btn">Respond</button>
+      </div>
+    </div>
+
+    <div id="sidebar_icns_grp">
+        <div class="nav_item">
+            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <p id="navigation_paragraph">Navigate</p>
+        </div>
+        <div class="nav_item">
+            <img class="sidebar_icns" src="{% static 'Images/Notification.png' %}" alt="Notification">
+            <p id="notification_paragraph">Notification</p>
+        </div>
+        <div class="nav_item">
+            <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
+            <p>Settings</p>
+        </div>
+    </div>
+</div>
+
     <div id="header">
         <div>
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
         <div id="header_nav" class="text_white">
-            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+          <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+          <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+          <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+          <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+          <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
         </div>
         <div>
             <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
         </div>
     </div>
+    
     <div class="contentorg">
         <section class="continue-working">
             <div class="header-with-line">
@@ -180,137 +248,7 @@
             </div>
         </section>
   </div> 
-    
-    
-
-    <script>
-        const container = document.querySelector('.card-container');  //cards
-      
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      
-      container.addEventListener('mousedown', (e) => {
-        isDown = true;
-        container.classList.add('active');
-        startX = e.pageX - container.offsetLeft;
-        scrollLeft = container.scrollLeft;
-      });
-      
-      container.addEventListener('mouseleave', () => {
-        isDown = false;
-        container.classList.remove('active');
-      });
-      
-      container.addEventListener('mouseup', () => {
-        isDown = false;
-        container.classList.remove('active');
-      });
-      
-      container.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - container.offsetLeft;
-        const walk = (x - startX) * 1; // Adjust scroll speed here
-        container.scrollLeft = scrollLeft - walk;
-      });
-      
-    </script>
-
-    <script>
-        // Make each time slot toggle active state when clicked
-        document.querySelectorAll('.time-slot').forEach(slot => {
-          slot.addEventListener('click', () => {
-            slot.classList.toggle('active');
-          });
-        });
-      </script>
-
-      <script>
-        const weekLabel = document.getElementById('week-label');
-        const prevWeekBtn = document.getElementById('prev-week');
-        const nextWeekBtn = document.getElementById('next-week');
-        const scheduleBarsContainer = document.querySelector('.schedule-bars');
-    
-        // Example week data with schedule bars
-        const weeks = [
-            {
-                label: 'March 25-31',
-                bars: [
-                    { gridRow: 3, gridColumn: '2 / 5', color: '#353A56' },
-                    { gridRow: 5, gridColumn: '6 / 10', color: '#6AFF3C' },
-                ],
-            },
-            {
-                label: 'April 1-5',
-                bars: [
-                    { gridRow: 6, gridColumn: '15 / 24', color: '#353A56' },
-                    { gridRow: 4, gridColumn: '4 / 8', color: '#6AFF3C' },
-                    { gridRow: 5, gridColumn: '8 / 12', color: '#FFD700' },
-                ],
-            },
-            {
-                label: 'April 6-12',
-                bars: [
-                    { gridRow: 2, gridColumn: '3 / 7', color: '#FF5733' },
-                    { gridRow: 6, gridColumn: '5 / 9', color: '#33FF57' },
-                ],
-            },
-            {
-                label: 'April 13-19',
-                bars: [
-                    { gridRow: 3, gridColumn: '1 / 4', color: '#FFC300' },
-                    { gridRow: 7, gridColumn: '6 / 10', color: '#DAF7A6' },
-                ],
-            },
-            {
-                label: 'April 20-26',
-                bars: [
-                    { gridRow: 4, gridColumn: '2 / 5', color: '#C70039' },
-                    { gridRow: 5, gridColumn: '7 / 11', color: '#900C3F' },
-                ],
-            },
-        ];
-    
-        let currentWeekIndex = 1; // Start at "April 1-5"
-    
-        // Function to update the week label and schedule bars
-        function updateWeek() {
-            // Update the week label
-            weekLabel.textContent = weeks[currentWeekIndex].label;
-    
-            // Clear existing bars
-            scheduleBarsContainer.innerHTML = '';
-    
-            // Add new bars for the selected week
-            weeks[currentWeekIndex].bars.forEach(bar => {
-                const barElement = document.createElement('div');
-                barElement.classList.add('bar');
-                barElement.style.gridRow = bar.gridRow;
-                barElement.style.gridColumn = bar.gridColumn;
-                barElement.style.backgroundColor = bar.color;
-                scheduleBarsContainer.appendChild(barElement);
-            });
-        }
-    
-        // Navigate to the previous week
-        prevWeekBtn.addEventListener('click', () => {
-            if (currentWeekIndex > 0) {
-                currentWeekIndex--;
-                updateWeek();
-            }
-        });
-    
-        // Navigate to the next week
-        nextWeekBtn.addEventListener('click', () => {
-            if (currentWeekIndex < weeks.length - 1) {
-                currentWeekIndex++;
-                updateWeek();
-            }
-        });
-    
-        // Initialize the week label and schedule bars
-        updateWeek();
-    </script>
+    <script src="{% static 'js/org.js' %}"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
 </body>
 </html>
