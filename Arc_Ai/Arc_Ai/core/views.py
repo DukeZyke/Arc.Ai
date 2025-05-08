@@ -3,7 +3,10 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
-from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile
+
+# MODELS
+from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
+
 from google_auth_oauthlib.flow import Flow
 import os
 from django.conf import settings
@@ -31,6 +34,45 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 def signup_details(request):
+
+    if request.method == 'POST':
+        profile_avatar = request.FILES.get('profile_avatar')
+        first_name = request.POST.get('first_name')
+        middle_name = request.POST.get('middle_name')
+        last_name = request.POST.get('last_name')
+        complete_address = request.POST.get('complete_address')
+        contact_number = request.POST.get('contact_number')
+        gender = request.POST.get('gender')
+
+        signup_details = SignupDetails.objects.create(
+            profile_avatar=profile_avatar,
+            first_name=first_name,
+            middle_name=middle_name,
+            last_name=last_name,
+            complete_address=complete_address,
+            contact_number=contact_number,
+            gender=gender
+        )
+
+        PersonalInformation.objects.create(
+            signup_details=signup_details,
+            name=f"{first_name} {last_name}",
+            email=request.POST.get('email'),
+            complete_address=complete_address,
+            contact_number=contact_number,
+            age=request.POST.get('age'),
+            birth_date=request.POST.get('birth_date', None),
+            gender=gender,
+            user_title=request.POST.get('user_title')
+
+        )
+
+        signup_details.save()
+
+        messages.info(request, "Profile details saved successfully!")
+        return redirect('core:home')
+
+    
     return render(request, 'core/signup_details.html', {
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
@@ -135,7 +177,7 @@ def saved(request):
     })
 
 def email(request):
-    online_users = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy"]  # Simulated online users
+    online_users = User.objects.all() 
     emails = Email.objects.all()  # Fetch all emails from the database
 
     return render(request, 'core/email.html', {

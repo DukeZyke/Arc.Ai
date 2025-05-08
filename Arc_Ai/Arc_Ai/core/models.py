@@ -34,6 +34,11 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
 class PersonalInformation(models.Model):
+    # signup_details = models.OneToOneField(
+    #     'SignupDetails', 
+    #     on_delete=models.CASCADE, 
+    #     related_name='personal_information'
+    # )
     name = models.CharField(max_length=100, default='Enter your name')
     email = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
@@ -65,5 +70,16 @@ class EmployeeAward(models.Model):
 
 class DriveFile(models.Model):
     name = models.CharField(max_length=255)
-    file_id = models.CharField(max_length=255)
+    file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+
+class SignupDetails(models.Model):
+    profile_avatar = models.ImageField(upload_to='avatars/')
+    first_name = models.CharField(max_length=255)
+    middle_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    complete_address = models.CharField(max_length=255)
+    contact_number = models.CharField(max_length=255)
+    gender = models.CharField(max_length=255)
