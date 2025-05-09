@@ -20,5 +20,6 @@ urlpatterns = [
     path('profilepage/', views.profilepage, name='profilepage'),
     path('drive/auth/', views.google_drive_auth, name='google_drive_auth'),
     path('drive/callback/', views.google_drive_callback, name='google_drive_callback'),
-    path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),  
+    path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),
+    path('delete_files_from_drive/', views.delete_files_from_drive, name='delete_files_from_drive'),  
 ]

@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
+from django.http import JsonResponse
+
+
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -165,15 +168,39 @@ def landingpage(request):
     return render(request, 'core/landingpage.html')
 
 def saved(request):
-# Simulated backend data
+    # Simulated backend data
     folders = [f"Folder {i}" for i in range(1, 21)]  # 20 folders
-    files = DriveFile.objects.all().order_by('-uploaded_at')      # 20 files
-    trash = [f"Trash File {i}" for i in range(1, 21)] # 20 trash files
+    trash = [f"Trash File {i}" for i in range(1, 21)]  # 20 trash files
+
+    # Load credentials from session
+    creds_data = request.session.get('credentials')
+    if not creds_data:
+        messages.error(request, "You must authorize Google Drive to fetch files.")
+        return redirect('core:google_drive_auth')
+
+    creds = Credentials(**creds_data)
+
+    try:
+        # Initialize the Google Drive API service
+        service = build('drive', 'v3', credentials=creds)
+
+        # Fetch files from Google Drive
+        results = service.files().list(
+            pageSize=50,  # Adjust the number of files to fetch
+            fields="files(id, name, mimeType, webViewLink, parents)"
+        ).execute()
+
+        drive_files = results.get('files', [])
+
+    except Exception as e:
+        print("Error fetching files from Google Drive:", str(e))
+        messages.error(request, "Failed to fetch files from Google Drive.")
+        drive_files = []
 
     # Pass the data to the template
     return render(request, 'core/saved.html', {
         'folders': folders,
-        'files': files,
+        'files': drive_files,  # Pass Google Drive files to the template
         'trash': trash,
     })
 
@@ -275,6 +302,33 @@ def upload_file_to_drive(request):
             return HttpResponse(f"Error: {e}", status=500)
 
     return HttpResponse("Invalid method", status=405)
+
+def delete_files_from_drive(request):
+    if request.method == 'POST':
+        file_ids = request.POST.getlist('file_ids[]')  # Get the list of file IDs from the request
+
+        # Load credentials from session
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to delete files.'}, status=403)
+
+        creds = Credentials(**creds_data)
+
+        try:
+            # Initialize the Google Drive API service
+            service = build('drive', 'v3', credentials=creds)
+
+            # Delete each file
+            for file_id in file_ids:
+                service.files().delete(fileId=file_id).execute()
+
+            return JsonResponse({'success': True, 'message': 'Files deleted successfully.'})
+
+        except Exception as e:
+            print("Error deleting files from Google Drive:", str(e))
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 def credentials_to_dict(creds):
     return {

@@ -115,30 +115,36 @@
             <!-- Dropdown Button -->
             <img src="{% static 'Images/dots.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdown()" style="width: 40px; height: 40px; cursor: pointer;">
             <div class="dropdown-content" id="myDropdown">
-                <a href="{% url 'core:google_drive_auth' %}">AUTHORIZE</a>
-                <hr class="dropdown-divider">
-        
                 <!-- File Upload -->
                 <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="file" name="file" multiple required>
                     <button type="submit">Upload</button>
                 </form>
-                
+                <hr class="dropdown-divider">
+
+                <!-- DELETE Button -->
+                <a href="#" onclick="toggleCheckboxes()">DELETE</a>
             </div>
         </div>
 
-        <ul>
-        {% for file in files %}
-            <li>
-            <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank">
-                {{ file.name }}
-            </a>
-            </li>
-        {% empty %}
-            <li>No files uploaded yet.</li>
-        {% endfor %}
+        <!-- File List -->
+        <ul id="file-list">
+            {% for file in files %}
+                <li>
+                    <input type="checkbox" class="file-checkbox" style="display: none;" data-file-id="{{ file.id }}">
+                    <a href="{{ file.webViewLink }}" target="_blank">
+                        {{ file.name }}
+                    </a>
+                    <p>Type: {{ file.mimeType }}</p>
+                </li>
+            {% empty %}
+                <li>No files found in Google Drive.</li>
+            {% endfor %}
         </ul>
+
+        <!-- Delete Selected Files Button -->
+        <button id="delete-selected-btn" style="display: none;" onclick="deleteSelectedFiles()">Delete Selected Files</button>
 
         <h3>Trash</h3>
         <div id="file_items">
@@ -169,6 +175,92 @@
             }
         }
     }
-    </script>
+
+ let checkboxesVisible = false; // Track the visibility state of checkboxes
+
+    function toggleCheckboxes() {
+        const checkboxes = document.querySelectorAll('.file-checkbox');
+        const deleteButton = document.getElementById('delete-selected-btn');
+        checkboxesVisible = !checkboxesVisible; // Toggle the visibility state
+
+        // Show or hide checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.style.display = checkboxesVisible ? 'inline-block' : 'none';
+        });
+
+        // Show or hide the delete button
+        deleteButton.style.display = checkboxesVisible ? 'block' : 'none';
+
+        // Add or remove the event listener for hiding checkboxes
+        if (checkboxesVisible) {
+            window.addEventListener('click', hideCheckboxesOnClickOutside);
+        } else {
+            window.removeEventListener('click', hideCheckboxesOnClickOutside);
+        }
+    }
+
+    function hideCheckboxesOnClickOutside(event) {
+        const deleteButton = document.querySelector('[onclick="toggleCheckboxes()"]');
+        const checkboxes = document.querySelectorAll('.file-checkbox');
+        const isClickOnCheckbox = Array.from(checkboxes).some(checkbox => checkbox.contains(event.target));
+        if (!deleteButton.contains(event.target) && !isClickOnCheckbox) {
+            // Hide checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.style.display = 'none';
+            });
+
+            // Hide the delete button
+            document.getElementById('delete-selected-btn').style.display = 'none';
+
+            checkboxesVisible = false; // Reset visibility state
+            window.removeEventListener('click', hideCheckboxesOnClickOutside); // Remove the event listener
+        }
+    }
+
+    function deleteSelectedFiles() {
+        const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
+        const fileIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.fileId);
+
+        if (fileIds.length === 0) {
+            alert('No files selected for deletion.');
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete the selected files?')) {
+            // Create a FormData object to send the file IDs
+            const formData = new FormData();
+            fileIds.forEach(fileId => formData.append('file_ids[]', fileId));
+
+            // Send an AJAX request to the backend
+            fetch("{% url 'core:delete_files_from_drive' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token for security
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+
+                    // Remove the deleted files from the DOM
+                    selectedCheckboxes.forEach(checkbox => {
+                        checkbox.closest('li').remove();
+                    });
+
+                    // Hide the delete button after deletion
+                    document.getElementById('delete-selected-btn').style.display = 'none';
+                } else {
+                    alert(data.error || 'Failed to delete the files.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the files.');
+            });
+        }
+    }
+</script>
     
 </html>
