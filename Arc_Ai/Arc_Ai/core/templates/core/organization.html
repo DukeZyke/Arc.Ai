@@ -10,7 +10,7 @@
 </head>
 <body>
 
-  <div id="sidebar">
+<div id="sidebar">
     <div id="sidebar_content" class="hidden">
         <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
         <p><a href="{% url 'core:home' %}">Home</a></p>
@@ -21,8 +21,8 @@
     <hr class="divider_sidebar"/>
 
     <div class="notification_container">
-      <!-- Notification Pop-Up -->
-      <div id="notification_popup" class="hidden">
+    <!-- Notification Pop-Up -->
+    <div id="notification_popup" class="hidden">
         <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
         <div id="notification_list">
             <ul>
@@ -55,14 +55,14 @@
             </ul>
         </div>
     </div>
-      <!-- Detailed Notification -->
-      <div id="detailed_notification" class="hidden">
-          <h2 id="notification_title">Schedule Update</h2><p class="notification_date">Yesterday, January 29, 2025</p>
-          <button id="close_detailed_notification" class="close-btn">&times;</button>
-          <p id="notification_detail"></p>
-          <p class="posted-by">- Imee Duterte, Team Head</p>
-          <button class="respond-btn">Respond</button>
-      </div>
+    <!-- Detailed Notification -->
+    <div id="detailed_notification" class="hidden">
+        <h2 id="notification_title">Schedule Update</h2><p class="notification_date">Yesterday, January 29, 2025</p>
+        <button id="close_detailed_notification" class="close-btn">&times;</button>
+        <p id="notification_detail"></p>
+        <p class="posted-by">- Imee Duterte, Team Head</p>
+        <button class="respond-btn">Respond</button>
+    </div>
     </div>
 
     <div id="sidebar_icns_grp">
@@ -86,11 +86,11 @@
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
         <div id="header_nav" class="text_white">
-          <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
-          <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-          <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-          <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
-          <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
+            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+            <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
         </div>
         <div>
             <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
@@ -152,26 +152,26 @@
             </div>
             <div class="card-section">
                 <div class="card-container">
-                  <!-- Repeat this card as needed -->
-                  {% for project in projects %}
-                  <!-- Repeat this card as needed -->
-                   <div class="project-container">
-                      <div class="project-card">  
-                          <div class="card-header">
+                    <!-- Repeat this card as needed -->
+                    {% for project in projects %}
+                    <!-- Repeat this card as needed -->
+                    <div class="project-container">
+                        <div class="project-card">  
+                            <div class="card-header">
                             <img src="{% static 'Images/icon1.png' %}" alt="icon" />
                             <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
-                          </div>
-                          <div class="card-body">
+                            </div>
+                            <div class="card-body">
                             <h3>{{project.name}}</h3>
                             <div class="project-details">
-              
-                              <p>{{project.project_id}}</p>
-                              <div class="dategroup">
-                              <p>{{project.start_date}}</p>
-                              <p>{{project.finish_date}}</p>
-                              </div>
+
+                                <p>{{project.project_id}}</p>
+                                <div class="dategroup">
+                                <p>{{project.start_date}}</p>
+                                <p>{{project.finish_date}}</p>
+                                </div>
                             </div>
-              
+
                             {% if project.project_status == 'Completed' %}
                             <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
                             {% elif project.project_status == 'Ongoing' %}
@@ -179,22 +179,22 @@
                             {% elif project.project_status == 'Missing' %}
                             <p class="status" style="color: red">{{project.project_status}}</p>
                             {% endif %}
-              
-                          </div>
+
+                            </div>
                         </div>
-                   </div>
-                   {% endfor %}
-                  <!-- Duplicate above block for more cards -->
+                    </div>
+                {% endfor %}
+                    <!-- Duplicate above block for more cards -->
                 </div>
-              </div>
+                </div>
         </section>
 
         <section class="Schedules">
-          <div class="header-with-line">
-              <h1 class="Title">Schedules</h1>
-              <hr class="divider" />
-          </div> 
-          <div class="schedule-container">
+            <div class="header-with-line">
+                <h1 class="Title">Schedules</h1>
+                <hr class="divider" />
+            </div> 
+            <div class="schedule-container">
             <div class="schedule-grid">
                 <div class="days">
                     <p>Monday</p>
@@ -247,7 +247,7 @@
                 <button class="nav-btn" id="next-week">&gt;</button>
             </div>
         </section>
-  </div> 
+</div> 
     <script src="{% static 'js/org.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
 </body>
