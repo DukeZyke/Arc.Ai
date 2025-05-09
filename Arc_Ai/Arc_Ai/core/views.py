@@ -31,7 +31,8 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-
+def edit_user(request):
+    return render(request, 'core/edit_user.html')
 
 def signup_details(request):
 
