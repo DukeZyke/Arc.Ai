@@ -195,52 +195,62 @@
                 <hr class="divider" />
             </div> 
             <div class="schedule-container">
-            <div class="schedule-grid">
-                <div class="days">
-                    <p>Monday</p>
-                    <p>Tuesday</p>
-                    <p>Wednesday</p>
-                    <p>Thursday</p>
-                    <p>Friday</p>
-                    <p>Saturday</p>
-                    <p>Sunday</p>
-                </div>
-        
-                <div class="time-labels">
-                    <p>1AM</p>
-                    <p>2AM</p>
-                    <p>3AM</p>
-                    <p>4AM</p>
-                    <p>5AM</p>
-                    <p>6AM</p>
-                    <p>7AM</p>
-                    <p>8AM</p>
-                    <p>9AM</p>
-                    <p>10AM</p>
-                    <p>11AM</p>
-                    <p>12PM</p>
-                    <p>1PM</p>
-                    <p>2PM</p>
-                    <p>3PM</p>
-                    <p>4PM</p>
-                    <p>5PM</p>
-                    <p>6PM</p>
-                    <p>7PM</p>
-                    <p>8PM</p>
-                    <p>9PM</p>
-                    <p>10PM</p>
-                    <p>11PM</p>
-                    <p>12AM</p>
-                </div>
+                <div class="schedule-grid">
+                    <div class="days">
+                        <p>Monday</p>
+                        <p>Tuesday</p>
+                        <p>Wednesday</p>
+                        <p>Thursday</p>
+                        <p>Friday</p>
+                        <p>Saturday</p>
+                        <p>Sunday</p>
+                    </div>
+
+                    <div class="time-labels">
+                        <p>1AM</p>
+                        <p>2AM</p>
+                        <p>3AM</p>
+                        <p>4AM</p>
+                        <p>5AM</p>
+                        <p>6AM</p>
+                        <p>7AM</p>
+                        <p>8AM</p>
+                        <p>9AM</p>
+                        <p>10AM</p>
+                        <p>11AM</p>
+                        <p>12PM</p>
+                        <p>1PM</p>
+                        <p>2PM</p>
+                        <p>3PM</p>
+                        <p>4PM</p>
+                        <p>5PM</p>
+                        <p>6PM</p>
+                        <p>7PM</p>
+                        <p>8PM</p>
+                        <p>9PM</p>
+                        <p>10PM</p>
+                        <p>11PM</p>
+                        <p>12AM</p>
+                    </div>
+
+                    <!-- Add this popup element inside the schedule-container -->
+                    <div class="popup-wrapper hidden">
+                        <div id="popup-overlay"></div> <!-- Colored overlay -->
+                        <div id="bar-popup" >
+                            <h3 id="popup-title">Worksheet #4</h3>
+                            <p id="popup-date">Yesterday, January 29, 2025</p>
+                            <p id="popup-description">description</p>
+                            <button id="popup-close-btn">Done</button>
+                        </div>
+                    </div>
+
                     <div class="time-slots">
                         <div class="schedule-bars">
-                            <div class="bar" style="grid-row: 5; grid-column: 2 / 6; background-color: #353A56;"></div>
-                            <div class="bar" style="grid-row: 4; grid-column: 4 / 8; background-color: #6AFF3C;"></div>
-                            <div class="bar" style="grid-row: 5; grid-column: 8 / 12; background-color: #FFD700;"></div>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="schedule-navigation">
                 <button class="nav-btn" id="prev-week">&lt;</button>
                 <p id="week-label">April 1-5</p>
