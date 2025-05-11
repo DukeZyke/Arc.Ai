@@ -10,17 +10,23 @@
     grid-template-rows: repeat(2, auto); /* Create 2 rows with automatic height */
     grid-auto-flow: column; /* Add new items in columns */
     gap: 20px; /* Add spacing between items */
-    overflow-x: auto; /* Enable horizontal scrolling */
     padding: 10px; /* Optional: Add padding for spacing */
     margin-left: 60px;
     margin-right: 60px;
     max-height: 300px; /* Set a maximum height for the container */
+    overflow-x: scroll; /* Enable horizontal scrolling */
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none; /* For Internet Explorer and Edge */
 }
 
 #file_items {
     max-height: calc(51px * 10); /* Set the maximum height of the container */
     overflow-y: auto; /* Enable vertical scrolling */
     padding: 10px; /* Optional: Add padding for spacing */
+}
+
+#folder_items.active {
+    cursor: grabbing; /* Change cursor to grabbing while scrolling */
 }
 
 .dropdown {
@@ -70,4 +76,82 @@
     margin-right: 20px; /* Space between the line and dropdown button */
 }
 
+/***********file items***********/
+/* Style the file list container */
+.file-list {
+    list-style-type: none; /* Remove default bullet points */
+    padding: 0;
+    margin: 20px 0;
+}
+
+/* Style each file item */
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 7px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* Add hover effect for file items */
+.file-item:hover {
+    background-color: #e6e6e6;
+}
+
+/* Style the file icon */
+.file-icon img {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+}
+
+/* Style the file details */
+.file-details {
+    flex: 2;
+}
+
+.file-name a {
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+}
+
+.file-name a:hover {
+    color: black;
+}
+
+.file-owner {
+    font: "Inter", sans-serif;
+    font-size: 0.9em;
+    font-weight: 200;
+}
+
+/* Style the file metadata */
+.file-meta {
+    flex: 1;
+    text-align: right;
+    font: "Inter", sans-serif;
+    font-size: 0.9em;
+    font-weight: 200;
+}
+
+/* Style the action button */
+.file-actions {
+    margin-left: 15px;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #666;
+}
+
+.action-button:hover {
+    color: #333;
+}
 
