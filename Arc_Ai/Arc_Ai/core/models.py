@@ -22,7 +22,6 @@ class Project(models.Model):
             last_project = Project.objects.order_by('-id').first()
             if last_project and last_project.project_id:
                 try:
-                    # Extract the numeric part and increment it
                     last_number = int(last_project.project_id.split('-')[-1])
                     next_number = last_number + 1
                 except:
@@ -30,7 +29,7 @@ class Project(models.Model):
             else:
                 next_number = 1
 
-            self.project_id = f"{next_number:02d}"  # e.g., 01, 02, etc.
+            self.project_id = f"{next_number:02d}"
         super().save(*args, **kwargs)
 
 class PersonalInformation(models.Model):
@@ -66,14 +65,11 @@ class EmployeeAward(models.Model):
 
     def __str__(self):
         return f'{self.award_title} ({self.award_date})'
-    
 
 class DriveFile(models.Model):
     name = models.CharField(max_length=255)
     file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
-
 
 class SignupDetails(models.Model):
     profile_avatar = models.ImageField(upload_to='avatars/')
