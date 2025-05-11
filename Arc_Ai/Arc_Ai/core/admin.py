@@ -1,8 +1,6 @@
 from django.contrib import admin
 from .models import Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, Email
 
-# Register your models here.
-
 # Profile page
 admin.site.register(Project)
 admin.site.register(PersonalInformation)

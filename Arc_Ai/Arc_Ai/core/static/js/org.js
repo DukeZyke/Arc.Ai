@@ -6,31 +6,31 @@ let startX;
 let scrollLeft;
 
 container.addEventListener('mousedown', (e) => {
-  isDown = true;
-  container.classList.add('active');
-  startX = e.pageX - container.offsetLeft;
-  scrollLeft = container.scrollLeft;
-  document.body.style.userSelect = 'none';
+    isDown = true;
+    container.classList.add('active');
+    startX = e.pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+    document.body.style.userSelect = 'none';
 });
 
 container.addEventListener('mouseleave', () => {
-  isDown = false;
-  container.classList.remove('active');
-  document.body.style.userSelect = '';
+    isDown = false;
+    container.classList.remove('active');
+    document.body.style.userSelect = '';
 });
 
 container.addEventListener('mouseup', () => {
-  isDown = false;
-  container.classList.remove('active');
+    isDown = false;
+    container.classList.remove('active');
   document.body.style.userSelect = ''; // Fix added here
 });
 
 container.addEventListener('mousemove', (e) => {
-  if (!isDown) return;
-  e.preventDefault();
-  const x = e.pageX - container.offsetLeft;
-  const walk = (x - startX) * 1; // Adjust scroll speed here
-  container.scrollLeft = scrollLeft - walk;
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const walk = (x - startX) * 1; // Adjust scroll speed here
+    container.scrollLeft = scrollLeft - walk;
 });
 
 
@@ -58,9 +58,9 @@ const weeks = [
     {
         label: 'April 1-5',
         bars: [
-            { gridRow: 6, gridColumn: '15 / 24', color: '#353A56' },
-            { gridRow: 4, gridColumn: '4 / 8', color: '#6AFF3C' },
+            { gridRow: 4, gridColumn: '4 / 4', color: '#6AFF3C' },
             { gridRow: 5, gridColumn: '8 / 12', color: '#FFD700' },
+            { gridRow: 6, gridColumn: '15 / 24', color: '#353A56' },
         ],
     },
     {
@@ -97,12 +97,20 @@ function updateWeek() {
     scheduleBarsContainer.innerHTML = '';
 
     // Add new bars for the selected week
-    weeks[currentWeekIndex].bars.forEach(bar => {
+    weeks[currentWeekIndex].bars.forEach((bar, index) => {
         const barElement = document.createElement('div');
         barElement.classList.add('bar');
         barElement.style.gridRow = bar.gridRow;
         barElement.style.gridColumn = bar.gridColumn;
         barElement.style.backgroundColor = bar.color;
+
+        // Add data-details for the popup
+        barElement.dataset.details = JSON.stringify({
+            title: `Worksheet #${index + 1}`,
+            date: 'Yesterday, January 29, 2025',
+            description: `Details for bar ${index + 1}`,
+        });
+
         scheduleBarsContainer.appendChild(barElement);
     });
 }
@@ -112,6 +120,9 @@ prevWeekBtn.addEventListener('click', () => {
     if (currentWeekIndex > 0) {
         currentWeekIndex--;
         updateWeek();
+
+        // Hide the popup if it is open
+        popupWrapper.classList.add('hidden');
     }
 });
 
@@ -120,8 +131,63 @@ nextWeekBtn.addEventListener('click', () => {
     if (currentWeekIndex < weeks.length - 1) {
         currentWeekIndex++;
         updateWeek();
+
+        // Hide the popup if it is open
+        popupWrapper.classList.add('hidden');
     }
 });
 
 // Initialize the week label and schedule bars
 updateWeek();
+
+// Select the popup and close button
+const barPopup = document.getElementById('bar-popup');
+const popupCloseBtn = document.getElementById('popup-close-btn');
+const popupWrapper = document.querySelector('.popup-wrapper');
+
+// Function to show the popup
+function showPopup(bar, details) {
+    // Set popup content
+    document.getElementById('popup-title').textContent = details.title || 'Worksheet #4';
+    document.getElementById('popup-date').textContent = details.date || 'Yesterday, January 29, 2025';
+    document.getElementById('popup-description').textContent = details.description || 'Meeting details here.';
+
+    // Temporarily make the popup visible to calculate its dimensions
+    popupWrapper.classList.remove('hidden');
+    popupWrapper.style.visibility = 'hidden'; // Make it invisible but still measurable
+    popupWrapper.style.display = 'block'; // Ensure it takes up space in the DOM
+
+    // Get the bar's position within the grid
+    const barRect = bar.getBoundingClientRect();
+    const containerRect = scheduleBarsContainer.getBoundingClientRect();
+
+    // Calculate the popup's position relative to the grid container
+    const top = barRect.top - containerRect.top + barRect.height / 2 - popupWrapper.offsetHeight / 2; // Center vertically
+    const left = barRect.right - containerRect.left + 10; // Place it to the right of the bar
+
+    // Position the wrapper
+    popupWrapper.style.top = `${top}px`;
+    popupWrapper.style.left = `${left}px`;
+
+    // Restore visibility and show the popup
+    popupWrapper.style.visibility = 'visible';
+    popupWrapper.style.display = ''; // Reset to default display
+    popupWrapper.classList.remove('hidden');
+
+    // Set the overlay color to match the bar's color
+    const overlay = document.getElementById('popup-overlay');
+    overlay.style.backgroundColor = bar.style.backgroundColor;
+}
+
+// Function to hide the popup
+popupCloseBtn.addEventListener('click', () => {
+    popupWrapper.classList.add('hidden'); // Hide the entire wrapper, not just the popup
+});
+
+// Add click event to each bar
+scheduleBarsContainer.addEventListener('click', (e) => {
+    if (e.target.classList.contains('bar')) {
+        const barDetails = JSON.parse(e.target.dataset.details);
+        showPopup(e.target, barDetails);
+    }
+});

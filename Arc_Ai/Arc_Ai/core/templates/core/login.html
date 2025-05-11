@@ -15,10 +15,10 @@
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">
-                <h1 class="titles">Sign In</h1>
+                <h1 class="titles" style="margin-bottom: 12px;">Sign In</h1>
 
                 {% for message in messages %}
-                <h5 style="color: red;">{{message}}</h5>
+                <h5 style="color: red; margin: 0 0 12px 0;">{{message}}</h5>
                 {% endfor %}
 
                 <form id="form" method="post" action="{% url 'core:login' %}">

@@ -160,8 +160,6 @@
 /*  */
 
 
-
-
 /* Other Project  */
 .card-section {
     margin: 40px 60px;
@@ -217,158 +215,49 @@
     
   }
   
-  
-  
   .card-body {
-    padding: 15px;
-    margin-bottom: auto;
-  }
-  
-  .card-body h3 {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 10px 0;
-  }
-  
-  .card-body p {
-    margin: 5px 0;
-    font-size: 14px;
-    font-weight: 300;
-    width: 258px;
-    height: 19px;
-    top: 318.5px;
-    left: 76px;
-  
-  }
-   
-  .project-details {
-    display: flex;
-    flex-direction: column  ;
-    gap: 10px; 
-  }
-  
-  .date-group {
-    display: inline-flex;
-    gap: 0;
-  }
-  
-  
-  
-  .status {
-    color: orange;
-    font-weight: 500;
-    font-style: italic;
-    font-size: 32px !important;
-    margin-top: 20px!important;
-  }
-  
-/* --- Schedule Section --- */
-.schedule-container {
-  margin: 40px 60px;
+  padding: 15px;
 }
 
-.schedule-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  position: relative;
-  z-index: 1;
+.card-body h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 10px 0;
+  width: 200px; /* Set a fixed width */
+  height: 24px; /* Set a fixed height */
 }
 
-.schedule-grid {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
-  width: 100%;
-  max-width: 1200px;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  position: relative;
-}
-
-.days {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.card-body p {
+  margin: 5px 0;
   font-size: 14px;
-  font-weight: 500;
-  color: #353A56;
+  font-weight: 300;
+  width: 258px;
+  height: 19px;
+  top: 318.5px;
+  left: 76px;
+
 }
 
-.time-labels {
-  position: absolute;
-  top: -5px;
-  left: 105px; /* Adjust to align with the grid */
-  display: grid;
-  grid-template-columns: repeat(24, 1fr); /* 24 rows for 24 hours */
-  grid-template-rows: 1fr; /* Each label takes the same width */
-  gap: 15.2px; /* No extra spacing between rows */
-  font-size: 12px;
-  color: #888888;
-  text-align: center; /* Center-align the text */
-  z-index: 2;
-}
-
-.time-slots {
-  display: grid;
-  grid-template-rows: repeat(7, 1fr); /* 7 rows for days */
-  grid-template-columns: repeat(24, 1fr); /* 24 columns for hours */
-  position: relative;
-  z-index: 2;
-  background: 
-    linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
-  background-size: calc(100% / 24) calc(100% / 7); /* Adjust grid size */
-  border: 1px solid #ddd; /* Border around the grid */
-}
-
-
-
-.schedule-bars {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-rows: repeat(7, 1fr);
-  grid-template-columns: repeat(24, 1fr);
-}
-
-.bar {
-  margin-top: 15px;
-  border-radius: 50px;
-  height: 50%;
-}
-
-.schedule-navigation {
+.project-details {
   display: flex;
-  align-items: center;
-  justify-content: center; /* Center horizontally */
-  gap: 10px;
-  font-size: 16px;
+  flex-direction: column  ;
+  margin-top: 60px;
+}
+
+.date-group {
+  display: inline-flex;
+  gap: 0;
+
+}
+
+
+
+.status {
+  color: orange;
   font-weight: 500;
-  color: #353A56;
-  position: relative; /* Keep it relative to the parent container */
-  margin: 0 auto; /* Center the element within the container */
-  width: fit-content; /* Ensure the width only fits the content */
-}
-
-.nav-btn {
-  background: #353A56;
-  color: white;
-  border: none;
-  width: 35px;
-  border-radius: 50px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.nav-btn:hover {
-  background: #2a2f45;
+  font-style: italic;
+  font-size: 32px !important;
+  margin-top: 20px!important;
 }
   
 /*  Divider  */
@@ -656,7 +545,7 @@
     font-weight: 500;
     font-style: italic;
     font-size: 32px !important;
-    margin-top: 20px!important;
+    margin-top: 45px!important;
   }
   
 /* --- Schedule Section --- */
@@ -722,8 +611,7 @@
   border: 1px solid #ddd; /* Border around the grid */
 }
 
-
-
+/* Schedule bar and popup*/
 .schedule-bars {
   position: absolute;
   top: 0;
@@ -753,6 +641,81 @@
   margin: 0 auto; /* Center the element within the container */
   width: fit-content; /* Ensure the width only fits the content */
 }
+
+/* popup */
+/* Wrapper for popup and overlay */
+.popup-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 556px; /* Match the width of the popup */
+    height: 192px; /* Match the height of the popup */
+    transform: translateY(-50%); /* Center vertically relative to the bar */
+    z-index: 10; /* Ensure it is above other elements */
+    margin-left: 66px;
+    margin-top: -5px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Colored overlay underneath the entire container */
+#popup-overlay {
+    position: absolute;
+    top: 5px; /* Slightly offset below the popup */
+    left: -5px; /* Slightly misalign to the left */
+    width: calc(100% + 30px); /* Slightly wider than the popup */
+    height: calc(100% + 30px); /* Slightly taller than the popup */
+    background-color: #353A56; /* Default color */
+    border-radius: 10px;
+    z-index: -1; /* Place it underneath the popup container */
+}
+
+/* Popup container */
+#bar-popup {
+    position: relative; /* Position relative to the wrapper */
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%; /* Match the wrapper width */
+    height: 100%; /* Match the wrapper height */
+    z-index: 1; /* Ensure it is above the overlay */
+}
+
+#bar-popup h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+}
+
+#bar-popup p {
+    font-size: 14px;
+    margin: 0;
+}
+
+#popup-close-btn {
+    background: #353A56;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 40px;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-top: auto;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+#popup-close-btn:hover {
+    background: #2a2f45;
+}
+
+/* Button */
 
 .nav-btn {
   background: #353A56;
