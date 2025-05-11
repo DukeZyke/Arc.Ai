@@ -5,11 +5,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 
-
-
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
-
 from google_auth_oauthlib.flow import Flow
 import os
 from django.conf import settings
@@ -25,8 +22,6 @@ import googleapiclient.discovery
 from googleapiclient.http import MediaIoBaseUpload
 import io
 from io import BytesIO
-
-
 
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
 
@@ -68,7 +63,6 @@ def signup_details(request):
             birth_date=request.POST.get('birth_date', None),
             gender=gender,
             user_title=request.POST.get('user_title')
-
         )
 
         signup_details.save()
@@ -76,7 +70,6 @@ def signup_details(request):
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:home')
 
-    
     return render(request, 'core/signup_details.html', {
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
@@ -112,7 +105,6 @@ def login(request):
             return redirect('core:login')  # Redirect back to login page
 
     return render(request, 'core/login.html')
-
 
 def signup(request):
     if request.method == 'POST':
@@ -168,11 +160,9 @@ def landingpage(request):
     return render(request, 'core/landingpage.html')
 
 def saved(request):
-    # Simulated backend data
-    folders = [f"Folder {i}" for i in range(1, 21)]  # 20 folders
-    trash = [f"Trash File {i}" for i in range(1, 21)]  # 20 trash files
+    folders = [f"Folder {i}" for i in range(1, 21)]
+    trash = [f"Trash File {i}" for i in range(1, 21)]
 
-    # Load credentials from session
     creds_data = request.session.get('credentials')
     if not creds_data:
         messages.error(request, "You must authorize Google Drive to fetch files.")
@@ -181,12 +171,10 @@ def saved(request):
     creds = Credentials(**creds_data)
 
     try:
-        # Initialize the Google Drive API service
         service = build('drive', 'v3', credentials=creds)
 
-        # Fetch files from Google Drive
         results = service.files().list(
-            pageSize=50,  # Adjust the number of files to fetch
+            pageSize=50,
             fields="files(id, name, mimeType, webViewLink, parents)"
         ).execute()
 
@@ -197,16 +185,15 @@ def saved(request):
         messages.error(request, "Failed to fetch files from Google Drive.")
         drive_files = []
 
-    # Pass the data to the template
     return render(request, 'core/saved.html', {
         'folders': folders,
-        'files': drive_files,  # Pass Google Drive files to the template
+        'files': drive_files,
         'trash': trash,
     })
 
 def email(request):
     online_users = User.objects.all() 
-    emails = Email.objects.all()  # Fetch all emails from the database
+    emails = Email.objects.all()
 
     return render(request, 'core/email.html', {
         'online_users': online_users,
@@ -216,21 +203,18 @@ def email(request):
 
 
 def google_drive_auth(request):
-    # Check if the user is logged in
+
     if not request.user.is_authenticated:
         messages.error(request, "You must be logged in to authorize Google Drive.")
         return redirect('core:login')
 
-    # Check if credentials are already stored in the session
     creds_data = request.session.get('credentials')
     if creds_data:
         creds = Credentials(**creds_data)
         if creds.valid:
-            # Credentials are valid, no need to reauthorize
             messages.success(request, "Google Drive is already authorized.")
             return redirect('core:saved')
 
-    # If no valid credentials, initiate the Google OAuth flow
     flow = Flow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_FILE,
         scopes=SCOPES,
@@ -253,10 +237,8 @@ def google_drive_callback(request):
     )
     flow.fetch_token(authorization_response=request.build_absolute_uri())
 
-    # ✅ Get credentials from the flow object after fetching token
     credentials = flow.credentials
 
-    # ✅ Store credentials in session
     request.session['credentials'] = credentials_to_dict(credentials)
 
     return redirect('core:saved')
@@ -268,7 +250,6 @@ def upload_file_to_drive(request):
         uploaded_file = request.FILES.get('file')
         print("Received file:", uploaded_file.name)
 
-        # Load credentials from session
         creds_data = request.session.get('credentials')
         if not creds_data:
             print("No credentials in session. Redirecting to auth.")
@@ -278,13 +259,10 @@ def upload_file_to_drive(request):
 
         try:
             service = build('drive', 'v3', credentials=creds)
-
-            # Convert uploaded file into a media upload
             media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.content_type)
             file_metadata = {'name': uploaded_file.name,
-                             'parents': ['1katYIAY6Xzw1fOorjULbdMAneODhdVpl']}
+                            'parents': ['1katYIAY6Xzw1fOorjULbdMAneODhdVpl']}
 
-            # Upload file to Google Drive
             file = service.files().create(
                 body=file_metadata,
                 media_body=media,
@@ -305,9 +283,8 @@ def upload_file_to_drive(request):
 
 def delete_files_from_drive(request):
     if request.method == 'POST':
-        file_ids = request.POST.getlist('file_ids[]')  # Get the list of file IDs from the request
+        file_ids = request.POST.getlist('file_ids[]')
 
-        # Load credentials from session
         creds_data = request.session.get('credentials')
         if not creds_data:
             return JsonResponse({'error': 'You must authorize Google Drive to delete files.'}, status=403)
@@ -315,10 +292,8 @@ def delete_files_from_drive(request):
         creds = Credentials(**creds_data)
 
         try:
-            # Initialize the Google Drive API service
             service = build('drive', 'v3', credentials=creds)
 
-            # Delete each file
             for file_id in file_ids:
                 service.files().delete(fileId=file_id).execute()
 
