@@ -128,19 +128,16 @@
             </div>
         </div>
 
-        <!-- File List -->
-        <ul id="file-list">
-            {% for file in files %}
-                <li>
-                    <input type="checkbox" class="file-checkbox" style="display: none;" data-file-id="{{ file.id }}">
-                    <a href="{{ file.webViewLink }}" target="_blank">
-                        {{ file.name }}
-                    </a>
-                    <p>Type: {{ file.mimeType }}</p>
-                </li>
-            {% empty %}
-                <li>No files found in Google Drive.</li>
-            {% endfor %}
+        <ul>
+        {% for file in files %}
+            <li>
+            <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank">
+                {{ file.name }}
+            </a>
+            </li>
+        {% empty %}
+            <li>No files uploaded yet.</li>
+        {% endfor %}
         </ul>
 
         <!-- Delete Selected Files Button -->
@@ -175,92 +172,6 @@
             }
         }
     }
-
- let checkboxesVisible = false; // Track the visibility state of checkboxes
-
-    function toggleCheckboxes() {
-        const checkboxes = document.querySelectorAll('.file-checkbox');
-        const deleteButton = document.getElementById('delete-selected-btn');
-        checkboxesVisible = !checkboxesVisible; // Toggle the visibility state
-
-        // Show or hide checkboxes
-        checkboxes.forEach(checkbox => {
-            checkbox.style.display = checkboxesVisible ? 'inline-block' : 'none';
-        });
-
-        // Show or hide the delete button
-        deleteButton.style.display = checkboxesVisible ? 'block' : 'none';
-
-        // Add or remove the event listener for hiding checkboxes
-        if (checkboxesVisible) {
-            window.addEventListener('click', hideCheckboxesOnClickOutside);
-        } else {
-            window.removeEventListener('click', hideCheckboxesOnClickOutside);
-        }
-    }
-
-    function hideCheckboxesOnClickOutside(event) {
-        const deleteButton = document.querySelector('[onclick="toggleCheckboxes()"]');
-        const checkboxes = document.querySelectorAll('.file-checkbox');
-        const isClickOnCheckbox = Array.from(checkboxes).some(checkbox => checkbox.contains(event.target));
-        if (!deleteButton.contains(event.target) && !isClickOnCheckbox) {
-            // Hide checkboxes
-            checkboxes.forEach(checkbox => {
-                checkbox.style.display = 'none';
-            });
-
-            // Hide the delete button
-            document.getElementById('delete-selected-btn').style.display = 'none';
-
-            checkboxesVisible = false; // Reset visibility state
-            window.removeEventListener('click', hideCheckboxesOnClickOutside); // Remove the event listener
-        }
-    }
-
-    function deleteSelectedFiles() {
-        const selectedCheckboxes = document.querySelectorAll('.file-checkbox:checked');
-        const fileIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.fileId);
-
-        if (fileIds.length === 0) {
-            alert('No files selected for deletion.');
-            return;
-        }
-
-        if (confirm('Are you sure you want to delete the selected files?')) {
-            // Create a FormData object to send the file IDs
-            const formData = new FormData();
-            fileIds.forEach(fileId => formData.append('file_ids[]', fileId));
-
-            // Send an AJAX request to the backend
-            fetch("{% url 'core:delete_files_from_drive' %}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token for security
-                },
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-
-                    // Remove the deleted files from the DOM
-                    selectedCheckboxes.forEach(checkbox => {
-                        checkbox.closest('li').remove();
-                    });
-
-                    // Hide the delete button after deletion
-                    document.getElementById('delete-selected-btn').style.display = 'none';
-                } else {
-                    alert(data.error || 'Failed to delete the files.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the files.');
-            });
-        }
-    }
-</script>
+    </script>
     
 </html>

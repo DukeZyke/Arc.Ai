@@ -216,47 +216,49 @@
   }
   
   .card-body {
-    padding: 15px;
-    margin-bottom: auto;
-  }
-  
-  .card-body h3 {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 10px 0;
-  }
-  
-  .card-body p {
-    margin: 5px 0;
-    font-size: 14px;
-    font-weight: 300;
-    width: 258px;
-    height: 19px;
-    top: 318.5px;
-    left: 76px;
-  
-  }
-   
-  .project-details {
-    display: flex;
-    flex-direction: column  ;
-    gap: 10px; 
-  }
-  
-  .date-group {
-    display: inline-flex;
-    gap: 0;
-  }
-  
-  
-  
-  .status {
-    color: orange;
-    font-weight: 500;
-    font-style: italic;
-    font-size: 32px !important;
-    margin-top: 20px!important;
-  }
+  padding: 15px;
+}
+
+.card-body h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 10px 0;
+  width: 200px; /* Set a fixed width */
+  height: 24px; /* Set a fixed height */
+}
+
+.card-body p {
+  margin: 5px 0;
+  font-size: 14px;
+  font-weight: 300;
+  width: 258px;
+  height: 19px;
+  top: 318.5px;
+  left: 76px;
+
+}
+
+.project-details {
+  display: flex;
+  flex-direction: column  ;
+  margin-top: 60px;
+}
+
+.date-group {
+  display: inline-flex;
+  gap: 0;
+
+}
+
+
+
+.status {
+  color: orange;
+  font-weight: 500;
+  font-style: italic;
+  font-size: 32px !important;
+  margin-top: 20px!important;
+}
   
 /*  Divider  */
 .header-with-line{
@@ -543,7 +545,7 @@
     font-weight: 500;
     font-style: italic;
     font-size: 32px !important;
-    margin-top: 20px!important;
+    margin-top: 45px!important;
   }
   
 /* --- Schedule Section --- */

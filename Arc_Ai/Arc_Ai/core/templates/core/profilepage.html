@@ -5,24 +5,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HBFR Profile Page</title>
-    <link rel ="stylesheet" href="{% static 'Styles/profilepage.css' %}">
+    <title>Profile</title>
+    <link rel ="stylesheet" href="{% static 'styles/profilepage.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class ="logo">
-            <img src="{% static 'Images/Logo.png' %}" alt ="Site Icon" class="arclogo"/>
+    <div id="sidebar">
+        <div id="sidebar_content" class="hidden">
+            <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
+            <p><a href="{% url 'core:home' %}">Home</a></p>
+            <p><a href="{% url 'core:organization' %}">Organization</a></p>
+            <p><a href="{% url 'core:saved' %}">Saved</a></p>
+            <p><a href="{% url 'core:email' %}">Email</a></p>
         </div>
-        <nav>
-            <a href="#">Home</a>
-            <a href="#">Organization</a>
-            <a href="#">Saved</a>
-            <a href="#">Email</a>
-            <button class="logout">Log out</button>
-        </nav>
-    </header>
-
+        <hr class="divider_sidebar"/>
+    
+        <div class="notification_container">
+          <!-- Notification Pop-Up -->
+          <div id="notification_popup" class="hidden">
+            <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
+            <div id="notification_list">
+                <ul>
+                    <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                        <p>Schedule Update <span>Yesterday</span></p>
+                        <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 202</p>
+                        <p class="posted-by">- Imee Duterte</p>
+                        
+                    </li>
+                    <li class="notification_item" data-detail="Another meeting detail here.">
+                        <p>Schedule Update <span>Yesterday</span></p>
+                        <p class="short-description">Another meeting detail here General meeting at 10:30AM on Jan 3, 202 General meet</p>
+                        <p class="posted-by">- John Doe</p>
+                    </li>
+                    <li class="notification_item" data-detail="Another meeting detail here.">
+                        <p>Schedule Update <span>Yesterday</span></p>
+                        <p class="short-description">Another meeting detail here</p>
+                        <p class="posted-by">- Sarah Marcos</p>
+                    </li>
+                    <li class="notification_item" data-detail="Another meeting detail here.">
+                        <p>Schedule Update <span>Yesterday</span></p>
+                        <p class="short-description">Another meeting detail here</p>
+                        <p class="posted-by">- Ginno Arostique</p>
+                    </li>
+                    <li class="notification_item" data-detail="Another meeting detail here.">
+                        <p>Schedule Update <span>Yesterday</span></p>
+                        <p class="short-description">Another meeting detail here</p>
+                        <p class="posted-by">- Ginno Arostique</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+          <!-- Detailed Notification -->
+          <div id="detailed_notification" class="hidden">
+              <h2 id="notification_title">Schedule Update</h2><p class="notification_date">Yesterday, January 29, 2025</p>
+              <button id="close_detailed_notification" class="close-btn">&times;</button>
+              <p id="notification_detail"></p>
+              <p class="posted-by">- Imee Duterte, Team Head</p>
+              <button class="respond-btn">Respond</button>
+          </div>
+        </div>
+    
+        <div id="sidebar_icns_grp">
+            <div class="nav_item">
+                <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+                <p id="navigation_paragraph">Navigate</p>
+            </div>
+            <div class="nav_item">
+                <img class="sidebar_icns" src="{% static 'Images/Notification.png' %}" alt="Notification">
+                <p id="notification_paragraph">Notification</p>
+            </div>
+            <div class="nav_item">
+                <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
+                <p>Settings</p>
+            </div>
+        </div>
+    </div>
+    
+        <div id="header">
+            <div>
+                <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+            </div>
+            <div id="header_nav" class="text_white">
+              <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+              <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+              <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
+              <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
+              <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
+              <button class="logout">Log out</button>
+            </div>
+        </div>
+        <div id="main-content">
     <section class="MainProfile">
         <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
         <div class="userInfo">
@@ -30,9 +103,9 @@
             <h3 class="email">{{personal_information.email}}</h3>
             <h3 class="user-title">{{personal_information.user_title}}</h3>
         </div>
-            <a href="#">
-                <box-icon name='cog' class="setting-icon"></box-icon>
-            </a>
+        <div class="setting-icon">
+            <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
+        </div>
     </section>
 
     <section class="PersonalInformation">
@@ -68,23 +141,12 @@
             </div>
         </div>
     </section>
-    <div class="sidebar">
-        <div class="sidebarOptions">
-        <a href="#"><box-icon name='cog' type='solid' class="sidebarsetting"></box-icon>
-        </a>
-
-        <a href="#"><box-icon name='menu' class="sidebarmenu"></box-icon>
-        </a>
-
-        <a href="#"><box-icon name='bell' class="sidebarnotif"></box-icon>
-        </a>
-        </div>
-    </div>
+    
 
     <section class="ProjectHistory">
-        <div class="header-with-line2">
-            <h1 class="Title2">Project History</h1>
-            <hr class="divider2"/>
+        <div class="header-with-line">
+            <h1 class="Title">Project History</h1>
+            <hr class="divider"/>
         </div>
 
         <div class="card-section">
@@ -128,9 +190,9 @@
 
     
     <section class="EmployeeAwards">
-        <div class="header-with-line3">
-            <h1 class="Title3">Employee Awards</h1>
-            <hr class="divider3"/>
+        <div class="header-with-line">
+            <h1 class="Title">Employee Awards</h1>
+            <hr class="divider"/>
         </div>
 
         <div class="awards-container">
@@ -156,15 +218,19 @@
                 </p>
             {% endfor %}
         </div>
+        <div>
+            <hr class="divider"/>
+          </div>
+      
     </section>
 
-  
-      <div>
-        <hr class="divider4"/>
-      </div>
-  
-      <div class="MoreOptions"> <a href="#" class="Title4">More Options</a>
-      </div>
-      <script src="{% static 'js/profilepage.js' %}"></script>
+    <div class="MoreOptions"> <a href="#" class="Title4">More Options</a>
+    </div>
+
+</div>
+
+    <script src="{% static 'js/profilepage.js' %}"></script>
+    <script src="{% static 'js/sidebar.js' %}"></script>
+
 </body>
 </html>

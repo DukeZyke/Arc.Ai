@@ -1,66 +1,5 @@
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    box-sizing: border-box;
-    background-color: #353A56;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 999;
-   
-  }
 
-  body{
-    margin: 0;
-    box-sizing: border-box;
-    overflow-x: hidden;
-    overflow-y: auto;
-    margin-top: 60px;
-    margin-left: 60px; /* to account for sidebar */
-    overflow-x: hidden;
-
-    
-  }
-  
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: 70px;
-  
-  }
-  
-  .arclogo {
-    width: 190px;
-    height: auto;
-    flex-shrink: 0;
-    margin-left: 20px;
-  }
-
-
-  
-  nav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  
-  nav a {
-    text-decoration: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 100%;
-    letter-spacing: 0%;
-    color: white;
-  }
-  
   .logout {
-    margin-left: auto;
     height: 32px;
     width: 87px;
     background-color: white;
@@ -68,22 +7,29 @@ header {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 35px;
+    margin: auto auto auto 5px;
     font-size: 18px;
   }
 
+  #main-content {
+    margin-left: 120px; /* Offset to the right of the sidebar */
+    padding: 20px; /* Add padding for spacing */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the content horizontally */
+    justify-content: center; /* Center the content vertically */
+    min-height: 100vh; /* Ensure it takes the full height of the viewport */
+    box-sizing: border-box;
+}
+
 /*----------------------------------------*/
   .MainProfile {
-    width: 1200px;
+    margin-right: auto;
     height: 344px;
+    width:1155px;
     display: flex;
     align-items: center;
     position: relative;
-    padding: 40px;
-    margin: 40px auto;
-    margin-top: 100px;
-    margin-left: 60px;
-    margin-right: 60px;
     box-sizing: border-box;
   }
 
@@ -102,14 +48,12 @@ header {
     gap: 10px;
     margin-left: 70px;
     margin-bottom: -13%;
-    flex-grow: 1;
     font-family: 'Inter', sans-serif;
-    
   }
 
   .username {
     font-weight: 600;
-    font-size: 54px;
+    font-size: 64px;
     line-height: 100%;
     letter-spacing: 0%;
     width: 600.6045532226562;
@@ -154,9 +98,8 @@ header {
     top: 20px;
     right: 20px;
     cursor: pointer;
-    margin-left: 500px;
   }
-  .setting-icon a img{
+  .setting-icon img{
     width: 40px;
     height: 40px;
     object-fit: contain;
@@ -170,9 +113,7 @@ header {
     width: 100%;
     max-width: 1437px;
     height: 344px;
-    padding: 40px; 
-    margin-left: 60px;
-    margin-right: 60px;
+    padding: 40px;
     box-sizing: border-box;
     margin-bottom: 80px;
   }
@@ -196,7 +137,8 @@ header {
 
   .divider {
     flex-grow: 1;
-    margin-right: 200px;
+    margin-right: 120px;
+    max-width: auto;
     height: 1px;
     border-width: 1px;
     background-color: #353A5624;
@@ -228,38 +170,7 @@ header {
   font-weight: 200;
   color: #000000;
 }
-/*-----------------------*/
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 70px;
-  height: 100vh;
-  background-color: #FFFFFF;
-  border-right: 1px #ccc;
-  box-shadow: 7px 0 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0;
-  z-index: 1000;
-}
 
-.sidebarOptions {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  margin-top: auto;
-  margin-bottom: 60px;
-  position: relative;
-}
-
-.sidebarOptions a img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-}
 
 
 /*---------------------------------*/
@@ -267,37 +178,11 @@ header {
 .ProjectHistory{
   width: 100%;
   max-width: 1437px;
-  height: 344px;
-  padding: 40px; 
-  margin-left: 60px;
-  margin-right: 60px;
+  height: 570px;
+  padding: 40px;
   box-sizing: border-box;
 }
 
-.header-with-line2{
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.Title2 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 200;
-  font-size: 48px;
-  line-height: 100%;
-  letter-spacing: 0%;
-  margin: 0;
-  margin-right: 20px;
-  margin-bottom: 20px;
-}
-
-.divider2 {
-  flex-grow: 1;
-  margin-right: 200px;
-  height: 1px;
-  border-width: 1px;
-  background-color: #353A5624;
-}
 
 .card-section {
   margin: 40px 60px;
@@ -326,8 +211,8 @@ header {
 
 
 .project-card {
-  width: 241px;
-  height: 360px;
+  width: 291px;
+    height: 394px;
   background: white;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1),     /* base shadow */
@@ -349,20 +234,21 @@ header {
 .card-header img {
   width: 70px;
   height: 70px;
-  
 }
+
 
 
 
 .card-body {
   padding: 15px;
-  margin-bottom: auto;
 }
 
 .card-body h3 {
   font-size: 20px;
   font-weight: 700;
   margin: 10px 0;
+  width: 200px; /* Set a fixed width */
+  height: 24px; /* Set a fixed height */
 }
 
 .card-body p {
@@ -375,11 +261,11 @@ header {
   left: 76px;
 
 }
- 
+
 .project-details {
   display: flex;
   flex-direction: column  ;
-  gap: 10px; 
+  margin-top: 60px;
 }
 
 .date-group {
@@ -397,60 +283,37 @@ header {
   margin-top: 20px!important;
 }
 
+/***************************/
 .EmployeeAwards{
   width: 100%;
   max-width: 1437px;
-  height: 344px;
-  padding: 40px; 
-  margin-left: 60px;
-  margin-right: 60px;
+  height: auto;
+  padding: 40px;
   box-sizing: border-box;
-  margin-top: 230px;
-  margin-bottom: 500px;
+  margin-top: auto;
+  overflow: hidden;
 }
 
-.header-with-line3{
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.Title3 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 200;
-  font-size: 48px;
-  line-height: 100%;
-  letter-spacing: 0%;
-  margin: 0;
-  margin-right: 20px;
-  margin-bottom: 20px;
-}
-
-.divider3 {
-  flex-grow: 1;
-  margin-right: 200px;
-  height: 1px;
-  border-width: 1px;
-  background-color: #353A5624;
-}
 
 .awards-container {
-  max-height: 700px;
-  overflow-y: auto;
+  max-height: 755px; /* Set a fixed height for the container */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 20px; /* Add spacing between awards */
   padding: 10px;
+  box-sizing: border-box; /* Include padding in the height calculation */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
 }
-
-
-
 .award {
   display: flex;
   align-items: center;
-  margin-left: 60px;
+  margin-left: 40px;
   margin-bottom: 1.5rem;
   max-width: 1437px;
+  height: 150px; /* Set a consistent height */
 }
 
 .award-icon{
@@ -475,7 +338,7 @@ header {
   margin-left: 20px;
   margin-top: 0;
   width: 100%;
-  max-width: 970px;
+  max-width: 950px;
 }
 
 .award-date {
@@ -488,16 +351,7 @@ header {
   max-width: 1437px;
 }
 
-.divider4 {
-  margin-right: 60px;
-  margin-left: 100px;
-  margin-top: 550px;
-  height: 1px;
-  border-width: 1px;
-  background-color: #353A5624;
-  max-width: 1130px;
-  
-}
+
 
 .MoreOptions{
   font-family: 'Inter', sans-serif;
@@ -505,9 +359,9 @@ header {
   font-size: 48px;
   line-height: 100%;
   letter-spacing: 0%;
-  margin-left: 100px;
+  margin-left: 40px;
+  margin-right: auto;
   margin-bottom: 40px;
-  margin-top: 60px;
 }
 
 .Title4 {
