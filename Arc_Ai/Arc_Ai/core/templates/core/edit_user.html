@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Edit User Information</title>
-    <link rel="stylesheet" href="{% static 'styles/email.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/edit_user.css' %}?v=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
@@ -38,7 +38,7 @@
     </div>
 
     <div class="main-container">
-      <form id="editUserForm" method="post" action="{% url 'your_app:edit_user' %}">
+      <form id="editUserForm" method="post" action="{% url 'core:edit_user' %}">
       {% csrf_token %}
         <div class="form-container">
           <div class="form-header">
