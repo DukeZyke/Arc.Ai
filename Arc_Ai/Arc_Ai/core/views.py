@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
-from django.contrib.auth.decorators import login_required
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -30,54 +29,11 @@ GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_s
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-@login_required
-def edit_user_profile(request):
-    if request.method == 'POST':
-        # Get the form data from the request
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name')
-        middle_initial = request.POST.get('middle_initial')
-        last_name = request.POST.get('last_name')
-        complete_address = request.POST.get('complete_address')
-        contact_no = request.POST.get('contact_no')
-        age = request.POST.get('age')
-        gender = request.POST.get('gender')
-        department = request.POST.get('department')
-        position = request.POST.get('position')
-        profile_avatar = request.FILES.get('profile_avatar')  # For profile picture upload
 
-        # Update the user's personal information
-        personal_info = PersonalInformation.objects.filter(user=request.user).first()
-        if personal_info:
-            personal_info.email = email
-            personal_info.first_name = first_name
-            personal_info.middle_initial = middle_initial
-            personal_info.last_name = last_name
-            personal_info.complete_address = complete_address
-            personal_info.contact_number = contact_no
-            personal_info.age = age
-            personal_info.gender = gender
-            personal_info.department = department
-            personal_info.position = position
-            if profile_avatar:
-                personal_info.profile_avatar = profile_avatar  # Update profile picture if provided
-            personal_info.save()
-
-            messages.success(request, "Your profile has been updated successfully!")
-        else:
-            messages.error(request, "Failed to update profile. Please try again.")
-
-        return redirect('core:edit_user_profile')  # Redirect back to the edit profile page
-
-    # Render the form with the current user's information
-    personal_info = PersonalInformation.objects.filter(user=request.user).first()
-    return render(request, 'core/edit_user_profile.html', {
-        'range': range(1, 16),  # For profile picture selection
-        'personal_info': personal_info,  # Pass the current user's info to the template
-    })
+def edit_user(request):
+    return render(request, 'core/edit_user.html')
 
 def signup_details(request):
-
     if request.method == 'POST':
         profile_avatar = request.FILES.get('profile_avatar')
         first_name = request.POST.get('first_name')
@@ -86,7 +42,10 @@ def signup_details(request):
         complete_address = request.POST.get('complete_address')
         contact_number = request.POST.get('contact_number')
         gender = request.POST.get('gender')
+        age = request.POST.get('age')
+        birth_date = request.POST.get('birth_date')
 
+        # Create SignupDetails instance
         signup_details = SignupDetails.objects.create(
             profile_avatar=profile_avatar,
             first_name=first_name,
@@ -97,19 +56,18 @@ def signup_details(request):
             gender=gender
         )
 
+        # Create PersonalInformation instance linked to SignupDetails
         PersonalInformation.objects.create(
             signup_details=signup_details,
             name=f"{first_name} {last_name}",
             email=request.POST.get('email'),
-            complete_address=complete_address,
+            address=complete_address,
             contact_number=contact_number,
-            age=request.POST.get('age'),
-            birth_date=request.POST.get('birth_date', None),
+            age=age,
+            birth_date=birth_date,
             gender=gender,
-            user_title=request.POST.get('user_title')
+            user_title=request.POST.get('user_title', 'User')  # Default title if not provided
         )
-
-        signup_details.save()
 
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:home')
@@ -120,14 +78,20 @@ def signup_details(request):
 
 def profilepage(request):
     projects = Project.objects.all()
-    personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
 
+    # Fetch the PersonalInformation linked to the logged-in user's SignupDetails
+    personal_information = None
+    if request.user.is_authenticated:
+        signup_details = SignupDetails.objects.filter(first_name=request.user.first_name).first()
+        if signup_details:
+            personal_information = PersonalInformation.objects.filter(signup_details=signup_details).first()
+
     return render(request, 'core/profilepage.html', {
-        'projects' : projects,
-        'personal_information' : personal_information,
-        'employee_awards' : employee_awards,
-        })
+        'projects': projects,
+        'personal_information': personal_information,
+        'employee_awards': employee_awards,
+    })
 
 def landingpage(request):
     return render(request, 'core/landingpage.html')
@@ -364,8 +328,8 @@ def get_notifications(request):
     notifications = Notification.objects.all().order_by('-created_at')[:10]  # Fetch the latest 10 notifications
     data = [
         {
-            "title": notification.title[:20],
-            "description": notification.description,  # Limit description to 40 characters
+            "title": notification.title,
+            "description": notification.description,
             "posted_by": notification.posted_by,
             "created_at": notification.created_at.strftime("%b %d, %Y"),
         }
