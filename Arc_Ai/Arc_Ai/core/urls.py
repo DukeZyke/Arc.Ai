@@ -22,4 +22,5 @@ urlpatterns = [
     path('drive/callback/', views.google_drive_callback, name='google_drive_callback'),
     path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),
     path('delete_files_from_drive/', views.delete_files_from_drive, name='delete_files_from_drive'),  
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
 ]

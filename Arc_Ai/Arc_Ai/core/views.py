@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
+from .models import Notification
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -314,3 +315,17 @@ def credentials_to_dict(creds):
         'client_secret': creds.client_secret,
         'scopes': creds.scopes
     }
+    
+# For notification sidebar Popup TEST
+def get_notifications(request):
+    notifications = Notification.objects.all().order_by('-created_at')[:10]  # Fetch the latest 10 notifications
+    data = [
+        {
+            "title": notification.title[:20],
+            "description": notification.description,  # Limit description to 40 characters
+            "posted_by": notification.posted_by,
+            "created_at": notification.created_at.strftime("%b %d, %Y"),
+        }
+        for notification in notifications
+    ]
+    return JsonResponse(data, safe=False)

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
@@ -79,3 +80,14 @@ class SignupDetails(models.Model):
     complete_address = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
+    
+# For notification sidebar Popup TEST
+class Notification(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    posted_by = models.CharField(max_length=100)
+    created_at = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return self.title
+# =======================================================
