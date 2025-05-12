@@ -3,7 +3,11 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
-from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile
+from django.http import JsonResponse
+from .models import Notification
+
+# MODELS
+from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
 from google_auth_oauthlib.flow import Flow
 import os
 from django.conf import settings
@@ -20,17 +24,53 @@ from googleapiclient.http import MediaIoBaseUpload
 import io
 from io import BytesIO
 
-
-
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
 
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-
+def edit_user(request):
+    return render(request, 'core/edit_user.html')
 
 def signup_details(request):
+
+    if request.method == 'POST':
+        profile_avatar = request.FILES.get('profile_avatar')
+        first_name = request.POST.get('first_name')
+        middle_name = request.POST.get('middle_name')
+        last_name = request.POST.get('last_name')
+        complete_address = request.POST.get('complete_address')
+        contact_number = request.POST.get('contact_number')
+        gender = request.POST.get('gender')
+
+        signup_details = SignupDetails.objects.create(
+            profile_avatar=profile_avatar,
+            first_name=first_name,
+            middle_name=middle_name,
+            last_name=last_name,
+            complete_address=complete_address,
+            contact_number=contact_number,
+            gender=gender
+        )
+
+        PersonalInformation.objects.create(
+            signup_details=signup_details,
+            name=f"{first_name} {last_name}",
+            email=request.POST.get('email'),
+            complete_address=complete_address,
+            contact_number=contact_number,
+            age=request.POST.get('age'),
+            birth_date=request.POST.get('birth_date', None),
+            gender=gender,
+            user_title=request.POST.get('user_title')
+        )
+
+        signup_details.save()
+
+        messages.info(request, "Profile details saved successfully!")
+        return redirect('core:home')
+
     return render(request, 'core/signup_details.html', {
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
@@ -66,7 +106,6 @@ def login(request):
             return redirect('core:login')  # Redirect back to login page
 
     return render(request, 'core/login.html')
-
 
 def signup(request):
     if request.method == 'POST':
@@ -118,22 +157,44 @@ def organization(request):
         'employee_awards' : employee_awards,
         })
 
-def saved(request):
-# Simulated backend data
-    folders = [f"Folder {i}" for i in range(1, 21)]  # 20 folders
-    files = DriveFile.objects.all().order_by('-uploaded_at')      # 20 files
-    trash = [f"Trash File {i}" for i in range(1, 21)] # 20 trash files
+def landingpage(request):
+    return render(request, 'core/landingpage.html')
 
-    # Pass the data to the template
+def saved(request):
+    folders = [f"Folder {i}" for i in range(1, 21)]
+    trash = [f"Trash File {i}" for i in range(1, 21)]
+
+    creds_data = request.session.get('credentials')
+    if not creds_data:
+        messages.error(request, "You must authorize Google Drive to fetch files.")
+        return redirect('core:google_drive_auth')
+
+    creds = Credentials(**creds_data)
+
+    try:
+        service = build('drive', 'v3', credentials=creds)
+
+        results = service.files().list(
+            pageSize=50,
+            fields="files(id, name, mimeType, webViewLink, parents)"
+        ).execute()
+
+        drive_files = results.get('files', [])
+
+    except Exception as e:
+        print("Error fetching files from Google Drive:", str(e))
+        messages.error(request, "Failed to fetch files from Google Drive.")
+        drive_files = []
+
     return render(request, 'core/saved.html', {
         'folders': folders,
-        'files': files,
+        'files': drive_files,
         'trash': trash,
     })
 
 def email(request):
-    online_users = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy"]  # Simulated online users
-    emails = Email.objects.all()  # Fetch all emails from the database
+    online_users = User.objects.all() 
+    emails = Email.objects.all()
 
     return render(request, 'core/email.html', {
         'online_users': online_users,
@@ -143,6 +204,18 @@ def email(request):
 
 
 def google_drive_auth(request):
+
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to authorize Google Drive.")
+        return redirect('core:login')
+
+    creds_data = request.session.get('credentials')
+    if creds_data:
+        creds = Credentials(**creds_data)
+        if creds.valid:
+            messages.success(request, "Google Drive is already authorized.")
+            return redirect('core:saved')
+
     flow = Flow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_FILE,
         scopes=SCOPES,
@@ -165,10 +238,8 @@ def google_drive_callback(request):
     )
     flow.fetch_token(authorization_response=request.build_absolute_uri())
 
-    # ✅ Get credentials from the flow object after fetching token
     credentials = flow.credentials
 
-    # ✅ Store credentials in session
     request.session['credentials'] = credentials_to_dict(credentials)
 
     return redirect('core:saved')
@@ -180,7 +251,6 @@ def upload_file_to_drive(request):
         uploaded_file = request.FILES.get('file')
         print("Received file:", uploaded_file.name)
 
-        # Load credentials from session
         creds_data = request.session.get('credentials')
         if not creds_data:
             print("No credentials in session. Redirecting to auth.")
@@ -190,13 +260,10 @@ def upload_file_to_drive(request):
 
         try:
             service = build('drive', 'v3', credentials=creds)
-
-            # Convert uploaded file into a media upload
             media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.content_type)
             file_metadata = {'name': uploaded_file.name,
-                             'parents': ['1katYIAY6Xzw1fOorjULbdMAneODhdVpl']}
+                            'parents': ['1katYIAY6Xzw1fOorjULbdMAneODhdVpl']}
 
-            # Upload file to Google Drive
             file = service.files().create(
                 body=file_metadata,
                 media_body=media,
@@ -215,6 +282,30 @@ def upload_file_to_drive(request):
 
     return HttpResponse("Invalid method", status=405)
 
+def delete_files_from_drive(request):
+    if request.method == 'POST':
+        file_ids = request.POST.getlist('file_ids[]')
+
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to delete files.'}, status=403)
+
+        creds = Credentials(**creds_data)
+
+        try:
+            service = build('drive', 'v3', credentials=creds)
+
+            for file_id in file_ids:
+                service.files().delete(fileId=file_id).execute()
+
+            return JsonResponse({'success': True, 'message': 'Files deleted successfully.'})
+
+        except Exception as e:
+            print("Error deleting files from Google Drive:", str(e))
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
 def credentials_to_dict(creds):
     return {
         'token': creds.token,
@@ -224,3 +315,17 @@ def credentials_to_dict(creds):
         'client_secret': creds.client_secret,
         'scopes': creds.scopes
     }
+    
+# For notification sidebar Popup TEST
+def get_notifications(request):
+    notifications = Notification.objects.all().order_by('-created_at')[:10]  # Fetch the latest 10 notifications
+    data = [
+        {
+            "title": notification.title[:20],
+            "description": notification.description,  # Limit description to 40 characters
+            "posted_by": notification.posted_by,
+            "created_at": notification.created_at.strftime("%b %d, %Y"),
+        }
+        for notification in notifications
+    ]
+    return JsonResponse(data, safe=False)

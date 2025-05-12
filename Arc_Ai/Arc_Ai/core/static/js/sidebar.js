@@ -1,5 +1,4 @@
-
-    const navIcon = document.getElementById("nav_icon");
+const navIcon = document.getElementById("nav_icon");
     const sidebar = document.getElementById("sidebar");
     const sidebarContent = document.getElementById("sidebar_content");
     const navItems = document.querySelectorAll(".nav_item p");
@@ -88,16 +87,71 @@ closeNotificationPopup.addEventListener('click', () => {
     notificationPopup.classList.add('hidden'); // Hide notification pop-up
 });
 
-// Show detailed notification without hiding the notification pop-up
-notificationItems.forEach(item => {
-    item.addEventListener('click', () => {
-        const detail = item.getAttribute('data-detail');
-        notificationDetail.textContent = detail;
-        detailedNotification.classList.remove('hidden'); // Show detailed notification
-    });
-});
-
 // Close detailed notification
 closeDetailedNotification.addEventListener('click', () => {
     detailedNotification.classList.add('hidden'); // Hide detailed notification
+});
+
+
+// Data context for the notification items TEST
+document.addEventListener('DOMContentLoaded', () => {
+    const notificationList = document.getElementById('notification_list').querySelector('ul');
+
+    // Fetch notifications from the backend
+    fetch('/api/notifications/')
+        .then(response => response.json())
+        .then(data => {
+            notificationList.innerHTML = ''; // Clear existing notifications
+            data.forEach(notification => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('notification_item');
+                listItem.setAttribute('data-detail', notification.description); // Ensure full description is set
+                listItem.setAttribute('data-title', notification.title); // Set the title as data-title
+                listItem.setAttribute('data-date', notification.created_at); // Set the date as data-date
+                listItem.setAttribute('data-posted-by', notification.posted_by); // Set the posted-by as data-posted-by
+                listItem.innerHTML = `
+                    <div class="title-and-date">
+                        <p>${notification.title}</p><span>${notification.created_at}</span>
+                    </div>
+                    <p class="short-description">${notification.description}</p>
+                    <p class="posted-by">- ${notification.posted_by}</p>
+                `;
+                notificationList.appendChild(listItem);
+
+                // Attach click event listener to show detailed notification
+                listItem.addEventListener('click', () => {
+                    // Use the full description directly from the notification object
+                    notificationDetail.textContent = notification.description; // Fetch directly from the notification object
+                    document.getElementById('notification_title').textContent = notification.title;
+                    document.querySelector('#detailed_notification .notification_date').textContent = notification.created_at;
+                    document.querySelector('#detailed_notification .posted-by').textContent = `- ${notification.posted_by}`;
+                    detailedNotification.classList.remove('hidden'); // Show detailed notification
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
+});
+
+// Ensure DOM is fully loaded before attaching event listeners
+document.addEventListener("DOMContentLoaded", () => {
+    const closeDetailedNotification = document.getElementById("close_detailed_notification");
+    const detailedNotification = document.getElementById("detailed_notification");
+
+    // Function to toggle detailed notification visibility
+    const toggleDetailedNotification = (isVisible) => {
+        if (isVisible) {
+            detailedNotification.classList.remove("hidden");
+        } else {
+            detailedNotification.classList.add("hidden");
+        }
+    };
+
+    // Close button for detailed notification
+    if (closeDetailedNotification) {
+        closeDetailedNotification.addEventListener("click", () => {
+            toggleDetailedNotification(false);
+        });
+    } else {
+        console.error("Close button for detailed notification not found.");
+    }
 });
