@@ -7,8 +7,7 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.edit_user, name='edit_user'),
-    path('edit_user', views.edit_user, name='edit_user'),
+    path('', views.edit_user_profile, name='edit_user_profile'),
     path('signup_details/', views.signup_details, name='signup_details'),
     path('landingpage/', views.landingpage, name='landingpage'),
     path('login/', views.login, name='login'),
@@ -23,4 +22,5 @@ urlpatterns = [
     path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),
     path('delete_files_from_drive/', views.delete_files_from_drive, name='delete_files_from_drive'),  
     path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
 ]

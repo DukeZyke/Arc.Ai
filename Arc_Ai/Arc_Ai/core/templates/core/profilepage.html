@@ -96,53 +96,51 @@
             </div>
         </div>
         <div id="main-content">
-    <section class="MainProfile">
-        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
-        <div class="userInfo">
-            <h1 class="username">{{personal_information.name}}</h1>
-            <h3 class="email">{{personal_information.email}}</h3>
-            <h3 class="user-title">{{personal_information.user_title}}</h3>
+            <section class="MainProfile">
+                <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+                <div class="userInfo">
+                    <h1 class="username">{{personal_information.name}}</h1>
+                    <h3 class="email">{{personal_information.email}}</h3>
+                    <h3 class="user-title">{{personal_information.user_title}}</h3>
+                </div>
+                <div class="setting-icon">
+                    <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
+                </div>
+            </section>
         </div>
-        <div class="setting-icon">
-            <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
-        </div>
-    </section>
+        <section class="PersonalInformation">
+            <div class="header-with-line">
+                <h1 class="Title">Personal Information</h1>
+                <hr class="divider"/>
+            </div>
 
-    <section class="PersonalInformation">
-        <div class="header-with-line">
-            <h1 class="Title">Personal Information</h1>
-            <hr class="divider"/>
-        </div>
-
-        <div class="info-grid">
-            <div class="info">
-                <span class="label">Email:</span>
-                <span class="value">{{personal_information.email}}</span>
+            <div class="info-grid">
+                <div class="info">
+                    <span class="label">Email:</span>
+                    <span class="value">{{personal_information.email}}</span>
+                </div>
+                <div class="info">
+                    <span class="label">Address:</span>
+                    <span class="value">{{personal_information.address}}</span>
+                </div>
+                <div class="info">
+                    <span class="label">Contact Number:</span>
+                    <span class="value">{{personal_information.contact_number}}</span>
+                </div>
+                <div class="info">
+                    <span class="label">Age:</span>
+                    <span class="value">{{personal_information.age}}</span>
+                </div>
+                <div class="info">
+                    <span class="label">Birth Date:</span>
+                    <span class="value">{{personal_information.birth_date}}</span>
+                </div>
+                <div class="info">
+                    <span class="label">Gender:</span>
+                    <span class="value">{{personal_information.gender}}</span>
+                </div>
             </div>
-            <div class="info">
-                <span class="label">Address:</span>
-                <span class="value">{{personal_information.address}}</span>
-            </div>
-            <div class="info">
-                <span class="label">Contact Number:</span>
-                <span class="value">{{personal_information.contact_number}}</span>
-            </div>
-            <div class="info">
-                <span class="label">Age:</span>
-                <span class="value">{{personal_information.age}}</span>
-            </div>
-            <div class="info">
-                <span class="label">Birth Date:</span>
-                <span class="value">{{personal_information.birth_date}}</span>
-            </div>
-            <div class="info">
-                <span class="label">Gender:</span>
-                <span class="value">{{personal_information.gender}}</span>
-            </div>
-        </div>
-    </section>
-    
-
+        </section>
     <section class="ProjectHistory">
         <div class="header-with-line">
             <h1 class="Title">Project History</h1>
@@ -150,45 +148,40 @@
         </div>
 
         <div class="card-section">
-  <div class="card-container">
+            <div class="card-container">
 
-    {% for project in projects %}
-    <!-- Repeat this card as needed -->
-     <div class="project-container">
-        <div class="project-card">
-            <div class="card-header">
-              <img src="{% static 'Images/icon1.png' %}" alt="icon" />
-              <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
-            </div>
-            <div class="card-body">
-              <h3>{{project.name}}</h3>
-              <div class="project-details">
-
-                <p>{{project.project_id}}</p>
-                <div class="dategroup">
-                <p>{{project.start_date}}</p>
-                <p>{{project.finish_date}}</p>
+                {% for project in projects %}
+                <!-- Repeat this card as needed -->
+                <div class="project-container">
+                    <div class="project-card">
+                        <div class="card-header">
+                            <img src="{% static 'Images/icon1.png' %}" alt="icon" />
+                            <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
+                        </div>
+                        <div class="card-body">
+                            <h3>{{project.name}}</h3>
+                            <div class="project-details">
+                                <p>{{project.project_id}}</p>
+                                <div class="dategroup">
+                                    <p>{{project.start_date}}</p>
+                                    <p>{{project.finish_date}}</p>
+                                </div>
+                            </div>
+                            {% if project.project_status == 'Completed' %}
+                            <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
+                            {% elif project.project_status == 'Ongoing' %}
+                            <p class="status" style="color: orange">{{project.project_status}}</p>
+                            {% elif project.project_status == 'Missing' %}
+                            <p class="status" style="color: red">{{project.project_status}}</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-              </div>
-
-              {% if project.project_status == 'Completed' %}
-              <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
-              {% elif project.project_status == 'Ongoing' %}
-              <p class="status" style="color: orange">{{project.project_status}}</p>
-              {% elif project.project_status == 'Missing' %}
-              <p class="status" style="color: red">{{project.project_status}}</p>
-              {% endif %}
-
+                {% endfor %}
             </div>
-          </div>
-     </div>
-     {% endfor %}
-  </div>
-</div>
+        </div>
 
     </section>
-
-    
     <section class="EmployeeAwards">
         <div class="header-with-line">
             <h1 class="Title">Employee Awards</h1>

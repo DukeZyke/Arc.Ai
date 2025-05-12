@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
+from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
@@ -34,19 +36,24 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
 class PersonalInformation(models.Model):
-    # signup_details = models.OneToOneField(
-    #     'SignupDetails', 
-    #     on_delete=models.CASCADE, 
-    #     related_name='personal_information'
-    # )
-    name = models.CharField(max_length=100, default='Enter your name')
-    email = models.CharField(max_length=100)
-    address = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Link to the User model
+    email = models.EmailField(max_length=100)
+    first_name = models.CharField(max_length=50)
+    middle_initial = models.CharField(max_length=5, blank=True, null=True)
+    last_name = models.CharField(max_length=50)
+    complete_address = models.TextField()
     contact_number = models.CharField(max_length=20)
-    age = models.CharField(max_length=3)
-    birth_date = models.DateField(max_length=20)
-    gender = models.CharField(max_length=10)
-    user_title = models.CharField(max_length=30)
+    age = models.IntegerField(validators=[MinValueValidator(0)])
+    gender = models.CharField(
+        max_length=10,
+        choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')]
+    )
+    department = models.CharField(max_length=50, blank=True, null=True)
+    position = models.CharField(max_length=50, blank=True, null=True)
+    profile_avatar = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 class EmployeeAward(models.Model):
     award_classif = models.CharField(max_length=100)
