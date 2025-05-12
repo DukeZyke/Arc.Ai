@@ -34,7 +34,6 @@ def edit_user(request):
     return render(request, 'core/edit_user.html')
 
 def signup_details(request):
-
     if request.method == 'POST':
         profile_avatar = request.FILES.get('profile_avatar')
         first_name = request.POST.get('first_name')
@@ -43,7 +42,10 @@ def signup_details(request):
         complete_address = request.POST.get('complete_address')
         contact_number = request.POST.get('contact_number')
         gender = request.POST.get('gender')
+        age = request.POST.get('age')
+        birth_date = request.POST.get('birth_date')
 
+        # Create SignupDetails instance
         signup_details = SignupDetails.objects.create(
             profile_avatar=profile_avatar,
             first_name=first_name,
@@ -54,19 +56,18 @@ def signup_details(request):
             gender=gender
         )
 
+        # Create PersonalInformation instance linked to SignupDetails
         PersonalInformation.objects.create(
             signup_details=signup_details,
             name=f"{first_name} {last_name}",
             email=request.POST.get('email'),
-            complete_address=complete_address,
+            address=complete_address,
             contact_number=contact_number,
-            age=request.POST.get('age'),
-            birth_date=request.POST.get('birth_date', None),
+            age=age,
+            birth_date=birth_date,
             gender=gender,
-            user_title=request.POST.get('user_title')
+            user_title=request.POST.get('user_title', 'User')  # Default title if not provided
         )
-
-        signup_details.save()
 
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:home')
@@ -77,14 +78,20 @@ def signup_details(request):
 
 def profilepage(request):
     projects = Project.objects.all()
-    personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
 
+    # Fetch the PersonalInformation linked to the logged-in user's SignupDetails
+    personal_information = None
+    if request.user.is_authenticated:
+        signup_details = SignupDetails.objects.filter(first_name=request.user.first_name).first()
+        if signup_details:
+            personal_information = PersonalInformation.objects.filter(signup_details=signup_details).first()
+
     return render(request, 'core/profilepage.html', {
-        'projects' : projects,
-        'personal_information' : personal_information,
-        'employee_awards' : employee_awards,
-        })
+        'projects': projects,
+        'personal_information': personal_information,
+        'employee_awards': employee_awards,
+    })
 
 def landingpage(request):
     return render(request, 'core/landingpage.html')
