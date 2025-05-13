@@ -23,4 +23,10 @@ urlpatterns = [
     path('delete_files_from_drive/', views.delete_files_from_drive, name='delete_files_from_drive'),  
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
+
+
+    # PRACTICE TEMPLATES
+    path('practice/', views.practice, name='practice'),
+    path('practice1/', views.practice1, name='practice1'),
+
 ]
