@@ -1,6 +1,29 @@
 from django.db import models
 from django.utils.timezone import now
 
+ 
+# PRACTICE TEMPLATES =================================================
+
+class UserProfile(models.Model):
+    email = models.EmailField(unique=True)
+    address = models.CharField(max_length=120, default=None)
+    password = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f"{self.email} ({self.address})"
+
+class EditProfile(models.Model):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    new_email = models.EmailField()
+    new_address = models.CharField(max_length=120, default=None)
+
+    def __str__(self):
+        return f"Edit {self.user.email} to {self.new_email}\n Edit {self.user.address} to {self.new_address}"
+        
+
+# PRACTICE TEMPLATES =================================================
+
+
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
     sender_icon = models.ImageField(upload_to='icons/')
