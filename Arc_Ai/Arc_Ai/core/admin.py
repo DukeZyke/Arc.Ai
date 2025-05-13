@@ -17,3 +17,8 @@ admin.site.register(Email)
 
 # Sidebar Page
 admin.site.register(Notification)
+
+#PRACTICE TEMPLATES
+from .models import UserProfile, EditProfile
+admin.site.register(UserProfile)
+admin.site.register(EditProfile)
