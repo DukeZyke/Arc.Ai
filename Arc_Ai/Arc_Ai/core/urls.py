@@ -21,5 +21,9 @@ urlpatterns = [
     path('drive/auth/', views.google_drive_auth, name='google_drive_auth'),
     path('drive/callback/', views.google_drive_callback, name='google_drive_callback'),
     path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),
-    path('delete_files_from_drive/', views.delete_files_from_drive, name='delete_files_from_drive'),  
+    path('delete_files_from_drive/', views.delete_files_from_drive, name='delete_files_from_drive'),
+    path('create_folder_in_drive/', views.create_folder_in_drive, name='create_folder_in_drive'),
+    path('folder/<str:folder_id>/', views.view_folder_contents, name='view_folder_contents'),
+    path('move-files-to-trash/', views.move_files_to_trash, name='move_files_to_trash'),
+    path('empty-trash/', views.empty_trash, name='empty_trash'),
 ]
