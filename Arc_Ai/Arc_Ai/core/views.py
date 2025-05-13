@@ -315,8 +315,8 @@ def get_notifications(request):
     notifications = Notification.objects.all().order_by('-created_at')[:10]  # Fetch the latest 10 notifications
     data = [
         {
-            "title": notification.title[:20],
-            "description": notification.description,  # Limit description to 40 characters
+            "title": notification.title,
+            "description": notification.description,
             "posted_by": notification.posted_by,
             "created_at": notification.created_at.strftime("%b %d, %Y"),
         }

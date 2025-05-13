@@ -220,7 +220,12 @@ body {
 }
 
 /* Notification Pop-Up */
-/* Notification Pop-Up */
+.notification_container h2 {
+    font-family: 'Arial', sans-serif;
+    color: #353A56;
+    margin-bottom: 10px;
+}
+
 #notification_popup {
     position: fixed;
     bottom: 20px;
@@ -378,10 +383,10 @@ body {
 }
 
 .notification_date{
-    margin-top: 56px;
+    margin-top: -12px;
     font-family: 'Arial', sans-serif;
     color: #353A56;
-    position: absolute;
+    position: relative;
 }
 
 #notification_detail {
@@ -394,7 +399,7 @@ body {
     font-size: 14px;
     color: #000000;
     scrollbar-width: none; /* For Firefox */
-    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    margin: 0;
 }
 
 /* Hide scrollbar for Webkit browsers (Chrome, Safari, Edge) */
