@@ -56,19 +56,6 @@ def signup_details(request):
             gender=gender
         )
 
-        # Create PersonalInformation instance linked to SignupDetails
-        PersonalInformation.objects.create(
-            signup_details=signup_details,
-            name=f"{first_name} {last_name}",
-            email=request.POST.get('email'),
-            address=complete_address,
-            contact_number=contact_number,
-            age=age,
-            birth_date=birth_date,
-            gender=gender,
-            user_title=request.POST.get('user_title', 'User')  # Default title if not provided
-        )
-
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:home')
 
