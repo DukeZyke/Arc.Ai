@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
+from django.utils.timezone import datetime
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -176,10 +177,16 @@ def saved(request):
 
         results = service.files().list(
             pageSize=50,
-            fields="files(id, name, mimeType, webViewLink, parents)"
+            fields="files(id, name, mimeType, size, createdTime, owners)"
         ).execute()
 
         drive_files = results.get('files', [])
+    # Add metadata for each file
+        for file in drive_files:
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
 
     except Exception as e:
         print("Error fetching files from Google Drive:", str(e))
@@ -329,3 +336,16 @@ def get_notifications(request):
         for notification in notifications
     ]
     return JsonResponse(data, safe=False)
+
+def get_file_icon(mime_type):
+    file_icons = {
+        'application/pdf': 'Images/pdf.png',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Images/docx.png',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Images/csv.png',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Images/pptx.png',
+        'image/jpeg': 'Images/image.png',
+        'image/png': 'Images/image.png',
+        'text/plain': 'Images/default.png',
+        # Add more MIME types as needed
+    }
+    return file_icons.get(mime_type, 'Images/default.png')

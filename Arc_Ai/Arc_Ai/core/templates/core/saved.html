@@ -128,31 +128,28 @@
             </div>
         </div>
 
-        <ul class="file-list">
-            <div class="horizontal-line"></div>
-            {% for file in files %}
-                <li class="file-item">
-                    <div class="file-icon">
-                        <img src="{% static 'Images/file-icon.png' %}" alt="File Icon">
-                    </div>
-                    <div class="file-details">
-                        <p class="file-name"><a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank">{{ file.name }}</a></p>
-                        <p class="file-owner">{{ file.owner }}</p>
-                    </div>
-                    <div class="file-meta">
-                        <p>{{ file.date }}</p>
-                        <p>{{ file.size }}</p>
-                    </div>
-                    <div class="file-actions">
-                        <button class="action-button">⋮</button>
-                    </div>
-                </li>
-                <div class="horizontal-line"></div>
-            {% empty %}
-                <li>No files uploaded yet.</li>
-            {% endfor %}
-            
-        </ul>
+<ul class="file-list">
+    <div class="horizontal-line"></div>
+    {% for file in files %}
+        <li class="file-item">
+            <div class="file-icon">
+                <img src="{% static file.icon %}" alt="File Icon">
+            </div>
+            <div class="file-details">
+                <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
+                <span class="file-owner">{{ file.owner }}</span>
+                <span class="file-date">{{ file.date }}</span>
+                <span class="file-size">{{ file.size }}</span>
+            </div>
+            <div class="file-actions">
+                <button class="action-button">⋮</button>
+            </div>
+        </li>
+        <div class="horizontal-line"></div>
+    {% empty %}
+        <li>No files uploaded yet.</li>
+    {% endfor %}
+</ul>
 
 
         <!-- Delete Selected Files Button -->
