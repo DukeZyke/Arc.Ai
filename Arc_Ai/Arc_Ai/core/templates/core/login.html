@@ -42,9 +42,10 @@
                             <img class="button_images" src="{% static 'Images/Google.png' %}" alt="Google">
                             <span>Sign in with Google</span>
                         </button>
-                        <button class="continue_with_button margin-top" type="button" onclick="window.location.href='/register/'">
+                        <!-- Facebook Login Button (Custom with JS SDK) -->
+                        <button class="continue_with_button margin-top" type="button" onclick="facebookLogin()">
                             <img class="button_images" src="{% static 'Images/Facebook.png' %}" alt="Facebook">
-                            <span>Sign up with Facebook</span>
+                            <span>Sign in with Facebook</span>
                         </button>
                     </div>
                 </form>
@@ -60,5 +61,41 @@
             </div>
         </div>
     </div>
+
+
+    <!-- Facebook SDK -->
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1057377446451243', // 🔁 Replace with your actual Facebook App ID
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v19.0'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  function facebookLogin() {
+    FB.login(function(response) {
+      if (response.authResponse) {
+        FB.api('/me', {fields: 'name,email'}, function(profile) {
+          console.log('Welcome, ' + profile.name);
+          // 🔁 You can send profile info to your Django backend here via fetch/AJAX
+        });
+      } else {
+        console.log('Facebook login failed or cancelled.');
+      }
+    }, {scope: 'public_profile,email'});
+  }
+</script>
+
 </body>
 </html>

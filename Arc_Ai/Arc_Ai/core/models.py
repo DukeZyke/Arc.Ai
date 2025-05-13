@@ -1,4 +1,28 @@
 from django.db import models
+from django.utils.timezone import now
+
+ 
+# PRACTICE TEMPLATES =================================================
+
+class UserProfile(models.Model):
+    email = models.EmailField(unique=True)
+    address = models.CharField(max_length=120, default=None)
+    password = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f"{self.email} ({self.address})"
+
+class EditProfile(models.Model):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    new_email = models.EmailField()
+    new_address = models.CharField(max_length=120, default=None)
+
+    def __str__(self):
+        return f"Edit {self.user.email} to {self.new_email}\n Edit {self.user.address} to {self.new_address}"
+        
+
+# PRACTICE TEMPLATES =================================================
+
 
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
@@ -79,3 +103,14 @@ class SignupDetails(models.Model):
     complete_address = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=255)
     gender = models.CharField(max_length=255)
+    
+# For notification sidebar Popup TEST
+class Notification(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    posted_by = models.CharField(max_length=100)
+    created_at = models.DateTimeField(default=now)
+
+    def __str__(self):
+        return self.title
+# =======================================================

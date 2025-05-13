@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/org.css' %}">
 </head>
@@ -27,37 +28,20 @@
         <div id="notification_list">
             <ul>
                 <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
-                    <p>Schedule Update <span>Yesterday</span></p>
+                    <div class="title-and-date">
+                        <p>Schedule Update</p>
+                        <span>Yesterday</span>
+                    </div>
                     <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 202</p>
                     <p class="posted-by">- Imee Duterte</p>
-                    
-                </li>
-                <li class="notification_item" data-detail="Another meeting detail here.">
-                    <p>Schedule Update <span>Yesterday</span></p>
-                    <p class="short-description">Another meeting detail here General meeting at 10:30AM on Jan 3, 202 General meet</p>
-                    <p class="posted-by">- John Doe</p>
-                </li>
-                <li class="notification_item" data-detail="Another meeting detail here.">
-                    <p>Schedule Update <span>Yesterday</span></p>
-                    <p class="short-description">Another meeting detail here</p>
-                    <p class="posted-by">- Sarah Marcos</p>
-                </li>
-                <li class="notification_item" data-detail="Another meeting detail here.">
-                    <p>Schedule Update <span>Yesterday</span></p>
-                    <p class="short-description">Another meeting detail here</p>
-                    <p class="posted-by">- Ginno Arostique</p>
-                </li>
-                <li class="notification_item" data-detail="Another meeting detail here.">
-                    <p>Schedule Update <span>Yesterday</span></p>
-                    <p class="short-description">Another meeting detail here</p>
-                    <p class="posted-by">- Ginno Arostique</p>
                 </li>
             </ul>
         </div>
     </div>
     <!-- Detailed Notification -->
     <div id="detailed_notification" class="hidden">
-        <h2 id="notification_title">Schedule Update</h2><p class="notification_date">Yesterday, January 29, 2025</p>
+        <h2 id="notification_title">Schedule Update</h2>
+        <p class="notification_date">Yesterday, January 29, 2025</p>
         <button id="close_detailed_notification" class="close-btn">&times;</button>
         <p id="notification_detail"></p>
         <p class="posted-by">- Imee Duterte, Team Head</p>
@@ -117,7 +101,7 @@
                             <p>Project ID: HR-2024-ONB-01</p>
                             <p class="space">Start Date: 2024/11/10</p>
                             <p>Finished Date: -</p>
-                            <p class="status">Ongoing</p>
+                            <p class="status1">Ongoing</p>
                         </div>
                     </div>  
                 </div>
@@ -163,7 +147,7 @@
                             </div>
                             <div class="card-body">
                             <h3>{{project.name}}</h3>
-                            <div class="project-details">
+                            <div class="project-detailscard">
 
                                 <p>{{project.project_id}}</p>
                                 <div class="dategroup">

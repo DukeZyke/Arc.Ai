@@ -72,8 +72,8 @@
     flex-grow: 1; /* Make the line grow to fill the space */
     height: 2px; /* Thickness of the line */
     background-color: #ccc; /* Line color */
-    margin-left: 20px; /* Space between "Folders" and the line */
-    margin-right: 20px; /* Space between the line and dropdown button */
+    margin-left: 5px; /* Space between "Folders" and the line */
+    margin-right: 5px; /* Space between the line and dropdown button */
 }
 
 /***********file items***********/
@@ -90,7 +90,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 2px 7px;
-    margin-bottom: 10px;
+    margin-bottom: auto;
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }

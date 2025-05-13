@@ -220,7 +220,12 @@ body {
 }
 
 /* Notification Pop-Up */
-/* Notification Pop-Up */
+.notification_container h2 {
+    font-family: 'Arial', sans-serif;
+    color: #353A56;
+    margin-bottom: 10px;
+}
+
 #notification_popup {
     position: fixed;
     bottom: 20px;
@@ -308,11 +313,18 @@ body {
     margin: 0; /* Remove default margin */
 }
 
+.title-and-date {
+    display: flex;
+    justify-content: space-between; /* Ensures the span stays at the end of the line */
+    align-items: center; /* Aligns them vertically */
+    width: 100%; /* Ensures the container spans the full width */
+    word-break: break-word; /* Allows long words in the p to wrap */
+}
+
 .notification_item span {
     font-size: 14px;
+    font-family: 'Arial', sans-serif;
     color: #353A56;
-    align-self: flex-end; /* Align the timestamp to the right */
-    margin-left: 170px; /* Add space between the text and the timestamp */
 }
 
 .notification_item:hover {
@@ -371,10 +383,10 @@ body {
 }
 
 .notification_date{
-    margin-top: 56px;
+    margin-top: -12px;
     font-family: 'Arial', sans-serif;
     color: #353A56;
-    position: absolute;
+    position: relative;
 }
 
 #notification_detail {
@@ -387,7 +399,7 @@ body {
     font-size: 14px;
     color: #000000;
     scrollbar-width: none; /* For Firefox */
-    -ms-overflow-style: none; /* For Internet Explorer and Edge */
+    margin: 0;
 }
 
 /* Hide scrollbar for Webkit browsers (Chrome, Safari, Edge) */
