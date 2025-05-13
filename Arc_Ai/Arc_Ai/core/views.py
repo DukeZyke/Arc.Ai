@@ -30,8 +30,8 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-def edit_user(request):
-    return render(request, 'core/edit_user.html')
+def edit_user_profile(request):
+    return render(request, 'core/edit_user_profile.html')
 
 def signup_details(request):
     if request.method == 'POST':
