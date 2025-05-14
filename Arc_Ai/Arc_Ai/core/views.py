@@ -126,6 +126,10 @@ def practice1(request):
 #[PRACTICE TEMPLATES] ====================================================================
 
 
+def user_involved_map(request):
+    return render(request, 'core/user_involved_map.html')
+
+
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
