@@ -1,0 +1,421 @@
+/* Organization Map Styles */
+#organization_map_container {
+    position: relative;
+    width: calc(100% - 70px);
+    height: calc(100vh - 60px);
+    margin-left: 70px;
+    overflow: auto;
+}
+
+/* Grid background for alignment */
+#grid_background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: 50px 50px;
+    background-image:
+        linear-gradient(to right, rgba(99, 98, 98, 0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(99, 98, 98, 0.1) 1px, transparent 1px);
+    z-index: 0;
+}
+
+#organization_map {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 1;
+    transform-origin: top left; /* Match with arrows_container */
+}
+
+/* User bubble styling */
+.user_bubble {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: white;
+    border-radius: 30px;
+    padding: 10px 15px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: move;
+    z-index: 10;
+    transition: box-shadow 0.2s;
+    user-select: none;
+    width: 280px; /* Wider to match the design */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.user_bubble:hover {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.user_bubble.dragging {
+    opacity: 0.8;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.user_avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.user_info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user_name {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Expanded sidebar adjustment */
+#sidebar.expanded + #organization_map_container {
+    width: calc(100% - 200px);
+    margin-left: 200px;
+}
+
+/* Zoom controls */
+#zoom_controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+#zoom_controls button {
+    width: 40px;
+    height: 40px;
+    margin: 3px;
+    border: none;
+    background-color: white;
+    color: #353A56;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s;
+}
+
+#zoom_controls button:hover {
+    background-color: #f0f0f0;
+}
+
+#zoom_reset {
+    font-size: 12px !important;
+}
+
+/* Add transform-origin to organization_map */
+#organization_map {
+    transform-origin: center center;
+}
+
+/* Arrow SVG container */
+#arrows_container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    overflow: visible; /* Ensure markers at edges are visible */
+    transform-origin: center center; /* Match with organization_map for consistent zoom */
+}
+
+/* Add styles for the zoomed state */
+.zooming {
+    transition: transform 0.2s ease;
+}
+
+/* Arrow styling */
+.connection-path {
+    stroke: #353A56;
+    stroke-linecap: round;
+    fill: none;
+    pointer-events: stroke;
+    cursor: pointer;
+    vector-effect: non-scaling-stroke; /* Keeps stroke width consistent during zoom */
+}
+
+.connection-path:hover {
+    stroke: #5158a0;
+}
+
+.connection-path.selected {
+    stroke: #4285f4;
+}
+
+.connection-arrow {
+    fill: #353A56;
+}
+
+.connection-arrow.selected {
+    fill: #4285f4;
+}
+
+/* Ensure user bubbles are above arrows */
+.user_bubble {
+    z-index: 10;
+    width: 280px; /* Fixed width for consistency */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Arrow controls at bottom center */
+#arrow_controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    padding: 10px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 280px;
+}
+
+#create_arrow_btn, #delete_arrow_btn {
+    padding: 8px 12px;
+    background-color: #353A56;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+#create_arrow_btn:hover, #delete_arrow_btn:hover {
+    background-color: #4c5178;
+}
+
+#delete_arrow_btn {
+    background-color: #d32f2f;
+}
+
+#delete_arrow_btn:hover {
+    background-color: #f44336;
+}
+
+#arrow_properties {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.property_group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.property_group label {
+    font-size: 14px;
+    color: #333;
+    min-width: 70px;
+}
+
+#arrow_weight, #arrow_curve {
+    width: 100px;
+}
+
+#arrow_direction {
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white;
+}
+
+/* User bubble selection state */
+.user_bubble.selected {
+    box-shadow: 0 0 0 3px #4285f4, 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Helper class to show connection creation mode */
+.connection-mode {
+    cursor: crosshair !important;
+}
+
+.connection-mode .user_bubble {
+    cursor: pointer !important;
+}
+
+/* Dropdown toggle in user bubble */
+.toggle_dropdown {
+    margin-left: auto;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    margin-right: 10px; /* Increased margin to prevent arrow overlap */
+    position: relative; /* Ensure proper positioning */
+}
+
+.toggle_dropdown img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+    position: static; /* Changed from absolute to static */
+}
+
+/* Expanded state */
+.user_bubble.expanded {
+    border-radius: 30px 30px 0 0;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+    z-index: 50; /* Higher z-index when expanded */
+}
+
+.user_bubble.expanded .toggle_dropdown {
+    transform: rotate(180deg);
+}
+
+/* Files dropdown menu */
+.files_dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border-radius: 0 0 30px 30px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+    z-index: 40;
+}
+
+.user_bubble.expanded .files_dropdown {
+    max-height: 350px; /* Allow enough space for files */
+}
+
+/* File item styling */
+.file_item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.file_icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FF5252;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 3px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.file_name {
+    flex-grow: 1;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+.file_date:hover {
+    color: #4285f4;
+    text-decoration: underline;
+}
+
+.file_size {
+    font-size: 12px;
+    color: #888;
+    margin-right: 15px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.file_date {
+    font-size: 12px;
+    color: #353A56;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+/* Save controls */
+#save_controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#save_map {
+    padding: 8px 15px;
+    background-color: #353A56;
+    color: white;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#save_map:hover {
+    background-color: #4c5178;
+}
+
+#save_status {
+    color: #4CAF50;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: opacity 1s ease;
+}
+
+#save_status.hidden {
+    opacity: 0;
+}
+
+#save_status.visible {
+    opacity: 1;
+}
+
+/* Prevent dropdown from being draggable */
+.toggle_dropdown, .files_dropdown {
+    pointer-events: auto;
+}

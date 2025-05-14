@@ -124,13 +124,18 @@ def practice1(request):
     })
 
 #[PRACTICE TEMPLATES] ====================================================================
+def user_involved_map(request):
+    return render(request, 'core/user_involved_map.html')
 
+#[PRACTICE TEMPLATES] ====================================================================
+def admin_project_page(request):
+    return render(request, 'core/admin_project_page.html')
 
+#[PRACTICE TEMPLATES] ====================================================================
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
-def admin_project_page(request):
-    return render(request, 'core/admin_project_page.html')
+
 
 def signup_details(request):
     if request.method == 'POST':
