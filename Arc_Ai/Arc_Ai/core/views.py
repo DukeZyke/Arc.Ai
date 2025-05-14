@@ -24,6 +24,7 @@ import googleapiclient.discovery
 from googleapiclient.http import MediaIoBaseUpload
 import io
 from io import BytesIO
+from googleapiclient.errors import HttpError
 
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
 
@@ -291,6 +292,7 @@ def saved(request):
         trash_files = trashed_results.get('files', [])
     # Add metadata for each file
         for file in drive_files:
+            file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
@@ -509,6 +511,12 @@ def view_folder_contents(request, folder_id):
 
         trash_files = trashed_results.get('files', [])
 
+        # Add this to your view_folder_contents function after fetching files
+        for file in drive_files:
+            file['file_id'] = file['id']
+            # Add any other metadata processing you need
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
     except Exception as e:
         print("Error fetching folder contents from Google Drive:", str(e))
         messages.error(request, "Failed to fetch folder contents from Google Drive.")
@@ -532,32 +540,81 @@ def move_files_to_trash(request):
 
         creds_data = request.session.get('credentials')
         if not creds_data:
-            return JsonResponse({'error': 'You must authorize Google Drive to use trash.'}, status=403)
+            return JsonResponse({'error': 'You must authorize Google Drive to manage files.'}, status=403)
 
         creds = Credentials(**creds_data)
-
+        
         try:
             service = build('drive', 'v3', credentials=creds)
-
-            for file_id in file_ids:
-                # Update the file metadata to mark it as trashed
-                service.files().update(
-                    fileId=file_id,
-                    body={'trashed': True}
-                ).execute()
             
-            # Add this flag to indicate if it's the root folder
+            # Get current user's email for ownership comparison
+            user_info = service.about().get(fields="user").execute()
+            current_user_email = user_info['user']['emailAddress']
+            
+            trashed_files = []
+            deleted_files = []
+            skipped_files = []
+            
+            for file_id in file_ids:
+                try:
+                    # Get file info with owner information
+                    file_info = service.files().get(
+                        fileId=file_id, 
+                        fields="name,owners"
+                    ).execute()
+                    
+                    file_name = file_info.get("name", "Unknown")
+                    file_owners = file_info.get("owners", [])
+                    
+                    # Check if current user is the owner
+                    is_owner = any(owner.get('emailAddress') == current_user_email for owner in file_owners)
+                    
+                    if is_owner:
+                        # If owner, move to trash
+                        service.files().update(
+                            fileId=file_id,
+                            body={'trashed': True}
+                        ).execute()
+                        trashed_files.append({"id": file_id, "name": file_name})
+                    else:
+                        # If not owner, permanently delete
+                        service.files().delete(fileId=file_id).execute()
+                        deleted_files.append({"id": file_id, "name": file_name})
+                    
+                except HttpError as e:
+                    if e.resp.status == 403:
+                        # Permission error
+                        skipped_files.append({"id": file_id, "name": file_name})
+                        continue
+                    else:
+                        # Re-raise other errors
+                        raise
+            
+            # Create appropriate response message
+            message_parts = []
+            if trashed_files:
+                message_parts.append(f"Moved {len(trashed_files)} of your file(s) to trash")
+            if deleted_files:
+                message_parts.append(f"Permanently deleted {len(deleted_files)} file(s) owned by others")
+            if skipped_files:
+                message_parts.append(f"Skipped {len(skipped_files)} file(s) due to insufficient permissions")
+            
+            message = ". ".join(message_parts)
+            success = bool(trashed_files or deleted_files)
             is_root_folder = (folder_id == ROOT_FOLDER_ID)
             
             return JsonResponse({
-                'success': True, 
-                'message': 'Files moved to trash successfully.',
+                'success': success,
+                'message': message,
                 'folder_id': folder_id,
-                'is_root_folder': is_root_folder
+                'is_root_folder': is_root_folder,
+                'trashed_files': trashed_files,
+                'deleted_files': deleted_files,
+                'skipped_files': skipped_files
             })
 
         except Exception as e:
-            print("Error moving files to trash:", str(e))
+            print("Error processing files:", str(e))
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
