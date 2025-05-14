@@ -18,7 +18,7 @@
                 <h1 class="titles" style="margin-bottom: 12px;">Sign In</h1>
 
                 {% for message in messages %}
-                <h5 style="color: red; margin: 0 0 12px 0;">{{message}}</h5>
+                <h5 style="color: red; margin: auto;">{{message}}</h5>
                 {% endfor %}
 
                 <form id="form" method="post" action="{% url 'core:login' %}">
