@@ -129,8 +129,8 @@ def practice1(request):
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
-def admin_user_page(request):
-    return render(request, 'core/admin_user_page.html')
+def admin_project_page(request):
+    return render(request, 'core/admin_project_page.html')
 
 def signup_details(request):
     if request.method == 'POST':
