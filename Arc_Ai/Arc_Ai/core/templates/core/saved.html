@@ -95,82 +95,136 @@
             </div>
         </div>
     <div id="content">
-        <h1>Folders</h1>
-        <div id="folder_items">
-        {% for folder in folders %}
-            <p class="folders">{{ folder }}</p>
-        {% endfor %}
-        </div>
-        
+
         <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h1 class="titles">Files</h1>
-            
-            <!-- Horizontal Line Between Folders and Dropdown -->
+            <h1>Folders</h1>
+
             <div class="horizontal-line"></div>
-            
-                <!-- {% for message in messages %}
-                <h3 style="color: red;">message</h3>
-                {% endfor %} -->
+
 
             <!-- Dropdown Button -->
-            <img src="{% static 'Images/dots.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdown()" style="width: 40px; height: 40px; cursor: pointer;">
-            <div class="dropdown-content" id="myDropdown">
-                <!-- File Upload -->
-                <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
+            <img src="{% static 'Images/dots copy.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownFolders()" style="width: 40px; height: 40px; cursor: pointer;">
+            <div class="dropdown-content" id="myDropdownFolders">
+                <!-- Folder Creation -->
+                <form action="{% url 'core:create_folder_in_drive' %}" method="post">
                     {% csrf_token %}
-                    <input type="file" name="file" multiple required>
-                    <button type="submit">Upload</button>
+                    <input type="text" name="folder_name" placeholder="Folder Name" required>
+                    <button type="submit">Create</button>
                 </form>
                 <hr class="dropdown-divider">
 
                 <!-- DELETE Button -->
-                <a href="#" onclick="toggleCheckboxes()">DELETE</a>
+                <a href="#" onclick="">DELETE</a>
             </div>
         </div>
 
-        <ul class="file-list">
+            <div id="folder_items">
+                {% for folder in folders %}
+                    <div class="folder-item">
+                        <a href="{% url 'core:view_folder_contents' folder.id %}">{{ folder.name }}</a>
+                    </div>
+                {% empty %}
+                    <p>No folders found.</p>
+                {% endfor %}
+            </div>
+
+
+
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <h1 class="titles">Files</h1>
+                    
+                    <div class="horizontal-line"></div>
+                    
+                    <!-- Dropdown Button -->
+                    <img src="{% static 'Images/dots.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownFiles()" style="width: 40px; height: 40px; cursor: pointer;">
+                    <div class="dropdown-content" id="myDropdown">
+                        <!-- File Upload -->
+                        <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
+                            <input type="file" name="file" multiple required>
+                            <button type="submit">Upload</button>
+                        </form>
+                        <hr class="dropdown-divider">
+
+                        <!-- DELETE Button --><a href="#" onclick="toggleCheckboxes()">MOVE TO TRASH</a>
+                    </div>
+                </div>
+
+                <div id="file_items">
+                    <ul class="file-list">
+                            <div class="horizontal-line"></div>
+                            {% for file in files %}
+                                <li class="file-item">
+                                    <div class="file-icon">
+                                        <input type="checkbox" class ="file-checkbox"
+                                        style="display: none;" data-file-id="{{ file.file_id }}">
+                                        <img src="{% static file.icon %}" alt="File Icon">
+                                    </div>
+                                    <div class="file-details">
+                                        <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
+                                        <span class="file-owner">{{ file.owner }}</span>
+                                        <span class="file-date">{{ file.date }}</span>
+                                        <span class="file-size">{{ file.size }}</span>
+                                    </div>
+                                    <div class="file-actions">
+                                        <button class="action-button">⋮</button>
+                                    </div>
+                                </li>
+                                <div class="horizontal-line"></div>
+                            {% empty %}
+                                <li>No files uploaded yet.</li>
+                            {% endfor %}
+                        </ul>
+
+                    <!-- Single Delete Button that appears when checkboxes are shown -->
+                    <button id="delete-selected-btn" style="display: none;" onclick="moveToTrashSelectedFiles()">Move Selected Files to Trash</button>
+
+                    <!-- Keep the form for the CSRF token and folder ID -->
+                    <form id="delete-files-form" action="{% url 'core:move_files_to_trash' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
+                    </form>
+                    </div>
+                
+        
+
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+
+
+            <h3>Trash</h3>
             <div class="horizontal-line"></div>
-            {% for file in files %}
-                <li class="file-item">
-                    <div class="file-icon">
-                        <img src="{% static 'Images/file-icon.png' %}" alt="File Icon">
-                    </div>
-                    <div class="file-details">
-                        <p class="file-name"><a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank">{{ file.name }}</a></p>
-                        <p class="file-owner">{{ file.owner }}</p>
-                    </div>
-                    <div class="file-meta">
-                        <p>{{ file.date }}</p>
-                        <p>{{ file.size }}</p>
-                    </div>
-                    <div class="file-actions">
-                        <button class="action-button">⋮</button>
-                    </div>
-                </li>
-                <div class="horizontal-line"></div>
-            {% empty %}
-                <li>No files uploaded yet.</li>
-            {% endfor %}
-            
-        </ul>
+            <!-- Dropdown Button -->
+            <img src="{% static 'Images/dots copy 2.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownTrash()" style="width: 40px; height: 40px; cursor: pointer;">
+            <div class="dropdown-content" id="trashDropdown">
+                <!-- Remove All Trash Button -->
+                <form action="{% url 'core:empty_trash' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
+                </form>
+            </div>
+
+            </div>
+            <div id="file_items">
+                <ul>
+                {% for file in trash %}
+                    <li>
+                        <a href="{{ file.webViewLink }}" target="_blank">{{ file.name }}</a>
+                    </li>
+                {% empty %}
+                    <li>Trash is empty</li>
+                {% endfor %}
+                </ul>
 
 
-        <!-- Delete Selected Files Button -->
-        <button id="delete-selected-btn" style="display: none;" onclick="deleteSelectedFiles()">Delete Selected Files</button>
-
-        <h3>Trash</h3>
-        <div id="file_items">
-        {% for trash_file in trash %}
-            <p class="file">{{ trash_file }}</p>
-            <hr class="long-line">
-        {% endfor %}
-        </div>
+            </div>
     </div>
     <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="{% static 'js/saved.js' %}"></script>
 </body>
 
 <script>
-    function toggleDropdown() {
+    function toggleDropdownFiles() {
         document.getElementById("myDropdown").classList.toggle("show");
     }
     
@@ -187,6 +241,46 @@
             }
         }
     }
-    </script>
-    <script src="{% static 'js/saved.js' %}"></script>
+    function moveToTrashSelectedFiles() {
+    const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+    const fileIds = Array.from(checkboxes).map(checkbox => checkbox.dataset.fileId);
+    const form = document.getElementById('delete-files-form');
+
+    if (fileIds.length === 0) {
+        alert('No files selected to move to trash.');
+        return;
+    }
+
+    if (confirm(`Are you sure you want to move ${fileIds.length} selected file(s) to trash?`)) {
+        const formData = new FormData(form);
+        fileIds.forEach(fileId => formData.append('file_ids[]', fileId));
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Check if we're in root folder and redirect accordingly
+                if (data.is_root_folder) {
+                    window.location.href = '/saved/';
+                } else {
+                    window.location.href = `/folder/${data.folder_id}/`;
+                }
+            } else {
+                alert(data.error || 'An error occurred while moving files to trash.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while moving files to trash.');
+        });
+    }
+}
+</script>
+    
 </html>

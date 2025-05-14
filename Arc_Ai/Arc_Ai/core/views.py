@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
+from django.utils.timezone import datetime
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -23,12 +24,19 @@ import googleapiclient.discovery
 from googleapiclient.http import MediaIoBaseUpload
 import io
 from io import BytesIO
+from googleapiclient.errors import HttpError
 
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
 
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.file"
+]
+
+ROOT_FOLDER_ID = '1wdS3rmcuuiZ-mr2aH7SfYSTAF6Uvlv5z'
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+# This is for local development only. In production, use HTTPS.
 
 #[PRACTICE TEMPLATES] ====================================================================
 from .models import UserProfile
@@ -120,6 +128,9 @@ def practice1(request):
 
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
+
+def admin_project_page(request):
+    return render(request, 'core/admin_project_page.html')
 
 def signup_details(request):
     if request.method == 'POST':
@@ -241,9 +252,8 @@ def landingpage(request):
     return render(request, 'core/landingpage.html')
 
 def saved(request):
-    folders = [f"Folder {i}" for i in range(1, 21)]
-    trash = [f"Trash File {i}" for i in range(1, 21)]
-
+    folder_id = ROOT_FOLDER_ID
+    
     creds_data = request.session.get('credentials')
     if not creds_data:
         messages.error(request, "You must authorize Google Drive to fetch files.")
@@ -254,24 +264,53 @@ def saved(request):
     try:
         service = build('drive', 'v3', credentials=creds)
 
-        results = service.files().list(
-            pageSize=50,
-            fields="files(id, name, mimeType, webViewLink, parents)"
+        # Fetch folders from the root folder
+        folder_results = service.files().list(
+            q=f"'{folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+            pageSize=100,
+            fields="files(id, name, parents)"
         ).execute()
 
-        drive_files = results.get('files', [])
+        folders = folder_results.get('files', [])
+
+        # Fetch files from the root folder
+        file_results = service.files().list(
+            q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+            pageSize=100,
+            fields="files(id, name, mimeType, size, createdTime, owners)"
+        ).execute()
+
+        drive_files = file_results.get('files', [])
+        
+        # Fetch trashed files
+        trashed_results = service.files().list(
+            q="trashed = true",
+            pageSize=20,
+            fields="files(id, name, mimeType, webViewLink)"
+        ).execute()
+
+        trash_files = trashed_results.get('files', [])
+    # Add metadata for each file
+        for file in drive_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
 
     except Exception as e:
-        print("Error fetching files from Google Drive:", str(e))
-        messages.error(request, "Failed to fetch files from Google Drive.")
+        print("Error fetching files or folders from Google Drive:", str(e))
+        messages.error(request, "Failed to fetch files or folders from Google Drive.")
+        folders = []
         drive_files = []
+        trash_files = []
 
     return render(request, 'core/saved.html', {
         'folders': folders,
         'files': drive_files,
-        'trash': trash,
+        'trash': trash_files,  # Now passing actual trashed files
+        'ROOT_FOLDER_ID': ROOT_FOLDER_ID,
     })
-
 def email(request):
     online_users = User.objects.all() 
     emails = Email.objects.all()
@@ -328,33 +367,41 @@ def google_drive_callback(request):
 
 def upload_file_to_drive(request):
     if request.method == 'POST':
-        uploaded_file = request.FILES.get('file')
-        print("Received file:", uploaded_file.name)
+        uploaded_files = request.FILES.getlist('file')  # Get all uploaded files
+        folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)  # Get the folder ID from the form, default to root folder
 
         creds_data = request.session.get('credentials')
         if not creds_data:
-            print("No credentials in session. Redirecting to auth.")
             return redirect('core:google_drive_auth')
 
         creds = Credentials(**creds_data)
 
         try:
             service = build('drive', 'v3', credentials=creds)
-            media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.content_type)
-            file_metadata = {'name': uploaded_file.name,
-                            'parents': ['1katYIAY6Xzw1fOorjULbdMAneODhdVpl']}
 
-            file = service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields='id, name'
-            ).execute()
+            for uploaded_file in uploaded_files:
+                media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.content_type)
+                file_metadata = {
+                    'name': uploaded_file.name,
+                    'parents': [folder_id]  # Use the folder ID dynamically
+                }
 
-            DriveFile.objects.create(name=file['name'], file_id=file['id'])
+                file = service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id, name'
+                ).execute()
 
-            print(f"Uploaded to Drive: {file['name']} (ID: {file['id']})")
+                # Save the file details in the database
+                DriveFile.objects.create(name=file['name'], file_id=file['id'])
 
-            return redirect('core:saved')
+                print(f"Uploaded to Drive: {file['name']} (ID: {file['id']})")
+
+            # Check if upload was to root folder
+            if folder_id == ROOT_FOLDER_ID:
+                return redirect('core:saved')  # Redirect to saved.html for root folder
+            else:
+                return redirect('core:view_folder_contents', folder_id=folder_id)  # Redirect to folder view for other folders
 
         except Exception as e:
             print("Drive upload failed:", str(e))
@@ -364,7 +411,8 @@ def upload_file_to_drive(request):
 
 def delete_files_from_drive(request):
     if request.method == 'POST':
-        file_ids = request.POST.getlist('file_ids[]')
+        file_ids = request.POST.getlist('file_ids[]')  # Get the list of file IDs to delete
+        folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)  # Get the folder ID from the form, default to root folder
 
         creds_data = request.session.get('credentials')
         if not creds_data:
@@ -378,11 +426,246 @@ def delete_files_from_drive(request):
             for file_id in file_ids:
                 service.files().delete(fileId=file_id).execute()
 
-            return JsonResponse({'success': True, 'message': 'Files deleted successfully.'})
+            return JsonResponse({'success': True, 'message': 'Files deleted successfully.', 'folder_id': folder_id})
 
         except Exception as e:
             print("Error deleting files from Google Drive:", str(e))
             return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+def create_folder_in_drive(request):
+    if request.method == 'POST':
+        folder_name = request.POST.get('folder_name')  # Get the folder name from the form
+
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            messages.error(request, "You must authorize Google Drive to create folders.")
+            return redirect('core:google_drive_auth')
+
+        creds = Credentials(**creds_data)
+
+        try:
+            service = build('drive', 'v3', credentials=creds)
+
+            # Define folder metadata
+            folder_metadata = {
+                'name': folder_name,
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [ROOT_FOLDER_ID]  # Use the root folder ID
+            }
+
+            # Create the folder
+            folder = service.files().create(
+                body=folder_metadata,
+                fields='id, name'
+            ).execute()
+
+            print(f"Folder created: {folder['name']} (ID: {folder['id']})")
+            messages.success(request, f"Folder '{folder['name']}' created successfully.")
+            return redirect('core:saved')  # Redirect to the saved view
+
+        except Exception as e:
+            print("Error creating folder in Google Drive:", str(e))
+            messages.error(request, f"Error creating folder: {str(e)}")
+            return redirect('core:saved')  # Redirect to the saved view even on error
+
+    messages.error(request, "Invalid request method.")
+    return redirect('core:saved')  # Redirect to the saved view for invalid request methods
+
+def view_folder_contents(request, folder_id):
+    creds_data = request.session.get('credentials')
+    if not creds_data:
+        messages.error(request, "You must authorize Google Drive to view folder contents.")
+        return redirect('core:google_drive_auth')
+
+    creds = Credentials(**creds_data)
+
+    try:
+        service = build('drive', 'v3', credentials=creds)
+
+        # Fetch folders from the root folder
+        folder_results = service.files().list(
+            q=f"'{ROOT_FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder'",
+            pageSize=100,
+            fields="files(id, name, parents)"
+        ).execute()
+
+        folders = folder_results.get('files', [])
+
+        # Fetch files inside the clicked folder
+        file_results = service.files().list(
+            q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder'",
+            pageSize=100,
+            fields="files(id, name, mimeType, webViewLink, parents)"
+        ).execute()
+
+        drive_files = file_results.get('files', [])
+        
+        # Fetch trashed files - ADD THIS BLOCK
+        trashed_results = service.files().list(
+            q="trashed = true",
+            pageSize=20,
+            fields="files(id, name, mimeType, webViewLink)"
+        ).execute()
+
+        trash_files = trashed_results.get('files', [])
+
+        # Add this to your view_folder_contents function after fetching files
+        for file in drive_files:
+            file['file_id'] = file['id']
+            # Add any other metadata processing you need
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
+    except Exception as e:
+        print("Error fetching folder contents from Google Drive:", str(e))
+        messages.error(request, "Failed to fetch folder contents from Google Drive.")
+        folders = []
+        drive_files = []
+        trash_files = []  # Add this line
+
+    return render(request, 'core/saved.html', {
+        'folders': folders,  # Pass folders to the template
+        'files': drive_files,  # Pass files inside the clicked folder
+        'folder_id': folder_id,  # Pass the current folder ID to the template
+        'ROOT_FOLDER_ID': ROOT_FOLDER_ID,  # Pass ROOT_FOLDER_ID to the template
+        'trash': trash_files,  # Add this line to pass trash files
+    })
+
+
+def move_files_to_trash(request):
+    if request.method == 'POST':
+        file_ids = request.POST.getlist('file_ids[]')
+        folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)
+
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to manage files.'}, status=403)
+
+        creds = Credentials(**creds_data)
+        
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Get current user's email for ownership comparison
+            user_info = service.about().get(fields="user").execute()
+            current_user_email = user_info['user']['emailAddress']
+            
+            trashed_files = []
+            deleted_files = []
+            skipped_files = []
+            
+            for file_id in file_ids:
+                try:
+                    # Get file info with owner information
+                    file_info = service.files().get(
+                        fileId=file_id, 
+                        fields="name,owners"
+                    ).execute()
+                    
+                    file_name = file_info.get("name", "Unknown")
+                    file_owners = file_info.get("owners", [])
+                    
+                    # Check if current user is the owner
+                    is_owner = any(owner.get('emailAddress') == current_user_email for owner in file_owners)
+                    
+                    if is_owner:
+                        # If owner, move to trash
+                        service.files().update(
+                            fileId=file_id,
+                            body={'trashed': True}
+                        ).execute()
+                        trashed_files.append({"id": file_id, "name": file_name})
+                    else:
+                        # If not owner, permanently delete
+                        service.files().delete(fileId=file_id).execute()
+                        deleted_files.append({"id": file_id, "name": file_name})
+                    
+                except HttpError as e:
+                    if e.resp.status == 403:
+                        # Permission error
+                        skipped_files.append({"id": file_id, "name": file_name})
+                        continue
+                    else:
+                        # Re-raise other errors
+                        raise
+            
+            # Create appropriate response message
+            message_parts = []
+            if trashed_files:
+                message_parts.append(f"Moved {len(trashed_files)} of your file(s) to trash")
+            if deleted_files:
+                message_parts.append(f"Permanently deleted {len(deleted_files)} file(s) owned by others")
+            if skipped_files:
+                message_parts.append(f"Skipped {len(skipped_files)} file(s) due to insufficient permissions")
+            
+            message = ". ".join(message_parts)
+            success = bool(trashed_files or deleted_files)
+            is_root_folder = (folder_id == ROOT_FOLDER_ID)
+            
+            return JsonResponse({
+                'success': success,
+                'message': message,
+                'folder_id': folder_id,
+                'is_root_folder': is_root_folder,
+                'trashed_files': trashed_files,
+                'deleted_files': deleted_files,
+                'skipped_files': skipped_files
+            })
+
+        except Exception as e:
+            print("Error processing files:", str(e))
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+
+def get_trashed_files(request):
+    creds_data = request.session.get('credentials')
+    if not creds_data:
+        return []
+
+    creds = Credentials(**creds_data)
+
+    try:
+        service = build('drive', 'v3', credentials=creds)
+        
+        # Fetch trashed files
+        trashed_results = service.files().list(
+            q="trashed = true",
+            pageSize=20,
+            fields="files(id, name, mimeType, webViewLink)"
+        ).execute()
+
+        return trashed_results.get('files', [])
+
+    except Exception as e:
+        print("Error fetching trashed files:", str(e))
+        return []
+    
+
+
+def empty_trash(request):
+    if request.method == 'POST':
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to empty trash.'}, status=403)
+
+        creds = Credentials(**creds_data)
+
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Empty trash (deletes all trashed files permanently)
+            service.files().emptyTrash().execute()
+            
+            messages.success(request, "Trash emptied successfully.")
+            return redirect('core:saved')
+
+        except Exception as e:
+            print("Error emptying trash:", str(e))
+            messages.error(request, f"Error emptying trash: {str(e)}")
+            return redirect('core:saved')
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
@@ -409,3 +692,16 @@ def get_notifications(request):
         for notification in notifications
     ]
     return JsonResponse(data, safe=False)
+
+def get_file_icon(mime_type):
+    file_icons = {
+        'application/pdf': 'Images/pdf.png',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Images/docx.png',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Images/csv.png',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Images/pptx.png',
+        'image/jpeg': 'Images/image.png',
+        'image/png': 'Images/image.png',
+        'text/plain': 'Images/default.png',
+        # Add more MIME types as needed
+    }
+    return file_icons.get(mime_type, 'Images/default.png')

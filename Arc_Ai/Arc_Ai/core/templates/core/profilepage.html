@@ -96,23 +96,23 @@
             </div>
         </div>
         <div id="main-content">
-            <section class="MainProfile">
-                <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
-                <div class="userInfo">
-                    <h1 class="username">{{personal_information.name}}</h1>
-                    <h3 class="email">{{personal_information.email}}</h3>
-                    <h3 class="user-title">{{personal_information.user_title}}</h3>
-                </div>
-                <div class="setting-icon">
-                    <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
-                </div>
-            </section>
+    <section class="MainProfile">
+        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+        <div class="userInfo">
+            <h1 class="username">{{personal_information.name}}</h1>
+            <h3 class="email">{{personal_information.email}}</h3>
+            <h3 class="user-title">{{personal_information.user_title}}</h3>
         </div>
-        <section class="PersonalInformation">
-            <div class="header-with-line">
-                <h1 class="Title">Personal Information</h1>
-                <hr class="divider"/>
-            </div>
+        <div class="setting-icon">
+            <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
+        </div>
+    </section>
+
+    <section class="PersonalInformation">
+        <div class="header-with-line">
+            <h1 class="Title">Personal Information</h1>
+            <hr class="divider"/>
+        </div>
 
             <div class="info-grid">
                 <div class="info">
