@@ -130,7 +130,11 @@ def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
 def admin_project_page(request):
-    return render(request, 'core/admin_project_page.html')
+    projects = Project.objects.all()
+
+    return render(request,'core/admin_project_page.html', {
+        'projects': projects
+    })
 
 def signup_details(request):
     if request.method == 'POST':
@@ -160,16 +164,12 @@ def signup_details(request):
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
 
+
+
 def profilepage(request):
     projects = Project.objects.all()
     employee_awards = EmployeeAward.objects.all()
-
-    # Fetch the PersonalInformation linked to the logged-in user's SignupDetails
-    personal_information = None
-    if request.user.is_authenticated:
-        signup_details = SignupDetails.objects.filter(first_name=request.user.first_name).first()
-        if signup_details:
-            personal_information = PersonalInformation.objects.filter(signup_details=signup_details).first()
+    personal_information = PersonalInformation.objects.first()
 
     return render(request, 'core/profilepage.html', {
         'projects': projects,
