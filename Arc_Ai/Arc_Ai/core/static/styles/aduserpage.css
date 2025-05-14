@@ -1,0 +1,138 @@
+/* Project Management Section */
+#project-management {
+    margin-left: 70px; /* Avoid overlap with the sidebar */
+    padding: 30px;
+    background-color: #f4f6f9;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Adjustments for responsiveness */
+@media (max-width: 768px) {
+    #project-management {
+        margin-left: 70px; /* Adjust for collapsed sidebar on smaller screens */
+    }
+}
+
+.project-management-header {
+    display: flex;
+    margin-right: 80px;
+    margin-left: 80px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #dcdde1; /* Add a horizontal line */
+    padding-bottom: 15px; /* Add spacing below the line */
+}
+
+.project-management-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#search-projects {
+    padding: 10px 14px;
+    border: 1px solid #dcdde1;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 300px;
+}
+
+#search-button img {
+    width: 18px;
+    height: 18px;
+}
+
+.project-count {
+    font-size: 16px;
+    color: #34495e;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: #6c5ce7;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.project-card {
+    height: 283px;
+    margin-right: 110px;
+    margin-left: 120px;
+    display: flex;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 30px; /* Adjust padding for larger size */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+.project-icon img {
+    width: 100px; /* Increase size for better proportion */
+    height: 100px;
+}
+
+.project-info {
+    flex: 2;
+    margin-left: 30px; /* Increase spacing for larger card */
+}
+
+.project-info h3 {
+    margin: 0;
+    font-size: 22px; /* Increase font size for better readability */
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.project-info p {
+    margin: 8px 0; /* Adjust spacing for larger card */
+    font-size: 16px; /* Increase font size */
+    color: #7f8c8d;
+}
+
+.project-meta {
+    flex: 2;
+    font-size: 16px; /* Increase font size */
+    color: #7f8c8d;
+}
+
+.project-meta p {
+    margin: 8px 0; /* Adjust spacing for larger card */
+}
+
+.status-ongoing {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.project-actions {
+    display: flex;
+    gap: 20px; /* Increase spacing between action buttons */
+}
+
+.edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-btn img, .delete-btn img {
+    width: 30px; /* Increase size for better proportion */
+    height: 30px;
+}
