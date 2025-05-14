@@ -118,12 +118,6 @@
             </div>
         </div>
 
-
-
-
-
-
-
             <div id="folder_items">
                 {% for folder in folders %}
                     <div class="folder-item">
@@ -158,18 +152,30 @@
                 </div>
 
                 <div id="file_items">
-                    <ul>
-                    {% for file in files %}
-                        <li>
-                            <input type="checkbox" class="file-checkbox" style="display: none;" data-file-id="{{ file.id }}">
-                            <a href="{{ file.webViewLink }}" target="_blank">
-                                {{ file.name }}
-                            </a>
-                        </li>
-                    {% empty %}
-                        <li>No files uploaded yet.</li>
-                    {% endfor %}
-                    </ul>
+                    <ul class="file-list">
+                            <div class="horizontal-line"></div>
+                            {% for file in files %}
+                                <li class="file-item">
+                                    <div class="file-icon">
+                                        <input type="checkbox" class ="file-checkbox"
+                                        style="display: none;" data-file-id="{{ file.file_id }}">
+                                        <img src="{% static file.icon %}" alt="File Icon">
+                                    </div>
+                                    <div class="file-details">
+                                        <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
+                                        <span class="file-owner">{{ file.owner }}</span>
+                                        <span class="file-date">{{ file.date }}</span>
+                                        <span class="file-size">{{ file.size }}</span>
+                                    </div>
+                                    <div class="file-actions">
+                                        <button class="action-button">⋮</button>
+                                    </div>
+                                </li>
+                                <div class="horizontal-line"></div>
+                            {% empty %}
+                                <li>No files uploaded yet.</li>
+                            {% endfor %}
+                        </ul>
 
                     <!-- Single Delete Button that appears when checkboxes are shown -->
                     <button id="delete-selected-btn" style="display: none;" onclick="moveToTrashSelectedFiles()">Move Selected Files to Trash</button>
@@ -179,7 +185,8 @@
                         {% csrf_token %}
                         <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
                     </form>
-                </div>
+                    </div>
+                
         
 
             <div style="display: flex; align-items: center; justify-content: space-between;">
