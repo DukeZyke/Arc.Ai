@@ -1,0 +1,228 @@
+/* Project Management Section */
+#project-management {
+    margin-left: 70px; /* Avoid overlap with the sidebar */
+    padding: 30px;
+    background-color: #f4f6f9;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Adjustments for responsiveness */
+@media (max-width: 768px) {
+    #project-management {
+        margin-left: 70px; /* Adjust for collapsed sidebar on smaller screens */
+    }
+}
+
+.project-management-header {
+    display: flex;
+    margin-right: 80px;
+    margin-left: 80px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #dcdde1; /* Add a horizontal line */
+    padding-bottom: 15px; /* Add spacing below the line */
+}
+
+.project-management-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Enhanced search styling */
+.search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#search-projects {
+    padding: 10px 36px 10px 14px;
+    border: 1px solid #dcdde1;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 300px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#search-projects:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+#search-button {
+    background: #6c5ce7;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#search-button:hover {
+    background: #5649c0;
+}
+
+#search-button img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 93px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 8px;
+    display: none;
+}
+
+#search-projects.has-content + .clear-search-btn {
+    display: block;
+}
+
+.project-management-header h1.searching {
+    position: relative;
+}
+
+.project-management-header h1.searching::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 10px;
+    border: 2px solid #6c5ce7;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px 110px 20px 120px;
+    color: #7f8c8d;
+    font-size: 18px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.project-count {
+    font-size: 16px;
+    color: #34495e;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: #7d70e6;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.project-card {
+    height: 200px;
+    margin-right: 110px;
+    margin-left: 120px;
+    display: flex;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 30px; /* Adjust padding for larger size */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+.project-icon img {
+    width: 100px; /* Increase size for better proportion */
+    height: 100px;
+}
+
+.project-info {
+    flex: 2;
+    margin-left: 30px;
+    margin-top: 30px; /* Increase spacing for larger card */
+}
+
+.project-info h3 {
+    margin: 0;
+    font-size: 22px; /* Increase font size for better readability */
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.project-info p {
+    margin: 26px 0; /* Adjust spacing for larger card */
+    font-size: 16px; /* Increase font size */
+    color: #7f8c8d;
+}
+
+.project-meta {
+    flex: 2;
+    font-size: 16px; /* Increase font size */
+    color: #7f8c8d;
+}
+
+.project-meta p {
+    margin: 26px 0; /* Adjust spacing for larger card */
+}
+
+.status-ongoing {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.project-actions {
+    display: flex;
+    gap: 20px; /* Increase spacing between action buttons */
+}
+
+.edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-btn img, .delete-btn img {
+    width: 30px; /* Increase size for better proportion */
+    height: 30px;
+}
+
+/* Search Results Count */
+.search-results-count {
+    font-size: 16px;
+    margin-left: 20px;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+}
+
+.search-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: #df8c2d;
+    border-radius: 50%;
+    margin-left: 10px;
+}
