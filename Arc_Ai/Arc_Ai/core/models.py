@@ -1,27 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
 
- 
-# PRACTICE TEMPLATES =================================================
-
-class UserProfile(models.Model):
-    email = models.EmailField(unique=True)
-    address = models.CharField(max_length=120, default=None)
-    password = models.CharField(max_length=120)
-
-    def __str__(self):
-        return f"{self.email} ({self.address})"
-
-class EditProfile(models.Model):
-    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    new_email = models.EmailField()
-    new_address = models.CharField(max_length=120, default=None)
-
-    def __str__(self):
-        return f"Edit {self.user.email} to {self.new_email}\n Edit {self.user.address} to {self.new_address}"
-        
-
-# PRACTICE TEMPLATES =================================================
 
 
 class Email(models.Model):
@@ -34,12 +13,6 @@ class Email(models.Model):
     def __str__(self):
         return self.title
     
-class Project(models.Model):
-    name = models.CharField(max_length=100)
-    project_id = models.CharField(max_length=20, unique=True, blank=True)
-    start_date = models.DateField(max_length=20)
-    finish_date = models.DateField(max_length=20)
-    project_status = models.CharField(max_length=50)
 
     def save(self, *args, **kwargs):
         if not self.project_id:
@@ -57,11 +30,6 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
 class PersonalInformation(models.Model):
-    # signup_details = models.OneToOneField(
-    #     'SignupDetails', 
-    #     on_delete=models.CASCADE, 
-    #     related_name='personal_information'
-    # )
     name = models.CharField(max_length=100, default='Enter your name')
     email = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
@@ -70,6 +38,10 @@ class PersonalInformation(models.Model):
     birth_date = models.DateField(max_length=20)
     gender = models.CharField(max_length=10)
     user_title = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+    
 
 class EmployeeAward(models.Model):
     award_classif = models.CharField(max_length=100)
@@ -114,3 +86,63 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 # =======================================================
+
+
+
+
+
+
+
+# PRACTICE TEMPLATES =================================================
+
+class UserProfile(models.Model):
+    email = models.EmailField(unique=True)
+    address = models.CharField(max_length=120, default=None)
+    password = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f"{self.email} ({self.address})"
+
+class EditProfile(models.Model):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    new_email = models.EmailField()
+    new_address = models.CharField(max_length=120, default=None)
+
+    def __str__(self):
+        return f"Edit {self.user.email} to {self.new_email}\n Edit {self.user.address} to {self.new_address}"
+        
+
+# PRACTICE TEMPLATES =================================================
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    project_id = models.CharField(max_length=20, unique=True, blank=True)
+    start_date = models.DateField(max_length=20)
+    finish_date = models.DateField(max_length=20)
+    project_status = models.CharField(max_length=50)
+    project_manager = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name} {self.project_id}"
+    
+class ProjectMember(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')
+    member_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.member_name} ({self.project.name})"
+    
+
+    
+# class CreateProject(models.Model):
+#     project = models.OneToOneField(Project, on_delete=models.CASCADE) 
+#     project_members = super(Project.project_members)
+
+#     for members in project_members:
+#         member_names = models.CharField(max_length=200)
+
+# class EditProject(models.Model):
+#     project = models.OneToOneField(Project, on_delete=models.CASCADE) 
+
+

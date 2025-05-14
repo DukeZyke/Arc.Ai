@@ -25,9 +25,10 @@
 }
 
 .project-management-header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #2c3e50;
+    font-size: 38px;
+    font-style:'Inter', sans-serif;
+    font-weight: 200;
+    color: black;
 }
 
 /* Enhanced search styling */
@@ -35,16 +36,46 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+    justify-content: flex-start; /* Prevent shifting */
+}
+
+.search-bar input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Style for the search icon */
+.search-bar .search-icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #888;;
+}
+
+.search-bar .search-icon-btn:hover {
+    color: #6c5ce7; /* Change color on hover */
+}
+
+.search-bar .search-icon-btn i {
+    pointer-events: none; /* Prevent the icon from blocking button clicks */
 }
 
 #search-projects {
-    padding: 10px 36px 10px 14px;
+     width: 100%; /* Ensure the input doesn't resize */
+    padding: 10px 40px 10px 10px; /* Consistent padding */
     border: 1px solid #dcdde1;
-    border-radius: 6px;
+    border-radius: 12px;
     font-size: 14px;
-    width: 300px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth focus effect */
 }
 
 #search-projects:focus {
@@ -54,7 +85,6 @@
 }
 
 #search-button {
-    background: #6c5ce7;
     border: none;
     border-radius: 6px;
     padding: 10px;
@@ -62,15 +92,6 @@
     transition: background 0.3s;
 }
 
-#search-button:hover {
-    background: #5649c0;
-}
-
-#search-button img {
-    width: 18px;
-    height: 18px;
-    filter: brightness(0) invert(1);
-}
 
 .clear-search-btn {
     position: absolute;
@@ -83,11 +104,7 @@
     font-size: 16px;
     cursor: pointer;
     padding: 0 8px;
-    display: none;
-}
-
-#search-projects.has-content + .clear-search-btn {
-    display: block;
+    visibility: hidden;
 }
 
 .project-management-header h1.searching {
@@ -122,7 +139,7 @@
 }
 
 .project-count {
-    font-size: 16px;
+    font-size: 18px;
     color: #34495e;
 }
 
@@ -156,33 +173,48 @@
 }
 
 .project-icon img {
-    width: 100px; /* Increase size for better proportion */
-    height: 100px;
+    width: 152.444px;
+    height: 194px;
+    flex-shrink: 0;
+    border-radius: 15px;
+    background: #FFF;
+    box-shadow: -2px 3px 5.5px 3px rgba(0, 0, 0, 0.25);
 }
 
 .project-info {
     flex: 2;
     margin-left: 30px;
     margin-top: 30px; /* Increase spacing for larger card */
+    margin-bottom: 26px;
 }
 
 .project-info h3 {
-    margin: 0;
-    font-size: 22px; /* Increase font size for better readability */
-    font-weight: 600;
-    color: #2c3e50;
+    color: #000;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    width: 331px
 }
 
 .project-info p {
-    margin: 26px 0; /* Adjust spacing for larger card */
-    font-size: 16px; /* Increase font size */
-    color: #7f8c8d;
+    color: #000;
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 200;
+    line-height: normal;
 }
 
 .project-meta {
-    flex: 2;
-    font-size: 16px; /* Increase font size */
-    color: #7f8c8d;
+    color: #000;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    width: 313px;
 }
 
 .project-meta p {
@@ -192,6 +224,10 @@
 .status-ongoing {
     color: #27ae60;
     font-weight: bold;
+    font-style: italic;
+}
+.status {
+    font-style: italic;
 }
 
 .project-actions {
@@ -212,10 +248,9 @@
 
 /* Search Results Count */
 .search-results-count {
-    font-size: 16px;
+    font-size: 18px;
     margin-left: 20px;
     padding: 5px 10px;
-    transition: all 0.3s ease;
 }
 
 .search-indicator {

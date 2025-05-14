@@ -7,7 +7,7 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.admin_project_page, name='admin_project_page'),
+    path('', views.user_involved_map, name='user_involved_map'),
     path('signup_details/', views.signup_details, name='signup_details'),
     path('landingpage/', views.landingpage, name='landingpage'),
     path('login/', views.login, name='login'),
@@ -16,6 +16,7 @@ urlpatterns = [
     path('email/', views.email, name='email'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('home/', views.home, name='home'),
+    path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/', views.profilepage, name='profilepage'),
     path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),

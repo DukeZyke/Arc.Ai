@@ -127,17 +127,25 @@ def practice1(request):
 #[PRACTICE TEMPLATES] ====================================================================
 
 
+def user_involved_map(request):
+    return render(request, 'core/user_involved_map.html')
+
+
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
 def admin_project_page(request):
+    projects = Project.objects.all()
+
     # Check if user is authenticated and has admin privileges
     if not request.user.is_authenticated or not request.user.is_staff:
         messages.error(request, "You need administrator privileges to access this page.")
         return redirect('core:login')  # Or redirect to home
     
     # Continue with the admin page view for authorized users
-    return render(request, 'core/admin_project_page.html')
+    return render(request,'core/admin_project_page.html', {
+        'projects': projects
+    })
 
 def signup_details(request):
     if request.method == 'POST':
@@ -167,16 +175,12 @@ def signup_details(request):
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
 
+
+
 def profilepage(request):
     projects = Project.objects.all()
     employee_awards = EmployeeAward.objects.all()
-
-    # Fetch the PersonalInformation linked to the logged-in user's SignupDetails
-    personal_information = None
-    if request.user.is_authenticated:
-        signup_details = SignupDetails.objects.filter(first_name=request.user.first_name).first()
-        if signup_details:
-            personal_information = PersonalInformation.objects.filter(signup_details=signup_details).first()
+    personal_information = PersonalInformation.objects.first()
 
     return render(request, 'core/profilepage.html', {
         'projects': projects,

@@ -4,20 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organization</title>
+    <title>Admin-Project Page</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/adminstyles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/adprojpage.css' %}">
 </head>
 <body>
 
 <div id="sidebar">
     <div id="sidebar_content" class="hidden">
-        <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
-        <p><a href="{% url 'core:home' %}">Home</a></p>
-        <p><a href="{% url 'core:organization' %}">Organization</a></p>
-        <p><a href="{% url 'core:saved' %}">Saved</a></p>
-        <p><a href="{% url 'core:email' %}">Email</a></p>
+        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:home' %}">Projects</a></p>
+        <p><a href="{% url 'core:organization' %}">Files</a></p>
     </div>
     <hr class="divider_sidebar"/>
 
@@ -54,53 +53,31 @@
             <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
             <p id="navigation_paragraph">Navigate</p>
         </div>
-        <div class="nav_item">
-            <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
-            <p>Settings</p>
+    </div>
+</div>
+
+    <div id="header">
+        <div>
+            <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+        </div>
+        <div id="header_nav" class="text_white">
+            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
+            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
+            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+        </div>
+        <div>
+            <button class="logout">Log out</button>
         </div>
     </div>
-</div>
-
-<div id="header">
-    <div>
-        <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
-    </div>
-    <div id="header_nav" class="text_white">
-
-        {% if user.is_staff %}
-        <!-- Admin-only link -->
-        <p><a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Project Management</a></p>
-
-        {% if user.is_authenticated %}
-            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
-            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Users</a></p>
-            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Projects</a></p>
-            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Files</a></p>
-            
-
-            {% endif %}
-        {% else %}
-            <!-- Show login links for unauthenticated users -->
-            <p><a href="{% url 'core:login' %}">Login</a></p>
-            <p><a href="{% url 'core:signup' %}">Sign Up</a></p>
-        {% endif %}
-    </div>
-    <div>
-        <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
-        {% if user.is_authenticated and user.is_staff %}
-            <span class="admin-badge"></span>
-        {% endif %}
-    </div>
-</div>
 
 <div id="project-management">
     <div class="project-management-header">
         <h1>Project Management</h1>
         <div class="search-bar">
             <input type="text" placeholder="Search Projects..." id="search-projects">
-            <button id="search-button">
-                <img src="{% static 'Images/search-icon.png' %}" alt="Search">
-            </button>
+                <button id="search-button" class="search-icon-btn">
+                    <i class="bx bx-search"></i>
+                </button>
         </div>
         <div class="project-count">
             <span>Total Projects: <strong>69</strong></span>
@@ -114,103 +91,46 @@
     </div>
 
     <div class="project-list">
-        <!-- Project Card -->
-        <div class="project-card">
-            <div class="project-icon">
-                <img src="{% static 'Images/project-icon.png' %}" alt="Project Icon">
-            </div>
+        {% for project in projects %}
+            <!-- Project Card -->
+            <div class="project-card">
+                <div class="project-icon">
+                    <img src="{% static 'Images/project-icon.png' %}" alt="Project Icon">
+                </div>
+                <div class="project-info">
+                    <h3>{{ project.name }}</h3>
+                    <p>Project ID: HR-2024-ONB-{{ project.project_id }}</p>
+                    <p>Start Date: {{ project.start_date }}</p>
+                </div>
 
-            <div class="project-info">
-                <h3>New Employee Onboarding System Design</h3>
-                <p>Project ID: HR-2024-ONB-01</p>
-                <p>Start Date: 2025/06/01</p>
+                <div class="project-meta">
+                    <p>{{ project.project_manager }}</p>
+                    <p>
+                        Project Team:
+                        {% with total=project.members.count %}
+                            {% for member in project.members.all %}
+                                {% if forloop.counter <= 5 %}
+                                    {{ member.member_name }}{% if forloop.counter < 5 and forloop.counter < total %}, {% endif %}
+                                {% elif forloop.counter == 6 %}
+                                    and {{ total|add:"-5" }} others
+                                {% endif %}
+                            {% empty %}
+                                No members assigned.
+                            {% endfor %}
+                        {% endwith %}
+                    </p>
+                    <p class="status">Status: <span class="status-ongoing">{{project.project_status}}</span></p>
+                </div>
+                <div class="project-actions">
+                    <button class="edit-btn">
+                        <img src="{% static 'Images/edit-icon.png' %}" alt="Edit">
+                    </button>
+                    <button class="delete-btn">
+                        <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
+                    </button>
+                </div>
             </div>
-            <div class="project-meta">
-                <p>Project Manager: John Doe</p>
-                <p>Project Team: John Doe, Sarah Marcos, Imee Duterte, etc.</p>
-                <p>Status: <span class="status-ongoing">Ongoing</span></p>
-            </div>
-            <div class="project-actions">
-                <button class="edit-btn">
-                    <img src="{% static 'Images/edit-icon.png' %}" alt="Edit">
-                </button>
-                <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-                </button>
-            </div>
-        </div>
-        
-        <div class="project-card">
-            <div class="project-icon">
-                <img src="{% static 'Images/project-icon.png' %}" alt="Project Icon">
-            </div>
-            <div class="project-info">
-                <h3>New Employee Onboarding System Design</h3>
-                <p>Project ID: HR-2024-ONB-01</p>
-                <p>Start Date: 2025/06/01</p>
-            </div>
-            <div class="project-meta">
-                <p>Project Manager: John Doe</p>
-                <p>Project Team: John Doe, Sarah Marcos, Imee Duterte, etc.</p>
-                <p>Status: <span class="status-ongoing">Ongoing</span></p>
-            </div>
-            <div class="project-actions">
-                <button class="edit-btn">
-                    <img src="{% static 'Images/edit-icon.png' %}" alt="Edit">
-                </button>
-                <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-                </button>
-            </div>
-        </div>
-
-        <div class="project-card">
-            <div class="project-icon">
-                <img src="{% static 'Images/project-icon.png' %}" alt="Project Icon">
-            </div>
-            <div class="project-info">
-                <h3>P</h3>
-                <p>Project ID: TEST-P-001</p>
-                <p>Start Date: 2025/01/15</p>
-            </div>
-            <div class="project-meta">
-                <p>Project Manager: Patricia Miller</p>
-                <p>Project Team: Paul Davis, Peter Wilson</p>
-                <p>Status: <span class="status-ongoing">Ongoing</span></p>
-            </div>
-            <div class="project-actions">
-                <button class="edit-btn">
-                    <img src="{% static 'Images/edit-icon.png' %}" alt="Edit">
-                </button>
-                <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-                </button>
-            </div>
-        </div>
-
-        <div class="project-card">
-            <div class="project-icon">
-                <img src="{% static 'Images/project-icon.png' %}" alt="Project Icon">
-            </div>
-            <div class="project-info">
-                <h3>Employee Onboarding System Design</h3>
-                <p>Project ID: HR-2024-ONB-01</p>
-                <p>Start Date: 2025/06/01</p>
-            </div>
-            <div class="project-meta">
-                <p>Project Manager: John Doe</p>
-                <p>Project Team: John Doe, Sarah Marcos, Imee Duterte, etc.</p>
-                <p>Status: <span class="status-ongoing">Ongoing</span></p>
-            </div>
-            <div class="project-actions">
-                <button class="edit-btn">
-                    <img src="{% static 'Images/edit-icon.png' %}" alt="Edit">
-                </button>
-                <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-                </button>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 

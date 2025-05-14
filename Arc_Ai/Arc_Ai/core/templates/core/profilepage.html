@@ -101,10 +101,12 @@
         <div id="main-content">
     <section class="MainProfile">
         <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+
+        {% if personal_information %}
         <div class="userInfo">
-            <h1 class="username">{{personal_information.name}}</h1>
-            <h3 class="email">{{personal_information.email}}</h3>
-            <h3 class="user-title">{{personal_information.user_title}}</h3>
+            <h1 class="username">{{ personal_information.name }}</h1>
+            <h3 class="email">{{ personal_information.email }}</h3>
+            <h3 class="user-title">{{ personal_information.user_title }}</h3>
         </div>
         <div class="setting-icon">
             <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
@@ -116,34 +118,36 @@
             <h1 class="Title">Personal Information</h1>
             <hr class="divider"/>
         </div>
-
-            <div class="info-grid">
-                <div class="info">
-                    <span class="label">Email:</span>
-                    <span class="value">{{personal_information.email}}</span>
-                </div>
-                <div class="info">
-                    <span class="label">Address:</span>
-                    <span class="value">{{personal_information.address}}</span>
-                </div>
-                <div class="info">
-                    <span class="label">Contact Number:</span>
-                    <span class="value">{{personal_information.contact_number}}</span>
-                </div>
-                <div class="info">
-                    <span class="label">Age:</span>
-                    <span class="value">{{personal_information.age}}</span>
-                </div>
-                <div class="info">
-                    <span class="label">Birth Date:</span>
-                    <span class="value">{{personal_information.birth_date}}</span>
-                </div>
-                <div class="info">
-                    <span class="label">Gender:</span>
-                    <span class="value">{{personal_information.gender}}</span>
-                </div>
+        <div class="info-grid">
+            <div class="info">
+                <span class="label">Email:</span>
+                <span class="value">{{ personal_information.email }}</span>
             </div>
-        </section>
+            <div class="info">
+                <span class="label">Address:</span>
+                <span class="value">{{ personal_information.address }}</span>
+            </div>
+            <div class="info">
+                <span class="label">Contact Number:</span>
+                <span class="value">{{ personal_information.contact_number }}</span>
+            </div>
+            <div class="info">
+                <span class="label">Age:</span>
+                <span class="value">{{ personal_information.age }}</span>
+            </div>
+            <div class="info">
+                <span class="label">Birth Date:</span>
+                <span class="value">{{ personal_information.birth_date }}</span>
+            </div>
+            <div class="info">
+                <span class="label">Gender:</span>
+                <span class="value">{{ personal_information.gender }}</span>
+            </div>
+        </div>
+        {% else %}
+            <span class="value">No profile information found.</span>
+        {% endif %}
+    </section>
     <section class="ProjectHistory">
         <div class="header-with-line">
             <h1 class="Title">Project History</h1>
