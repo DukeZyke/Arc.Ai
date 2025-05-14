@@ -14,10 +14,15 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('saved/', views.saved, name='saved'),
     path('email/', views.email, name='email'),
-    path('admin_user_page/', views.admin_project_page, name='admin_user_page'),
+    path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('home/', views.home, name='home'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/', views.profilepage, name='profilepage'),
+    path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
+    path('admin_login/', views.admin_login, name='admin_login'),
+    path('admin_signup/', views.admin_signup, name='admin_signup'),
+
+    # Addtional paths
     path('drive/auth/', views.google_drive_auth, name='google_drive_auth'),
     path('drive/callback/', views.google_drive_callback, name='google_drive_callback'),
     path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),
@@ -27,7 +32,8 @@ urlpatterns = [
     path('move-files-to-trash/', views.move_files_to_trash, name='move_files_to_trash'),
     path('empty-trash/', views.empty_trash, name='empty_trash'),
     path('api/notifications/', views.get_notifications, name='get_notifications'),
-    path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
+    path('logout/', views.logout_view, name='logout'),
+   
 
 
     # PRACTICE TEMPLATES

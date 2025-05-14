@@ -11,6 +11,20 @@
     font-size: 18px;
   }
 
+  form .logout {
+    background-color: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    padding: 8px 16px;
+}
+
+form .logout:hover {
+    text-decoration: underline;
+}
+
   #main-content {
     margin-left: 120px; /* Offset to the right of the sidebar */
     padding: 20px; /* Add padding for spacing */

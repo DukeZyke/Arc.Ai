@@ -1,0 +1,61 @@
+{% load static %}
+{% load socialaccount %}
+{% providers_media_js %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign Up</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/signup.css' %}?v=1.0">
+</head>
+<body>
+    <div id="login_cntr">
+        <div id="container">
+            <div id="logo_container" class="gap">
+                <div id="main_logo">
+                    <img id="welcome_logo" src="{% static 'Images/welcome_logo.png' %}" alt="Arc.Ai Logo">
+                    <h1>ARC.AI</h1>
+                    <h2>Hierarchy-Based Online Repository</h2>
+                </div>
+                <h1>Admin Registration</h1>
+            </div>
+            <div id="form_container">
+                <h1 class="titles">Admin Sign Up</h1>
+
+                {% for message in messages %}
+                <h5 style="color: red;">{{message}}</h5>
+                {% endfor %}
+
+                <form id="form" method="post" action="{% url 'core:admin_signup' %}">
+                    {% csrf_token %}
+                    <div id="signin_form">
+                        <div class="form-group">
+                            <label for="admin_email">Email:</label>
+                            <input type="email" id="admin_email" name="admin_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin_username">Username:</label>
+                            <input type="text" id="admin_username" name="admin_username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="admin_password">Password:</label>
+                            <input type="password" id="admin_password" name="admin_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password:</label>
+                            <input type="password" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+                    <div id="footer">
+                        <button id="login_button" type="submit">Create Admin Account</button>
+                    </div>
+                </form>
+                <p class="titles">Already an Admin? <a class="titles" href="{% url 'core:admin_login' %}">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
