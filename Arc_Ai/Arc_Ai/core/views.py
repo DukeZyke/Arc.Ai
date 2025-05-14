@@ -289,6 +289,7 @@ def saved(request):
         trash_files = trashed_results.get('files', [])
     # Add metadata for each file
         for file in drive_files:
+            file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
@@ -506,6 +507,12 @@ def view_folder_contents(request, folder_id):
         ).execute()
 
         trash_files = trashed_results.get('files', [])
+
+        # Add this to your view_folder_contents function after fetching files
+        for file in drive_files:
+            file['file_id'] = file['id']
+            # Add any other metadata processing you need
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
 
     except Exception as e:
         print("Error fetching folder contents from Google Drive:", str(e))
