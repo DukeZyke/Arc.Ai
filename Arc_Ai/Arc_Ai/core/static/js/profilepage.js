@@ -31,3 +31,22 @@ container.addEventListener('mousemove', (e) => {
   const walk = (x - startX) * 1; // Adjust scroll speed here
   container.scrollLeft = scrollLeft - walk;
 });
+
+// Add this to your profilepage.js or create a new file
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutForm = document.querySelector('form[action="{% url "core:logout" %}"]');
+    if (logoutForm) {
+        logoutForm.addEventListener('submit', function(e) {
+            const confirmLogout = confirm('Are you sure you want to log out?');
+            if (!confirmLogout) {
+                e.preventDefault();
+            } else {
+                // Clear any local storage items you might have set
+                localStorage.removeItem('user_preferences');
+                
+                // You could also add:
+                // sessionStorage.clear();
+            }
+        });
+    }
+});

@@ -92,7 +92,10 @@
               <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
               <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
               <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
-              <button class="logout">Log out</button>
+              <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout">Log out</button>
+            </form>
             </div>
         </div>
         <div id="main-content">
