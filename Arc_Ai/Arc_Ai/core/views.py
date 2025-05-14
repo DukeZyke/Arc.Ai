@@ -139,6 +139,10 @@ def admin_project_page(request):
     return render(request,'core/admin_project_page.html', {
         'projects': projects
     })
+    
+def admin_users_page(request):
+    return render(request,'core/admin_users_page.html', {
+    })
 
 def signup_details(request):
     if request.method == 'POST':
