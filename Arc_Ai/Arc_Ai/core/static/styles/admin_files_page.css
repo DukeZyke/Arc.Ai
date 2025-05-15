@@ -1,0 +1,404 @@
+/* Project Management Section */
+#file-management {
+    margin-left: 70px; /* Avoid overlap with the sidebar */
+    padding: 30px;
+    background-color: #f4f6f9;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Adjustments for responsiveness */
+@media (max-width: 768px) {
+    #project-management {
+        margin-left: 70px; /* Adjust for collapsed sidebar on smaller screens */
+    }
+}
+
+.file-management-header {
+    display: flex;
+    margin-right: 80px;
+    margin-left: 80px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #dcdde1; /* Add a horizontal line */
+    padding-bottom: 15px; /* Add spacing below the line */
+}
+
+.file-management-header h1 {
+    font-size: 38px;
+    font-style:'Inter', sans-serif;
+    font-weight: 200;
+    color: black;
+}
+
+/* Enhanced search styling */
+.search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    justify-content: flex-start; /* Prevent shifting */
+}
+
+.search-bar input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Style for the search icon */
+.search-bar .search-icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #888;;
+}
+
+.search-bar .search-icon-btn:hover {
+    color: #6c5ce7; /* Change color on hover */
+}
+
+.search-bar .search-icon-btn i {
+    pointer-events: none; /* Prevent the icon from blocking button clicks */
+}
+
+#search-users {
+     width: 100%; /* Ensure the input doesn't resize */
+    padding: 10px 40px 10px 10px; /* Consistent padding */
+    border: 1px solid #dcdde1;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth focus effect */
+}
+
+#search-users:focus {
+    outline: none;
+    border-color: #6c5ce7;
+    box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+#search-button {
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+
+.clear-search-btn {
+    position: absolute;
+    right: 93px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 8px;
+    visibility: hidden;
+}
+
+.file-management-header h1.searching {
+    position: relative;
+}
+
+.file-management-header h1.searching::after {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 10px;
+    border: 2px solid #6c5ce7;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.8s linear infinite;
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px 110px 20px 120px;
+    color: #7f8c8d;
+    font-size: 18px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.files-count {
+    font-size: 18px;
+    color: #34495e;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color:  #00BFFF;;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+
+/* Search Results Count */
+.Used-Space {
+    font-size: 18px;
+    margin-left: 20px;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+}
+
+.space-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color:  #F6FF00;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+/************** User  Section *****************/
+.card-container {
+  width: 1130px;
+  height: 120px;
+  flex-shrink: 0;
+  position: relative;
+  background: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  margin: 20px auto;
+  display:block;
+  border-bottom: 1px solid #ddd; /* Add a bottom border */
+padding-bottom: 10px;
+}
+
+.user-info {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar {
+  position: absolute;
+  left: 49px;
+  top: 14px;
+  width: 90px;
+  height: 91px;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+}
+
+.user-details {
+  position: absolute;
+  left: 188px;
+  top: 20px;
+}
+
+.user-name {
+  font-size: 30px;
+  font-weight: 700;
+  color: black;
+}
+
+.user-email {
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 200;
+  color: black;
+  margin-top: 5px;
+}
+
+.job-info {
+  position: absolute;
+  left: 430px;
+  top: 22px;
+}
+
+.department,
+.position {
+  font-size: 18px;
+  font-weight: 400;
+  color: black;
+}
+
+.position {
+  margin-top: 24px;
+}
+
+.file-info {
+  position: absolute;
+  top: 43px;
+  display: flex;
+  gap: 30px;
+  left: 705px;
+}
+
+.files,
+.Folders {
+  font-size: 18px;
+  font-weight: 500;
+  color: black;
+}
+
+.icon-placeholder {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  top: 47px;
+  left: 1040px;
+  
+}
+.icon-button {
+    background: none; /* Remove background */
+    border: none; /* Remove border */
+    cursor: pointer; /* Change cursor to pointer */
+    padding: 0; /* Remove padding */
+    display: flex; /* Center the icon */
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button i {
+    font-size: 20px; /* Adjust icon size */
+    color: #333; /* Adjust icon color */
+}
+
+.icon-button:hover i {
+    color: #555; /* Change color on hover */
+}
+
+/* Dropdown container */
+.dropdown-content {
+    display: none; /* Hidden by default */
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    border-radius: 10px;
+}
+
+/* Show dropdown when active */
+.dropdown-content.active {
+    display: block;
+}
+
+/* Rotate the icon */
+.icon-button i {
+     font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.icon-button i.rotate {
+    transform: rotate(180deg);
+}
+
+.content-box {
+    margin-top: 20px; /* Add spacing below the user card container */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, padding 0.5s ease-out; /* Smooth transition */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  
+    
+}
+
+/* Hidden class to hide the content box initially */
+.hidden {
+    display: none;
+}
+
+/* Expanded class to show the content box */
+.content-box.expanded {
+    max-height: 1000px; /* Adjust this value based on your content */
+    
+}
+
+/* Hidden state for the content-box */
+.content-box.hidden {
+    display: none; /* Completely hide the content-box */
+}
+
+
+.section-titles {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-top: 150px;
+  margin-bottom: 10px;
+  background-color: #f4f6f9;
+  gap:50px;
+}
+
+.title-files{
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: 28px;
+}
+
+.title-Folders{
+    font-family: 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: 28px;
+}
+
+.files, .folderss {
+  flex: 1;
+}
+
+.file-item, .folder-item {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 18px;
+}
+
+.arrow {
+  width: 10px;
+  height: 10px;
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(45deg);
+  margin-left: 15px;
+  margin-right: -15px;
+}
+
+.file-item img, .folder-item .arrow {
+    margin-right: 10px;
+}
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-btn img {
+    width: 30px; /* Increase size for better proportion */
+    height: 30px;
+}
+
+

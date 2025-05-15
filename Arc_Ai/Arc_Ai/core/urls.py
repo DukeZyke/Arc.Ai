@@ -28,6 +28,7 @@ urlpatterns = [
     path('empty-trash/', views.empty_trash, name='empty_trash'),
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
+    path('admin_files_page/', views.admin_files_page, name='admin_files_page'),
 
 
     # PRACTICE TEMPLATES

@@ -131,6 +131,8 @@ def edit_user_profile(request):
 
 def admin_project_page(request):
     return render(request, 'core/admin_project_page.html')
+def admin_files_page(request):
+    return render(request, 'core/admin_files_page.html')
 
 def signup_details(request):
     if request.method == 'POST':
