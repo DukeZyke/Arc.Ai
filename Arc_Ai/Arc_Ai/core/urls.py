@@ -15,6 +15,7 @@ urlpatterns = [
     path('saved/', views.saved, name='saved'),
     path('email/', views.email, name='email'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
+    path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
     path('organization/', views.organization, name='organization'),
@@ -33,6 +34,12 @@ urlpatterns = [
     path('move-files-to-trash/', views.move_files_to_trash, name='move_files_to_trash'),
     path('empty-trash/', views.empty_trash, name='empty_trash'),
     path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('edit_user_profile/', views.edit_user_profile, name='edit_user_profile'),
+
+    # FOR EDITING PROJECTS
+    path('core/project/<int:project_id>/edit/', views.aa, name='aa'),
+    # FOR DELETING PROJECTS
+    path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
     path('logout/', views.logout_view, name='logout'),
    
 

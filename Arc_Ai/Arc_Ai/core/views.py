@@ -147,6 +147,80 @@ def admin_project_page(request):
         'projects': projects
     })
 
+# =================================== FOR EDITING OF PROJECTS ===================================
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Project, ProjectMember
+
+def aa(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    members = project.members.all()
+
+    if request.method == 'POST':
+        # Update project fields
+        project.name = request.POST.get('name')
+        project.project_id = request.POST.get('project_id')
+        project.start_date = request.POST.get('start_date')
+        project.finish_date = request.POST.get('finish_date')
+        project.project_status = request.POST.get('project_status')
+        project.project_manager = request.POST.get('project_manager')
+        project.save()
+
+        # Update members
+        member_names = request.POST.getlist('member_names')
+        # Remove all old members and add new ones
+        project.members.all().delete()
+        for name in member_names:
+            if name.strip():
+                ProjectMember.objects.create(project=project, member_name=name.strip())
+
+        return redirect('core:admin_project_page')  # or wherever you want to go after saving
+
+    return render(request, 'core/aa.html', {
+        'project': project,
+        'members': members,
+    })
+
+# =================================== FOR EDITING OF PROJECTS ===================================
+
+# =================================== FOR DELETING OF PROJECTS ===================================
+
+
+def delete_project(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    project.delete()
+    return redirect('core:admin_project_page')
+
+# =================================== FOR DELETING OF PROJECTS ===================================
+
+# =================================== FOR CREATION OF PROJECTS ===================================
+
+def create_project(request):
+    if request.method == 'POST':
+        # ... get other fields ...
+        name = request.POST.get('name')
+        project_id = request.POSt.get('project_id')
+        start_date = request.POST.get('start_date')
+        finish_date = request.POST.get('finish_date')
+        project_status = request.POST.get('project_status')
+        project_manager = request.POST.get('project_manager')
+
+        project = Project.objects.create(
+            name=name,
+            project_id=project_id,
+            start_date=start_date,
+            finish_date=finish_date,
+            project_status=project_status,
+            project_manager=project_manager
+        )
+        return redirect('core:admin_project_page')
+    return render(request, 'core/create_project.html')
+
+# =================================== FOR CREATION OF PROJECTS ===================================
+
+
+
+
 def signup_details(request):
     if request.method == 'POST':
         profile_avatar = request.FILES.get('profile_avatar')
