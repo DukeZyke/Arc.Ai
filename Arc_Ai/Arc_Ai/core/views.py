@@ -130,6 +130,8 @@ def practice1(request):
 def user_involved_map(request):
     return render(request, 'core/user_involved_map.html')
 
+def admin_edit_project_details(request):
+    return render(request, 'admin_edit_project_details')
 
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
