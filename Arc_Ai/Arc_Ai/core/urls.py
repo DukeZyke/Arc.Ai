@@ -16,6 +16,7 @@ urlpatterns = [
     path('email/', views.email, name='email'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
+    path('admin_users_page/', views.admin_users_page, name='admin_users_page'),
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
     path('organization/', views.organization, name='organization'),

@@ -130,6 +130,8 @@ def practice1(request):
 def user_involved_map(request):
     return render(request, 'core/user_involved_map.html')
 
+def admin_edit_project_details(request):
+    return render(request, 'admin_edit_project_details')
 
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
@@ -145,6 +147,10 @@ def admin_project_page(request):
     # Continue with the admin page view for authorized users
     return render(request,'core/admin_project_page.html', {
         'projects': projects
+    })
+    
+def admin_users_page(request):
+    return render(request,'core/admin_users_page.html', {
     })
 
 # =================================== FOR EDITING OF PROJECTS ===================================
