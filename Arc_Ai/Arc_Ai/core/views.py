@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
 from django.utils.timezone import datetime
+from django.contrib.auth import logout
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -136,6 +137,12 @@ def edit_user_profile(request):
 def admin_project_page(request):
     projects = Project.objects.all()
 
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')  # Or redirect to home
+    
+    # Continue with the admin page view for authorized users
     return render(request,'core/admin_project_page.html', {
         'projects': projects
     })
@@ -258,23 +265,72 @@ def profilepage(request):
 def landingpage(request):
     return render(request, 'core/landingpage.html')
 
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('core:login')
+
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('core:home')  # Already logged in, go to home
+        
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Authenticate user
-        user = authenticate(email=email, password=password)
+        # Find user by email first (keep your existing authentication logic)
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(username=user.username, password=password)
+            
+            if user is not None:
+                auth_login(request, user)
+                
+                # Set no-cache headers to prevent back button issues
+                response = redirect('core:home')
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
+                return response
+            else:
+                messages.error(request, 'Invalid credentials. Please try again.')
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+        
+        return redirect('core:login')
 
-        if user is not None:
-            auth_login(request, user)
-            messages.success(request, 'You have successfully logged in.')
-            return redirect('core:home')  # Redirect to a valid URL name
-        else:
-            messages.error(request, 'Invalid credentials. Please try again.')
-            return redirect('core:login')  # Redirect back to login page
+    # Set no-cache headers even on GET requests
+    response = render(request, 'core/login.html')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
-    return render(request, 'core/login.html')
+
+def admin_login(request):
+    if request.method == 'POST':
+        admin_email = request.POST.get('admin_email')
+        admin_password = request.POST.get('admin_password')
+
+        # Find user by email first
+        try:
+            user = User.objects.get(email=admin_email)
+            # Authenticate with username and password
+            user = authenticate(username=user.username, password=admin_password)
+            
+            if user is not None and (user.is_staff or user.is_superuser):
+                auth_login(request, user)
+                messages.success(request, 'Admin login successful.')
+                return redirect('core:admin_project_page')
+            else:
+                messages.error(request, 'Invalid admin credentials or insufficient privileges.')
+        except User.DoesNotExist:
+            messages.error(request, 'Admin account not found.')
+        
+        return redirect('core:admin_login')
+
+    return render(request, 'core/admin_login.html')
+
 
 def signup(request):
     if request.method == 'POST':
@@ -303,6 +359,42 @@ def signup(request):
         return redirect('core:login')
 
     return render(request, 'core/signup.html')
+
+def admin_signup(request):
+    if request.method == 'POST':
+        # Extracting data from the form
+        email = request.POST.get('admin_email')
+        username = request.POST.get('admin_username')
+        password = request.POST.get('admin_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Your passwords do not match. Please try again.')
+            return redirect('core:admin_signup')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email is already taken. Please try again.')
+            return redirect('core:admin_signup')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username is already taken. Please try again.')
+            return redirect('core:admin_signup')
+
+        # Create a user with admin privileges
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.is_staff = True  # Grant staff permissions
+        user.is_superuser = False  # Optional: can make True for full superuser privileges
+        user.save()
+        
+        messages.success(request, 'Admin account created successfully. You can now log in.')
+        return redirect('core:admin_login')
+
+    return render(request, 'core/admin_signup.html')
+
+# Add this helper function to your views.py
+def is_admin(user):
+    """Check if a user has admin privileges"""
+    return user.is_authenticated and user.is_staff
 
 
 from allauth.account.views import SignupView

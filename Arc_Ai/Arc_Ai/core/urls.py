@@ -15,10 +15,16 @@ urlpatterns = [
     path('saved/', views.saved, name='saved'),
     path('email/', views.email, name='email'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
+    path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/', views.profilepage, name='profilepage'),
+    path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
+    path('admin_login/', views.admin_login, name='admin_login'),
+    path('admin_signup/', views.admin_signup, name='admin_signup'),
+
+    # Addtional paths
     path('drive/auth/', views.google_drive_auth, name='google_drive_auth'),
     path('drive/callback/', views.google_drive_callback, name='google_drive_callback'),
     path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),
@@ -34,6 +40,8 @@ urlpatterns = [
     path('core/project/<int:project_id>/edit/', views.aa, name='aa'),
     # FOR DELETING PROJECTS
     path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
+    path('logout/', views.logout_view, name='logout'),
+   
 
 
     # PRACTICE TEMPLATES
