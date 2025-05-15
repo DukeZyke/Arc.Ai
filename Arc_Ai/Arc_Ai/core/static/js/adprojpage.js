@@ -41,15 +41,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         setTimeout(() => {
             projectCards.forEach(card => {
-                // Only search within project titles (h3)
-                const projectTitle = card.querySelector('.project-info h3').textContent.toLowerCase();
-                
-                // Check if the project title contains the search term
-                if (projectTitle.includes(searchTerm)) {
+                // If search term is empty, show all projects
+                if (searchTerm === '') {
                     card.style.display = 'flex';
                     matchCount++;
                 } else {
-                    card.style.display = 'none';
+                    // Only search within project titles (h3)
+                    const projectTitle = card.querySelector('.project-info h3').textContent.toLowerCase();
+                    
+                    // Check if the project title contains the search term
+                    if (projectTitle.includes(searchTerm)) {
+                        card.style.display = 'flex';
+                        matchCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
                 }
             });
             
@@ -57,19 +63,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (searchTerm) {
                 searchResultsLabel.textContent = 'Search Results: ';
                 updateSearchResultsCount(matchCount);
-                searchResultsCount.style.display = 'block';
             } else {
                 searchResultsLabel.textContent = 'All Projects: ';
                 updateSearchResultsCount(totalProjects);
-                searchResultsCount.style.display = 'block';
+                // Make sure count matches total when empty search
+                matchCount = totalProjects;
             }
             
-            // Show or hide search results count based on whether there's a search term
-            if (searchTerm) {
-                searchResultsCount.style.display = 'block';
-            } else {
-                searchResultsCount.style.display = 'none';
-            }
+            // Always keep search results count visible - IMPORTANT!
+            searchResultsCount.style.display = 'block';
             
             // Show no results message if needed
             const noResultsMessage = document.getElementById('no-results-message');

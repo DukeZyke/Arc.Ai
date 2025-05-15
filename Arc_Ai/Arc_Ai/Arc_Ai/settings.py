@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'allauth.account.middleware.AccountMiddleware',  # Required for allauth
+    'core.middleware.PreventLoginBackMiddleware',  # Custom middleware to prevent back navigation
 ]
 
 ROOT_URLCONF = 'Arc_Ai.urls'
@@ -167,6 +168,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     },
 }
+
 
 
 LOGIN_URL = 'core:login' # URL for login page

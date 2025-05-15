@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
 from django.utils.timezone import datetime
+from django.contrib.auth import logout
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -126,11 +127,105 @@ def practice1(request):
 #[PRACTICE TEMPLATES] ====================================================================
 
 
+def user_involved_map(request):
+    return render(request, 'core/user_involved_map.html')
+
+def admin_edit_project_details(request):
+    return render(request, 'admin_edit_project_details')
+
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
 def admin_project_page(request):
-    return render(request, 'core/admin_project_page.html')
+    projects = Project.objects.all()
+
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')  # Or redirect to home
+    
+    # Continue with the admin page view for authorized users
+    return render(request,'core/admin_project_page.html', {
+        'projects': projects
+    })
+    
+def admin_users_page(request):
+    return render(request,'core/admin_users_page.html', {
+    })
+
+# =================================== FOR EDITING OF PROJECTS ===================================
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Project, ProjectMember
+
+def aa(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    members = project.members.all()
+
+    if request.method == 'POST':
+        # Update project fields
+        project.name = request.POST.get('name')
+        project.project_id = request.POST.get('project_id')
+        project.start_date = request.POST.get('start_date')
+        project.finish_date = request.POST.get('finish_date')
+        project.project_status = request.POST.get('project_status')
+        project.project_manager = request.POST.get('project_manager')
+        project.save()
+
+        # Update members
+        member_names = request.POST.getlist('member_names')
+        # Remove all old members and add new ones
+        project.members.all().delete()
+        for name in member_names:
+            if name.strip():
+                ProjectMember.objects.create(project=project, member_name=name.strip())
+
+        return redirect('core:admin_project_page')  # or wherever you want to go after saving
+
+    return render(request, 'core/aa.html', {
+        'project': project,
+        'members': members,
+    })
+
+# =================================== FOR EDITING OF PROJECTS ===================================
+
+# =================================== FOR DELETING OF PROJECTS ===================================
+
+
+def delete_project(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    project.delete()
+    return redirect('core:admin_project_page')
+
+# =================================== FOR DELETING OF PROJECTS ===================================
+
+# =================================== FOR CREATION OF PROJECTS ===================================
+
+def create_project(request):
+    if request.method == 'POST':
+        # ... get other fields ...
+        name = request.POST.get('name')
+        project_id = request.POSt.get('project_id')
+        start_date = request.POST.get('start_date')
+        finish_date = request.POST.get('finish_date')
+        project_status = request.POST.get('project_status')
+        project_manager = request.POST.get('project_manager')
+
+        project = Project.objects.create(
+            name=name,
+            project_id=project_id,
+            start_date=start_date,
+            finish_date=finish_date,
+            project_status=project_status,
+            project_manager=project_manager
+        )
+        return redirect('core:admin_project_page')
+    return render(request, 'core/create_project.html')
+
+# =================================== FOR CREATION OF PROJECTS ===================================
+
+
+
 def admin_files_page(request):
     return render(request, 'core/admin_files_page.html')
 
@@ -162,16 +257,12 @@ def signup_details(request):
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
 
+
+
 def profilepage(request):
     projects = Project.objects.all()
     employee_awards = EmployeeAward.objects.all()
-
-    # Fetch the PersonalInformation linked to the logged-in user's SignupDetails
-    personal_information = None
-    if request.user.is_authenticated:
-        signup_details = SignupDetails.objects.filter(first_name=request.user.first_name).first()
-        if signup_details:
-            personal_information = PersonalInformation.objects.filter(signup_details=signup_details).first()
+    personal_information = PersonalInformation.objects.first()
 
     return render(request, 'core/profilepage.html', {
         'projects': projects,
@@ -182,23 +273,72 @@ def profilepage(request):
 def landingpage(request):
     return render(request, 'core/landingpage.html')
 
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('core:login')
+
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('core:home')  # Already logged in, go to home
+        
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Authenticate user
-        user = authenticate(email=email, password=password)
+        # Find user by email first (keep your existing authentication logic)
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(username=user.username, password=password)
+            
+            if user is not None:
+                auth_login(request, user)
+                
+                # Set no-cache headers to prevent back button issues
+                response = redirect('core:home')
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
+                return response
+            else:
+                messages.error(request, 'Invalid credentials. Please try again.')
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+        
+        return redirect('core:login')
 
-        if user is not None:
-            auth_login(request, user)
-            messages.success(request, 'You have successfully logged in.')
-            return redirect('core:home')  # Redirect to a valid URL name
-        else:
-            messages.error(request, 'Invalid credentials. Please try again.')
-            return redirect('core:login')  # Redirect back to login page
+    # Set no-cache headers even on GET requests
+    response = render(request, 'core/login.html')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
-    return render(request, 'core/login.html')
+
+def admin_login(request):
+    if request.method == 'POST':
+        admin_email = request.POST.get('admin_email')
+        admin_password = request.POST.get('admin_password')
+
+        # Find user by email first
+        try:
+            user = User.objects.get(email=admin_email)
+            # Authenticate with username and password
+            user = authenticate(username=user.username, password=admin_password)
+            
+            if user is not None and (user.is_staff or user.is_superuser):
+                auth_login(request, user)
+                messages.success(request, 'Admin login successful.')
+                return redirect('core:admin_project_page')
+            else:
+                messages.error(request, 'Invalid admin credentials or insufficient privileges.')
+        except User.DoesNotExist:
+            messages.error(request, 'Admin account not found.')
+        
+        return redirect('core:admin_login')
+
+    return render(request, 'core/admin_login.html')
+
 
 def signup(request):
     if request.method == 'POST':
@@ -227,6 +367,42 @@ def signup(request):
         return redirect('core:login')
 
     return render(request, 'core/signup.html')
+
+def admin_signup(request):
+    if request.method == 'POST':
+        # Extracting data from the form
+        email = request.POST.get('admin_email')
+        username = request.POST.get('admin_username')
+        password = request.POST.get('admin_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Your passwords do not match. Please try again.')
+            return redirect('core:admin_signup')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email is already taken. Please try again.')
+            return redirect('core:admin_signup')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username is already taken. Please try again.')
+            return redirect('core:admin_signup')
+
+        # Create a user with admin privileges
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.is_staff = True  # Grant staff permissions
+        user.is_superuser = False  # Optional: can make True for full superuser privileges
+        user.save()
+        
+        messages.success(request, 'Admin account created successfully. You can now log in.')
+        return redirect('core:admin_login')
+
+    return render(request, 'core/admin_signup.html')
+
+# Add this helper function to your views.py
+def is_admin(user):
+    """Check if a user has admin privileges"""
+    return user.is_authenticated and user.is_staff
 
 
 from allauth.account.views import SignupView
