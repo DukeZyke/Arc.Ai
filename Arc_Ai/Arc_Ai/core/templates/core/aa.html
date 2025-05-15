@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Project</title>
+</head>
+<body>
+    <h1>Edit Project: {{ project.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label>Name:</label>
+        <input type="text" name="name" value="{{ project.name }}"><br>
+        <label>Project ID:</label>
+        <input type="text" name="project_id" value="{{ project.project_id }}"><br>
+        <label>Start Date:</label>
+        <input type="date" name="start_date" value="{{ project.start_date|date:'Y-m-d' }}"><br>
+        <label>Finish Date:</label>
+        <input type="date" name="finish_date" value="{{ project.finish_date|date:'Y-m-d' }}"><br>
+        <label>Status:</label>
+        <input type="text" name="project_status" value="{{ project.project_status }}"><br>
+        <label>Manager:</label>
+        <input type="text" name="project_manager" value="{{ project.project_manager }}"><br>
+        <label>Members:</label>
+        <div id="members">
+            {% for member in members %}
+                <input type="text" name="member_names" value="{{ member.member_name }}"><br>
+            {% endfor %}
+            <input type="text" name="member_names" placeholder="Add new member"><br>
+        </div>
+        <button type="submit">Save</button>
+    </form>
+</body>
+</html>
