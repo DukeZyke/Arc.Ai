@@ -43,6 +43,7 @@ urlpatterns = [
     path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
     path('logout/', views.logout_view, name='logout'),
    
+    path('admin_files_page/', views.admin_files_page, name='admin_files_page'),
 
 
     # PRACTICE TEMPLATES
