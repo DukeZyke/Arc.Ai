@@ -2,6 +2,17 @@
 <html>
 <head>
     <title>Edit Project</title>
+    <script>
+        function addMemberField() {
+            var membersDiv = document.getElementById('members');
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'member_names';
+            input.placeholder = 'Add new member';
+            membersDiv.appendChild(input);
+            membersDiv.appendChild(document.createElement('br'));
+        }
+    </script>
 </head>
 <body>
     <h1>Edit Project: {{ project.name }}</h1>
@@ -26,6 +37,7 @@
             {% endfor %}
             <input type="text" name="member_names" placeholder="Add new member"><br>
         </div>
+        <button type="button" onclick="addMemberField()">Add Member</button>
         <button type="submit">Save</button>
     </form>
 </body>

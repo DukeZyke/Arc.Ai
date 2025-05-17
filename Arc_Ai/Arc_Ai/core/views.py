@@ -226,6 +226,8 @@ def create_project(request):
 
 
 
+def admin_files_page(request):
+    return render(request, 'core/admin_files_page.html')
 
 def signup_details(request):
     if request.method == 'POST':
