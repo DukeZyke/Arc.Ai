@@ -36,18 +36,46 @@ function toggleDropdownTrash() {
     document.getElementById("trashDropdown").classList.toggle("show");
 }
 
-window.onclick = function(event) {
-    // Check if click was NOT on the image
-    if (!event.target.classList.contains('dropdown-icon')) {
-        var dropdowns = document.getElementsByClassName("dropdown-content");
-        for (var i = 0; i < dropdowns.length; i++) {
-            var openDropdown = dropdowns[i];
+
+window.addEventListener('click', function(event) {
+    // Handle dropdowns
+    if (!event.target.matches('.dropdown-icon')) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
             if (openDropdown.classList.contains('show')) {
                 openDropdown.classList.remove('show');
             }
         }
     }
-}
+    
+    // Handle checkboxes and delete button
+    if (checkboxesVisible) {
+        const deleteToggleButton = document.querySelector('[onclick="toggleCheckboxes()"]');
+        const moveToTrashButton = document.getElementById('delete-selected-btn');
+        const checkboxes = document.querySelectorAll('.file-checkbox');
+        
+        // Check if click is on relevant elements
+        const isClickOnToggle = deleteToggleButton && deleteToggleButton.contains(event.target);
+        const isClickOnCheckbox = Array.from(checkboxes).some(checkbox => checkbox.contains(event.target));
+        const isClickOnButton = moveToTrashButton && moveToTrashButton.contains(event.target);
+        
+        // If click is outside our elements, hide everything
+        if (!isClickOnToggle && !isClickOnCheckbox && !isClickOnButton) {
+            // Hide checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.style.display = 'none';
+            });
+            
+            // Hide the delete button
+            if (moveToTrashButton) {
+                moveToTrashButton.style.display = 'none';
+            }
+            
+            checkboxesVisible = false;
+        }
+    }
+});
 
 function toggleDropdownFolders(event) {
     const dropdown = document.getElementById("myDropdownFolders");
@@ -62,48 +90,58 @@ function toggleDropdownFolders(event) {
 
 let checkboxesVisible = false; // Track the visibility state of checkboxes
 
-    function toggleCheckboxes() {
+function toggleCheckboxes() {
     const checkboxes = document.querySelectorAll('.file-checkbox');
-    const deleteButton = document.getElementById('delete-selected-btn'); // Keep the same ID for simplicity
-    checkboxesVisible = !checkboxesVisible; // Toggle the visibility state
-
-    // Show or hide checkboxes
+    const deleteButton = document.getElementById('delete-selected-btn');
+    
+    checkboxesVisible = !checkboxesVisible; // Toggle state
+    
+    // Show/hide checkboxes
     checkboxes.forEach(checkbox => {
         checkbox.style.display = checkboxesVisible ? 'inline-block' : 'none';
+        
+        // Add event listeners only when making visible
+        if (checkboxesVisible) {
+            checkbox.addEventListener('change', updateDeleteButtonVisibility);
+        }
     });
-
-    // Show or hide the move to trash button (still using delete-selected-btn ID)
+    
+    // Always hide the button initially when toggling checkboxes
     if (deleteButton) {
-        deleteButton.style.display = checkboxesVisible ? 'block' : 'none';
-    }
-
-    // Add or remove the event listener for hiding checkboxes
-    if (checkboxesVisible) {
-        window.addEventListener('click', hideCheckboxesOnClickOutside);
-    } else {
-        window.removeEventListener('click', hideCheckboxesOnClickOutside);
+        deleteButton.style.display = 'none';
     }
 }
 
-    function hideCheckboxesOnClickOutside(event) {
-    const deleteButton = document.querySelector('[onclick="toggleCheckboxes()"]');
-    const checkboxes = document.querySelectorAll('.file-checkbox');
-    const deleteForm = document.getElementById('delete-files-form');
-    const isClickOnCheckbox = Array.from(checkboxes).some(checkbox => checkbox.contains(event.target));
+// New function to update button visibility
+function updateDeleteButtonVisibility() {
+    const deleteButton = document.getElementById('delete-selected-btn');
+    const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+    
+    if (deleteButton) {
+        // Only show button if at least one checkbox is checked
+        deleteButton.style.display = checkedBoxes.length > 0 ? 'block' : 'none';
+    }
+}
 
-    if (!deleteButton.contains(event.target) && !isClickOnCheckbox) {
-        // Hide checkboxes
-        checkboxes.forEach(checkbox => {
-            checkbox.style.display = 'none';
-        });
 
-        // Hide the delete button
-        if (deleteForm) {
-            deleteForm.style.display = 'none';
+let trashCheckboxesVisible = false;
+
+function toggleTrashCheckboxes() {
+    const trashFiles = document.querySelectorAll('.trash-file');
+    const restoreButton = document.getElementById('restore-selected-btn');
+    trashCheckboxesVisible = !trashCheckboxesVisible;
+
+    // Toggle checkboxes visibility
+    trashFiles.forEach(file => {
+        const checkbox = file.querySelector('.trash-checkbox');
+        if (checkbox) {
+            checkbox.style.display = trashCheckboxesVisible ? 'inline-block' : 'none';
         }
+    });
 
-        checkboxesVisible = false; // Reset visibility state
-        window.removeEventListener('click', hideCheckboxesOnClickOutside); // Remove the event listener
+    // Toggle restore button visibility
+    if (restoreButton) {
+        restoreButton.style.display = trashCheckboxesVisible ? 'block' : 'none';
     }
 }
 

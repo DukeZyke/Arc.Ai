@@ -35,6 +35,8 @@ urlpatterns = [
     path('empty-trash/', views.empty_trash, name='empty_trash'),
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('edit_user_profile/', views.edit_user_profile, name='edit_user_profile'),
+    path('restore-from-trash/', views.restore_from_trash, name='restore_from_trash'),
+    path('delete_folders/', views.delete_folders, name='delete_folders'),
 
     # FOR EDITING PROJECTS
     path('core/project/<int:project_id>/edit/', views.admin_edit_project_details, name='admin_edit_project_details'),
