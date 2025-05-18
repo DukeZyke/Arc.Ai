@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin-Project Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/adminstyles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/adminedit.css' %}">
+</head>
+<body>
+
+<div id="sidebar">
+    <div id="sidebar_content" class="hidden">
+        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:home' %}">Projects</a></p>
+        <p><a href="{% url 'core:organization' %}">Files</a></p>
+    </div>
+    <hr class="divider_sidebar"/>
+
+    <div class="notification_container">
+    <!-- Notification Pop-Up -->
+    <div id="notification_popup" class="hidden">
+        <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
+        <div id="notification_list">
+            <ul>
+                <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                    <div class="title-and-date">
+                        <p>Schedule Update</p>
+                        <span>Yesterday</span>
+                    </div>
+                    <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 2023</p>
+                    <p class="posted-by">- Imee Duterte</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Detailed Notification -->
+    <div id="detailed_notification" class="hidden">
+        <h2 id="notification_title">Schedule Update</h2>
+        <p class="notification_date">Yesterday, January 29, 2025</p>
+        <button id="close_detailed_notification" class="close-btn">&times;</button>
+        <p id="notification_detail"></p>
+        <p class="posted-by">- Imee Duterte, Team Head</p>
+        <button class="respond-btn">Respond</button>
+    </div>
+    </div>
+
+    <div id="sidebar_icns_grp">
+        <div class="nav_item">
+            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <p id="navigation_paragraph">Navigate</p>
+        </div>
+    </div>
+</div>
+
+    <div id="header">
+        <div>
+            <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+        </div>
+        <div id="header_nav" class="text_white">
+            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
+            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
+            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+        </div>
+        <div>
+            <button class="logout">Log out</button>
+        </div>
+    </div>
+
+    <!-- Page Content Start -->
+    <div class="adminedit-content">
+        <form method="post" action="{% url 'core:admin_edit_project_details' project.id %}">
+        {% csrf_token %}
+        <!-- Edit Project Details Card -->
+        <div class="adminedit-card adminedit-details-card">
+            <div class="adminedit-card-header">
+                <h2>Edit Project Details</h2>
+                <a href="#" class="adminedit-back-link">&#8592; Back</a>
+            </div>
+            <div class="adminedit-details-section">
+                <div class="adminedit-row">
+                    <label class="adminedit-label" for="project_name">Project Name:</label>
+                    <input id="project_name" name="name" class="adminedit-input" type="text" value="{{project.name}}">
+                </div>
+                <hr>
+                <div class="adminedit-row">
+                    <label class="adminedit-label" for="project_desc">Project Description:</label>
+                    <textarea id="project_desc" name="project_desc" class="adminedit-input" rows="2">{{ project.project_desc }}</textarea>
+                </div>
+                <hr>
+                <div class="adminedit-row">
+                    <label class="adminedit-label" for="start_date">Start Date:</label>
+                    <input id="start_date" name="start_date" class="adminedit-input" type="date" value="{{ project.start_date|date:'Y-m-d' }}">
+                    <label class="adminedit-label" style="margin-left:2rem;" for="deadline">Deadline:</label>
+                    <input id="deadline" name="finish_date" class="adminedit-input" type="date" value="{{ project.finish_date|date:'Y-m-d' }}">
+                </div>
+                <hr>
+                <div class="adminedit-row">
+                    <label class="adminedit-label" for="project_status">Status:</label>
+                    <input id="project_status" name="project_status" class="adminedit-input" type="text" value="{{ project.project_status }}">
+                </div>
+                <hr>
+                <div class="adminedit-row">
+                    <label class="adminedit-label" for="project_manager">Manager:</label>
+                    <input id="project_manager" name="project_manager" class="adminedit-input" type="text" value="{{ project.project_manager }}">
+                </div>
+            </div>
+            <div class="adminedit-files-section">
+                <ul class="adminedit-file-list">
+                    <li>
+                        <span>Document 1.docx</span>
+                        <span class="adminedit-remove-file" title="Remove">&#10006;</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="file-upload-wrapper">
+                <label for="add_file" class="file-upload-label"></label>
+                <label class="file-upload-btn">
+                    Add File
+                    <input type="file" id="add_file" name="add_file" multiple>
+                </label>
+            </div>
+        </div>
+        <!-- Project Team Card -->
+        <div class="adminedit-card adminedit-team-card">
+            <h2>Project Team</h2>
+            <div class="adminedit-team-section">
+                <div class="adminedit-team-label">Project Manager</div>
+                <input type="text" class="adminedit-input" name="project_manager" value="{{project.project_manager}}" placeholder="Project Manager Name" style="margin-bottom:1.2rem;">
+                <div class="adminedit-team-members-row">
+                    <span class="adminedit-team-label">Project Team</span>
+                    <div>
+                        Team Members:
+                        <select class="adminedit-team-count" name="team_count" id="team_count" onchange="updateMemberFields()">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5" selected>5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="adminedit-team-list" id="members">
+                    {% for member in members %}
+                        <div style="display:flex;align-items:center;margin-bottom:4px;">
+                            <input type="text" name="member_names" class="adminedit-input" value="{{ member.member_name }}">
+                            <button type="button" onclick="removeMember(this)" style="margin-left:8px;">✖</button>
+                        </div>
+                    {% endfor %}
+                    <div style="display:flex;align-items:center;margin-bottom:4px;">
+                        <input type="text" name="member_names" class="adminedit-input" placeholder="Add new member">
+                        <button type="button" onclick="removeMember(this)" style="margin-left:8px;">✖</button>
+                    </div>
+                </div>
+                <button type="button" class="adminedit-submit-btn" style="margin-top:10px;" onclick="addMember()">Add Another Member</button>
+            </div>
+        </div>
+        <div class="adminedit-submit-row">
+            <button class="adminedit-submit-btn" type="submit">Submit</button>
+        </div>
+        </form>
+    </div>
+    <!-- Page Content End -->
+
+    <script>
+    function addMember() {
+        var membersDiv = document.getElementById('members');
+        var wrapper = document.createElement('div');
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.marginBottom = '4px';
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'member_names';
+        input.className = 'adminedit-input';
+        input.placeholder = 'Add new member';
+
+        var delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.textContent = '✖';
+        delBtn.style.marginLeft = '8px';
+        delBtn.onclick = function() {
+            wrapper.remove();
+            updateDropdownCount();
+        };
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(delBtn);
+        membersDiv.appendChild(wrapper);
+        updateDropdownCount();
+    }
+
+    function removeMember(btn) {
+        btn.parentElement.remove();
+        updateDropdownCount();
+    }
+
+    function updateMemberFields() {
+        var membersDiv = document.getElementById('members');
+        var count = parseInt(document.getElementById('team_count').value, 10);
+        var currentValues = Array.from(membersDiv.querySelectorAll('input[name="member_names"]')).map(i => i.value);
+        membersDiv.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            var wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.marginBottom = '4px';
+
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'member_names';
+            input.className = 'adminedit-input';
+            input.placeholder = 'Add new member';
+            input.value = currentValues[i] || '';
+
+            var delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.textContent = '✖';
+            delBtn.style.marginLeft = '8px';
+            delBtn.onclick = function() {
+                wrapper.remove();
+                updateDropdownCount();
+            };
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(delBtn);
+            membersDiv.appendChild(wrapper);
+        }
+    }
+
+    function updateDropdownCount() {
+        var membersDiv = document.getElementById('members');
+        var count = membersDiv.querySelectorAll('input[name="member_names"]').length;
+        document.getElementById('team_count').value = count;
+    }
+
+    // On page load, sync dropdown and fields
+    window.onload = function() {
+        updateDropdownCount();
+    };
+    </script>
+
+    <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="{% static 'js/adminedit.js' %}"></script>
+    <script>
+        function addMemberField() {
+            var membersDiv = document.getElementById('members');
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'member_names';
+            input.placeholder = 'Add new member';
+            membersDiv.appendChild(input);
+            membersDiv.appendChild(document.createElement('br'));
+        }
+    </script>
+</body>
+</html>
