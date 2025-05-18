@@ -130,9 +130,6 @@ def practice1(request):
 def user_involved_map(request):
     return render(request, 'core/user_involved_map.html')
 
-def admin_edit_project_details(request):
-    return render(request, 'admin_edit_project_details')
-
 def edit_user_profile(request):
     return render(request, 'core/edit_user_profile.html')
 
@@ -152,13 +149,16 @@ def admin_project_page(request):
 def admin_users_page(request):
     return render(request,'core/admin_users_page.html', {
     })
+    
+def admin_edit_project_details(request):
+    return render(request, 'core/admin_edit_project_details.html')
 
 # =================================== FOR EDITING OF PROJECTS ===================================
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, ProjectMember
 
-def aa(request, project_id):
+def admin_edit_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     members = project.members.all()
 
@@ -182,7 +182,7 @@ def aa(request, project_id):
 
         return redirect('core:admin_project_page')  # or wherever you want to go after saving
 
-    return render(request, 'core/aa.html', {
+    return render(request, 'core/admin_edit1.html', {
         'project': project,
         'members': members,
     })

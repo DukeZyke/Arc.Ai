@@ -14,7 +14,7 @@ urlpatterns = [
     path('saved/', views.saved, name='saved'),
     path('email/', views.email, name='email'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
-    path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
+    path('admin_edit_project_details/', views.admin_edit_project_details, name='admin_edit_project_details'),
     path('admin_users_page/', views.admin_users_page, name='admin_users_page'),
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
@@ -37,7 +37,7 @@ urlpatterns = [
     path('edit_user_profile/', views.edit_user_profile, name='edit_user_profile'),
 
     # FOR EDITING PROJECTS
-    path('core/project/<int:project_id>/edit/', views.aa, name='aa'),
+    path('core/project/<int:project_id>/edit/', views.admin_edit_project, name='admin_edit_project'),
     # FOR DELETING PROJECTS
     path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
     path('logout/', views.logout_view, name='logout'),
