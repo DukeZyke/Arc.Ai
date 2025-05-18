@@ -158,14 +158,15 @@ def admin_edit_project_details(request):
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, ProjectMember
 
-def aa(request, project_id):
+
+def admin_edit_project_details(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     members = project.members.all()
 
     if request.method == 'POST':
         # Update project fields
         project.name = request.POST.get('name')
-        project.project_id = request.POST.get('project_id')
+        # project.project_id = request.POST.get('project_id')
         project.start_date = request.POST.get('start_date')
         project.finish_date = request.POST.get('finish_date')
         project.project_status = request.POST.get('project_status')
@@ -182,7 +183,7 @@ def aa(request, project_id):
 
         return redirect('core:admin_project_page')  # or wherever you want to go after saving
 
-    return render(request, 'core/aa.html', {
+    return render(request, 'core/admin_edit_project_details.html', {
         'project': project,
         'members': members,
     })

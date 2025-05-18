@@ -3,7 +3,6 @@ from . import views
 from django.urls import path
 from . import views
 
-
 app_name = 'core'
 
 urlpatterns = [
@@ -40,9 +39,10 @@ urlpatterns = [
     path('delete_folders/', views.delete_folders, name='delete_folders'),
 
     # FOR EDITING PROJECTS
-    path('core/project/<int:project_id>/edit/', views.aa, name='aa'),
+    path('core/project/<int:project_id>/edit/', views.admin_edit_project_details, name='admin_edit_project_details'),
     # FOR DELETING PROJECTS
     path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
+
     path('logout/', views.logout_view, name='logout'),
    
     path('admin_files_page/', views.admin_files_page, name='admin_files_page'),

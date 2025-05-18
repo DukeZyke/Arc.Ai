@@ -1,0 +1,26 @@
+<select id="team_count" onchange="updateMemberFields()">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+</select>
+<div id="members"></div>
+<script>
+function createMemberInput(value = "") {
+    const wrapper = document.createElement('div');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'member_names';
+    input.value = value;
+    wrapper.appendChild(input);
+    return wrapper;
+}
+function updateMemberFields() {
+    const membersDiv = document.getElementById('members');
+    const count = parseInt(document.getElementById('team_count').value, 10);
+    membersDiv.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        membersDiv.appendChild(createMemberInput(""));
+    }
+}
+window.onload = updateMemberFields;
+</script>
