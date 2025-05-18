@@ -87,6 +87,8 @@
                 <h1 class="Title">Continue Working</h1>
                 <hr class="divider"/>
             </div>
+
+            {% if top_project %}
             <div class="continue-card">
                 <div>
                     <div class="under-image">
@@ -97,36 +99,45 @@
                             <img src="{% static 'Images/projlogo.png' %}" alt="Project Logo">
                         </div>
                         <div class="FileInfo">
-                            <p><strong>New Employee Onboarding System Design</strong></p>
-                            <p>Project ID: HR-2024-ONB-01</p>
-                            <p class="space">Start Date: 2024/11/10</p>
-                            <p>Finished Date: -</p>
-                            <p class="status1">Ongoing</p>
+                            <p><strong>{{top_project.name}}</strong></p>
+                            <p>Project ID: HR-2024-ONB-{{top_project.project_id}}</p>
+                            <p class="space">Start Date: {{top_project.project_start_Date}}</p>
+                            <p>Finished Date: {{ top_project.finish_date|default:"-" }}</p>
+                            <p class="status1">{{ top_project.project_status }}</p>
                         </div>
                     </div>  
                 </div>
                 <div class="project-details">
                     <h3>Description</h3>
-                    <p>Design and planning phase for a new, streamlined digital system to improve the onboarding experience for new hires.</p>
-                    <h3>Role</h3>
-                    <p>Project Manager</p>
+                    <p>{{top_project.project_desc}}</p>
+                    <h3>Project Manager</h3>
+                    <p>{{top_project.project_manager}}
                     <h3>Team</h3>
-                    <p>John Doe, Imee Duterte, Sarah Marcos, Ginno Arostique</p>
+                    <p>
+                        {% for member in top_project.members.all %}
+                            {{member.member_name}} {% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            No members assigned.
+                        {% endfor %}
+                    </p>
                     <div class="details-row">
                         <div>
                             <h3>Total Hours Spent</h3>
-                            <p>32Hrs</p>
+                            <p>{{ top_project.total_hours|default:"-" }}</p>
                         </div>
                         <div>
                             <h3>Deadline</h3>
-                            <p>2024/11/24</p>
+                            <p>{{ top_project.finish_date|default:"-" }}</p>
                         </div>
                         <div>
-                            <button class="continue-btn">Continue</button>
+                            <!-- <button class="continue-btn">Continue</button> -->
                         </div>
                     </div>
                 </div>
             </div>
+            {% else %}
+            <p>No projects available.</p>
+            {% endif %}
         </section>
     
         <section class="other-projects">
@@ -160,7 +171,7 @@
                             <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
                             {% elif project.project_status == 'Ongoing' %}
                             <p class="status" style="color: orange">{{project.project_status}}</p>
-                            {% elif project.project_status == 'Missing' %}
+                            {% elif project.project_status == 'Missed' %}
                             <p class="status" style="color: red">{{project.project_status}}</p>
                             {% endif %}
 

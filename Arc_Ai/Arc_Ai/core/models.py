@@ -122,6 +122,7 @@ class Project(models.Model):
     finish_date = models.DateField(max_length=20)
     project_status = models.CharField(max_length=50)
     project_manager = models.CharField(max_length=100)
+    project_desc = models.CharField(max_length=1000, blank=True)
 
     def __str__(self):
         return f"{self.name} {self.project_id}"

@@ -416,15 +416,17 @@ def home(request):
     return render(request, 'core/home.html')
 
 def organization(request):
-    projects = Project.objects.all()
+    projects = Project.objects.filter(name='New Employee Oasdasdanboarding System Design').order_by('-finish_date')  # or your preferred ordering
     personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
+    top_project = projects.first() if projects else None
 
     return render(request, 'core/organization.html', {
-        'projects' : projects,
-        'personal_information' : personal_information,
-        'employee_awards' : employee_awards,
-        })
+        'projects': projects,
+        'top_project': top_project,
+        'personal_information': personal_information,
+        'employee_awards': employee_awards,
+    })
 
 def landingpage(request):
     return render(request, 'core/landingpage.html')
