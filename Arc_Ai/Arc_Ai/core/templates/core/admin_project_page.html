@@ -101,6 +101,7 @@
                     <h3>{{ project.name }}</h3>
                     <p>Project ID: HR-2024-ONB-{{ project.project_id }}</p>
                     <p>Start Date: {{ project.start_date }}</p>
+                    <p>Finish Date: {{ project.finish_date }}</p>
                 </div>
 
                 <div class="project-meta">
@@ -122,7 +123,7 @@
                     <p class="status">Status: <span class="status-ongoing">{{project.project_status}}</span></p>
                 </div>
                 <div class="project-actions">
-                    <a href="{% url 'core:aa' project.id %}" class="edit-btn">
+                    <a href="{% url 'core:admin_edit_project_details' project.id %}" class="edit-btn">
                         <img src="{% static 'Images/edit-icon.png' %}" alt="Edit">
                     </a>
 

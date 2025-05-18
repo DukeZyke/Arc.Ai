@@ -1,44 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Project</title>
-    <script>
-        function addMemberField() {
-            var membersDiv = document.getElementById('members');
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.name = 'member_names';
-            input.placeholder = 'Add new member';
-            membersDiv.appendChild(input);
-            membersDiv.appendChild(document.createElement('br'));
-        }
-    </script>
-</head>
-<body>
-    <h1>Edit Project: {{ project.name }}</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label>Name:</label>
-        <input type="text" name="name" value="{{ project.name }}"><br>
-        <label>Project ID:</label>
-        <input type="text" name="project_id" value="{{ project.project_id }}"><br>
-        <label>Start Date:</label>
-        <input type="date" name="start_date" value="{{ project.start_date|date:'Y-m-d' }}"><br>
-        <label>Finish Date:</label>
-        <input type="date" name="finish_date" value="{{ project.finish_date|date:'Y-m-d' }}"><br>
-        <label>Status:</label>
-        <input type="text" name="project_status" value="{{ project.project_status }}"><br>
-        <label>Manager:</label>
-        <input type="text" name="project_manager" value="{{ project.project_manager }}"><br>
-        <label>Members:</label>
-        <div id="members">
-            {% for member in members %}
-                <input type="text" name="member_names" value="{{ member.member_name }}"><br>
-            {% endfor %}
-            <input type="text" name="member_names" placeholder="Add new member"><br>
-        </div>
-        <button type="button" onclick="addMemberField()">Add Member</button>
-        <button type="submit">Save</button>
-    </form>
-</body>
-</html>
+<select id="team_count" onchange="updateMemberFields()">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+</select>
+<div id="members"></div>
+<script>
+function createMemberInput(value = "") {
+    const wrapper = document.createElement('div');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'member_names';
+    input.value = value;
+    wrapper.appendChild(input);
+    return wrapper;
+}
+function updateMemberFields() {
+    const membersDiv = document.getElementById('members');
+    const count = parseInt(document.getElementById('team_count').value, 10);
+    membersDiv.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        membersDiv.appendChild(createMemberInput(""));
+    }
+}
+window.onload = updateMemberFields;
+</script>

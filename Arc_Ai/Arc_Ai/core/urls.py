@@ -37,9 +37,10 @@ urlpatterns = [
     path('edit_user_profile/', views.edit_user_profile, name='edit_user_profile'),
 
     # FOR EDITING PROJECTS
-    path('core/project/<int:project_id>/edit/', views.admin_edit_project, name='admin_edit_project'),
+    path('core/project/<int:project_id>/edit/', views.admin_edit_project_details, name='admin_edit_project_details'),
     # FOR DELETING PROJECTS
     path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
+
     path('logout/', views.logout_view, name='logout'),
    
     path('admin_files_page/', views.admin_files_page, name='admin_files_page'),
