@@ -116,19 +116,28 @@
                 <hr class="dropdown-divider">
 
                 <!-- DELETE Button -->
-                <a href="#" onclick="">DELETE</a>
+                <a href="#" onclick="toggleFolderCheckboxes()">DELETE</a>
             </div>
         </div>
 
             <div id="folder_items">
                 {% for folder in folders %}
                     <div class="folder-item">
+                        <input type="checkbox" class="folder-checkbox" style="display: none;" data-folder-id="{{ folder.id }}">
                         <a href="{% url 'core:view_folder_contents' folder.id %}">{{ folder.name }}</a>
                     </div>
                 {% empty %}
                     <p>No folders found.</p>
                 {% endfor %}
             </div>
+
+            <!-- Add delete selected folders button -->
+            <button id="delete-selected-folders-btn" style="display: none;" onclick="deleteSelectedFolders()">Delete Selected Folders</button>
+
+            <!-- Hidden form for folder deletion -->
+            <form id="delete-folders-form" action="{% url 'core:delete_folders' %}" method="post" style="display: none;">
+                {% csrf_token %}
+            </form>
 
 
 
@@ -198,13 +207,23 @@
             <div class="horizontal-line"></div>
             <!-- Dropdown Button -->
             <img src="{% static 'Images/dots copy 2.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownTrash()" style="width: 40px; height: 40px; cursor: pointer;">
-            <div class="dropdown-content" id="trashDropdown">
-                <!-- Remove All Trash Button -->
-                <form action="{% url 'core:empty_trash' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
-                </form>
-            </div>
+                <div class="dropdown-content" id="trashDropdown">
+                    <!-- Remove All Trash Button -->
+                    <form action="{% url 'core:empty_trash' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
+                    </form>
+                    
+                    <!-- Restore Files Button -->
+                    <hr class="dropdown-divider">
+                    <form action="{% url 'core:restore_from_trash' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Restore all files from trash?')">Restore All Files</button>
+                    </form>
+                </div>
+
+
+
 
             </div>
             <div id="file_items">
@@ -229,20 +248,7 @@
     function toggleDropdownFiles() {
         document.getElementById("myDropdown").classList.toggle("show");
     }
-    
-    // Optional: Close the dropdown if clicking outside
-    window.onclick = function(event) {
-        // Check if click was NOT on the image
-        if (!event.target.classList.contains('dropdown-icon')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-    }
+
     function moveToTrashSelectedFiles() {
     const checkboxes = document.querySelectorAll('.file-checkbox:checked');
     const fileIds = Array.from(checkboxes).map(checkbox => checkbox.dataset.fileId);
@@ -283,6 +289,61 @@
         });
     }
 }
+
+    function toggleFolderCheckboxes() {
+        const checkboxes = document.querySelectorAll('.folder-checkbox');
+        const deleteButton = document.getElementById('delete-selected-folders-btn');
+        
+        // Check if checkboxes are currently hidden
+        const isHidden = checkboxes.length > 0 && checkboxes[0].style.display === 'none';
+        
+        // Toggle visibility
+        checkboxes.forEach(checkbox => {
+            checkbox.style.display = isHidden ? 'inline-block' : 'none';
+        });
+        
+        // Toggle delete button visibility
+        deleteButton.style.display = isHidden ? 'block' : 'none';
+        
+        // Close the dropdown
+        document.getElementById('myDropdownFolders').classList.remove('show');
+    }
+    
+    function deleteSelectedFolders() {
+        const checkboxes = document.querySelectorAll('.folder-checkbox:checked');
+        const folderIds = Array.from(checkboxes).map(checkbox => checkbox.dataset.folderId);
+        const form = document.getElementById('delete-folders-form');
+        
+        if (folderIds.length === 0) {
+            alert('No folders selected for deletion.');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to delete ${folderIds.length} selected folder(s)?`)) {
+            const formData = new FormData(form);
+            folderIds.forEach(folderId => formData.append('folder_ids[]', folderId));
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'An error occurred while deleting folders.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting folders.');
+            });
+        }
+    }
 </script>
     
 </html>
