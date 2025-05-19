@@ -105,9 +105,9 @@
                 </div>
 
                 <div class="project-meta">
-                    <p>Project Manager: {{ project.project_manager }}</p>
-                    <p>
-                        Project Team:
+                    <p><span class="span">Project Manager: </span> {{ project.project_manager }}</p>
+                    <p> <span class="span">Project Team: </span>
+                        
                         {% with total=project.members.count %}
                             {% for member in project.members.all %}
                                 {% if forloop.counter <= 5 %}
