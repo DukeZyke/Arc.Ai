@@ -223,9 +223,6 @@ def create_project(request):
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
-def restore_from_trash(request):
-    return JsonResponse({'error': 'Invalid request method.'}, status=400)
-
 
 def admin_files_page(request):
     return render(request, 'core/admin_files_page.html')
