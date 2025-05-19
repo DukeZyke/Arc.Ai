@@ -149,7 +149,21 @@ def admin_project_page(request):
     })
     
 def admin_users_page(request):
-    return render(request,'core/admin_users_page.html', {
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')
+    
+    # Get all users
+    users = User.objects.all().order_by('username')
+    
+    # Count active users
+    active_users = User.objects.filter(is_active=True).count()
+    
+    return render(request, 'core/admin_users_page.html', {
+        'users': users,
+        'total_users': users.count(),
+        'active_users': active_users,
     })
     
 def admin_edit_project_details(request):

@@ -14,9 +14,9 @@
 
 <div id="sidebar">
     <div id="sidebar_content" class="hidden">
-        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:admin_users_page' %}">Users</a></p>
         <p><a href="{% url 'core:home' %}">Projects</a></p>
-        <p><a href="{% url 'core:organization' %}">Files</a></p>
+        <p><a href="{% url 'core:admin_files_page' %}">Files</a></p>
     </div>
     <hr class="divider_sidebar"/>
 
@@ -61,7 +61,7 @@
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
         <div id="header_nav" class="text_white">
-            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
+            <p><a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
             <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
             <p><a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
         </div>
