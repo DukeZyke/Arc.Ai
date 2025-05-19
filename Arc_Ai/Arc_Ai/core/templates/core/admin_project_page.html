@@ -63,7 +63,7 @@
         <div id="header_nav" class="text_white">
             <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
             <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
-            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+            <p><a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
         </div>
         <div>
             <button class="logout">Log out</button>

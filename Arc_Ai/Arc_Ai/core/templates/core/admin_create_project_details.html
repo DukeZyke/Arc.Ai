@@ -72,195 +72,194 @@
 
     <!-- Page Content Start -->
     <div class="adminedit-content">
-        <form method="post" action="{% url 'core:admin_edit_project_details' project.id %}">
+        <form method="post" action="{% url 'core:admin_edit_project_details' %}">
         {% csrf_token %}
-        <!-- Edit Project Details Card -->
-        <div class="adminedit-card adminedit-details-card">
-            <div class="adminedit-card-header">
-                <h2>Edit Project Details</h2>
-                <a href="#" class="adminedit-back-link">&#8592; Back</a>
-            </div>
-            <div class="adminedit-details-section">
-                <div class="adminedit-row">
-                    <label class="adminedit-label" for="project_name">Project Name:</label>
-                    <input id="project_name" name="name" class="adminedit-input" type="text" value="{{project.name}}">
-                </div>
-                <hr>
-                <div class="adminedit-row">
-                    <label class="adminedit-label" for="project_desc">Project Description:</label>
-                    <textarea id="project_desc" name="project_desc" class="adminedit-input" rows="2">{{ project.project_desc }}</textarea>
-                </div>
-                <hr>
-                <div class="adminedit-row">
-                    <label class="adminedit-label" for="start_date">Start Date:</label>
-                    <input id="start_date" name="start_date" class="adminedit-input" type="date" value="{{ project.start_date|date:'Y-m-d' }}">
-                    <label class="adminedit-label" style="margin-left:2rem;" for="deadline">Deadline:</label>
-                    <input id="deadline" name="finish_date" class="adminedit-input" type="date" value="{{ project.finish_date|date:'Y-m-d' }}">
-                </div>
-                <hr>
-                <div class="adminedit-row">
-                    <label class="adminedit-label" for="project_status">Status:</label>
-                    <input id="project_status" name="project_status" class="adminedit-input" type="text" value="{{ project.project_status }}">
-                </div>
-                <hr>
-                <div class="adminedit-row">
-                    <label class="adminedit-label" for="project_manager">Manager:</label>
-                    <input id="project_manager" name="project_manager" class="adminedit-input" type="text" value="{{ project.project_manager }}">
-                </div>
-            </div>
-            <div class="adminedit-files-section">
-                <ul class="adminedit-file-list">
-                    <li>
-                        <span>Document 1.docx</span>
-                        <span class="adminedit-remove-file" title="Remove">&#10006;</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="file-upload-wrapper">
-                <label for="add_file" class="file-upload-label"></label>
-                <label class="file-upload-btn">
-                    Add File
-                    <input type="file" id="add_file" name="add_file" multiple>
-                </label>
-            </div>
-        </div>
-        <!-- Project Team Card -->
-        <div class="adminedit-card adminedit-team-card">
-            <h2>Project Team</h2>
-            <div class="adminedit-team-section">
-                <div class="adminedit-team-label">Project Manager</div>
-                <input type="text" class="adminedit-input" name="project_manager" value="{{project.project_manager}}" placeholder="Project Manager Name" style="margin-bottom:1.2rem;">
-                <div class="adminedit-team-members-row">
-                    <span class="adminedit-team-label">Project Team</span>
-                    <div>
-                        Team Members:
-                        <select class="adminedit-team-count" name="team_count" id="team_count" onchange="updateMemberFields()">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5" selected>5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                        </select>
+            <div class="adminedit-card-container">
+                <!-- Edit Project Details Card -->
+                <div class="adminedit-card adminedit-details-card">
+                    <div class="adminedit-card-header">
+                        <h2>Create Project</h2>
+                        <a href="#" class="adminedit-back-link">&#8592; Back</a>
                     </div>
-                </div>
-                <div class="adminedit-team-list" id="members">
-                    {% for member in members %}
-                        <div style="display:flex;align-items:center;margin-bottom:4px;">
-                            <input type="text" name="member_names" class="adminedit-input" value="{{ member.member_name }}">
-                            <button type="button" onclick="removeMember(this)" style="margin-left:8px;">✖</button>
+                    <div class="adminedit-details-section">
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_name">Project Name:</label>
+                            <input id="project_name" name="name" class="adminedit-input" type="text" value="{{project.name}}">
                         </div>
-                    {% endfor %}
-                    <div style="display:flex;align-items:center;margin-bottom:4px;">
-                        <input type="text" name="member_names" class="adminedit-input" placeholder="Add new member">
-                        <button type="button" onclick="removeMember(this)" style="margin-left:8px;">✖</button>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_desc">Project Description:</label>
+                            <textarea id="project_desc" name="project_desc" class="adminedit-input" rows="2" maxlength="250">{{ project.project_desc }}</textarea>
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="start_date">Start Date:</label>
+                            <input id="start_date" name="start_date" class="adminedit-input" type="date" value="{{ project.start_date|date:'Y-m-d' }}">
+                            <label class="adminedit-label" style="margin-left:2rem;" for="deadline">Deadline:</label>
+                            <input id="deadline" name="finish_date" class="adminedit-input" type="date" value="{{ project.finish_date|date:'Y-m-d' }}">
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" value="Ongoing" for="project_status">Status:</label>
+                            <select id="project_status" name="project_status" class="adminedit-dropdown">
+                                <option value="Complete" {% if project.project_status == "Complete" %}selected{% endif %}>Complete</option>
+                                <option value="Ongoing" {% if project.project_status == "Ongoing" %}selected{% endif %}>Ongoing</option>
+                                <option value="Missing" {% if project.project_status == "Missing" %}selected{% endif %}>Missing</option>
+                            </select>
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_manager">Manager:</label>
+                            <input id="project_manager" name="project_manager" class="adminedit-input" type="text" value="{{ project.project_manager }}">
+                        </div>
+                    </div>
+                    <div class="adminedit-files-section">
+                        <ul class="adminedit-file-list">
+                            <li>
+                                <span>Document 1.docx</span>
+                                <span class="adminedit-remove-file" title="Remove">&#10006;</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="add_file" class="file-upload-label"></label>
+                        <label class="file-upload-btn">
+                            Add File
+                            <input type="file" id="add_file" name="add_file" multiple>
+                        </label>
+                        <div class="adminedit-submit-row">
+                        <button class="adminedit-submit-btn" type="submit">Submit</button>
+                    </div>
                     </div>
                 </div>
-                <button type="button" class="adminedit-submit-btn" style="margin-top:10px;" onclick="addMember()">Add Another Member</button>
+                
+                <!-- Project Team Card -->
+                <div class="adminedit-card adminedit-team-card">
+                    <div class="adminedit-card-header">
+                        <h2>Project Team</h2>
+                    </div>
+                    <div class="adminedit-team-section">
+                        <div class="adminedit-row">
+                            <div class="adminedit-team-label">Project Manager</div>
+                            <input type="text" class="adminedit-input" name="manager_name" value="{{project.project_manager}}" placeholder="Project Manager Name">
+                        </div>
+                        <hr>
+                        <div class="adminedit-team-members-row">
+                            <span class="adminedit-team-label">Project Team</span>
+                            <div>
+                                Team Members: 
+                                <span id="team_count_display" class="adminedit-team-count-display">5</span>
+                                <input type="hidden" name="team_count" id="team_count" value="5">
+                            </div>
+                        </div>
+                        <div class="adminedit-team-list" id="members">
+                            {% for member in members %}
+                                <div class="member-row">
+                                    <input type="text" name="member_names" class="adminedit-input" value="{{ member.member_name }}">
+                                    <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
+                                </div>
+                            {% endfor %}
+                            <div class="member-row">
+                                <input type="text" name="member_names" class="adminedit-input" placeholder="Add new member">
+                                <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
+                            </div>
+                        </div>
+                        <div class="adminedit-team-controls">
+                            <button type="button" class="adminedit-add-member-btn" id="add_member_btn">
+                                <span class="add-icon-circle">+</span>
+                                <span>Add Team Member</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="adminedit-submit-row">
-            <button class="adminedit-submit-btn" type="submit">Submit</button>
-        </div>
         </form>
     </div>
     <!-- Page Content End -->
 
-    <script>
-    function addMember() {
-        var membersDiv = document.getElementById('members');
-        var wrapper = document.createElement('div');
-        wrapper.style.display = 'flex';
-        wrapper.style.alignItems = 'center';
-        wrapper.style.marginBottom = '4px';
-
-        var input = document.createElement('input');
-        input.type = 'text';
-        input.name = 'member_names';
-        input.className = 'adminedit-input';
-        input.placeholder = 'Add new member';
-
-        var delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.textContent = '✖';
-        delBtn.style.marginLeft = '8px';
-        delBtn.onclick = function() {
-            wrapper.remove();
-            updateDropdownCount();
-        };
-
-        wrapper.appendChild(input);
-        wrapper.appendChild(delBtn);
-        membersDiv.appendChild(wrapper);
-        updateDropdownCount();
-    }
-
-    function removeMember(btn) {
-        btn.parentElement.remove();
-        updateDropdownCount();
-    }
-
-    function updateMemberFields() {
-        var membersDiv = document.getElementById('members');
-        var count = parseInt(document.getElementById('team_count').value, 10);
-        var currentValues = Array.from(membersDiv.querySelectorAll('input[name="member_names"]')).map(i => i.value);
-        membersDiv.innerHTML = '';
-        for (let i = 0; i < count; i++) {
-            var wrapper = document.createElement('div');
-            wrapper.style.display = 'flex';
-            wrapper.style.alignItems = 'center';
-            wrapper.style.marginBottom = '4px';
-
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.name = 'member_names';
-            input.className = 'adminedit-input';
-            input.placeholder = 'Add new member';
-            input.value = currentValues[i] || '';
-
-            var delBtn = document.createElement('button');
-            delBtn.type = 'button';
-            delBtn.textContent = '✖';
-            delBtn.style.marginLeft = '8px';
-            delBtn.onclick = function() {
-                wrapper.remove();
-                updateDropdownCount();
-            };
-
-            wrapper.appendChild(input);
-            wrapper.appendChild(delBtn);
-            membersDiv.appendChild(wrapper);
-        }
-    }
-
-    function updateDropdownCount() {
-        var membersDiv = document.getElementById('members');
-        var count = membersDiv.querySelectorAll('input[name="member_names"]').length;
-        document.getElementById('team_count').value = count;
-    }
-
-    // On page load, sync dropdown and fields
-    window.onload = function() {
-        updateDropdownCount();
-    };
-    </script>
-
     <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="{% static 'js/adminedit.js' %}"></script>
-    <script>
-        function addMemberField() {
-            var membersDiv = document.getElementById('members');
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.name = 'member_names';
-            input.placeholder = 'Add new member';
-            membersDiv.appendChild(input);
-            membersDiv.appendChild(document.createElement('br'));
-        }
-    </script>
+    <script>function initTeamMemberFields() {
+    const teamCountInput = document.getElementById('team_count');
+    const teamList = document.getElementById('members');
+    
+    if (teamCountInput && teamList) {
+        // Initialize remove member button event handlers
+        document.querySelectorAll('.remove-member-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                removeMember(this);
+            });
+        });
+    }
+}
+
+/**
+ * Add a new team member field
+ */
+function addMember() {
+    const membersDiv = document.getElementById('members');
+    if (!membersDiv) return;
+    
+    // Create member row elements
+    const wrapper = document.createElement('div');
+    wrapper.className = 'member-row';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'member_names';
+    input.className = 'adminedit-input';
+    input.placeholder = 'Enter team member name';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-member-btn';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove member';
+    removeBtn.addEventListener('click', function() {
+        removeMember(this);
+    });
+    
+    // Assemble and add to the DOM
+    wrapper.appendChild(input);
+    wrapper.appendChild(removeBtn);
+    membersDiv.appendChild(wrapper);
+    
+    // Update the counter
+    updateDropdownCount();
+}
+
+/**
+ * Remove a team member field
+ */
+function removeMember(btn) {
+    const row = btn.closest('.member-row') || btn.parentElement;
+    if (row) {
+        row.remove();
+        updateDropdownCount();
+    }
+}
+
+/**
+ * Update team member fields based on count
+ */
+function updateMemberFields() {
+    const membersDiv = document.getElementById('members');
+    if (!membersDiv) return;
+    
+    const count = parseInt(document.getElementById('team_count').value);
+    const currentInputs = membersDiv.querySelectorAll('input[name="member_names"]');
+    
+    // Store current values
+    const currentValues = Array.from(currentInputs).map(input => input.value);
+    
+    // Clear existing fields
+    membersDiv.innerHTML = '';
+    
+    // Add new fields based on count
+    for (let i = 0; i < count; i++) {
+        createMemberRow(membersDiv, currentValues[i] || '');
+    }
+}
+</script>
 </body>
 </html>
