@@ -191,7 +191,7 @@
 .project-info h3 {
     color: #000;
     font-family: Inter;
-    font-size: 24px;
+    font-size: 22px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -199,16 +199,15 @@
 }
 
 .project-info p {
-    color: #000;
+    color: grey;
     font-family: 'Inter', sans-serif;
-    font-size: 22px;
-    font-style: italic;
-    font-weight: 200;
+    font-size: 20px;
+    font-weight: 300;
     line-height: normal;
 }
 
 .project-meta {
-    color: #000;
+    color: grey;
     font-family: 'Inter', sans-serif;
     font-size: 20px;
     font-style: normal;
@@ -224,10 +223,15 @@
 .status-ongoing {
     color: #27ae60;
     font-weight: bold;
-    font-style: italic;
+    font-style: italic
 }
-.status {
-    font-style: italic;
+.status{
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+}
+.span{
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
 }
 
 .project-actions {
