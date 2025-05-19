@@ -158,7 +158,6 @@ def admin_edit_project_details(request):
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, ProjectMember
 
-
 def admin_edit_project_details(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     members = project.members.all()
@@ -166,7 +165,6 @@ def admin_edit_project_details(request, project_id):
     if request.method == 'POST':
         # Update project fields
         project.name = request.POST.get('name')
-        # project.project_id = request.POST.get('project_id')
         project.start_date = request.POST.get('start_date')
         project.finish_date = request.POST.get('finish_date')
         project.project_status = request.POST.get('project_status')
@@ -225,6 +223,8 @@ def create_project(request):
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
+def restore_from_trash(request):
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 
 def admin_files_page(request):
@@ -417,7 +417,7 @@ def home(request):
     return render(request, 'core/home.html')
 
 def organization(request):
-    projects = Project.objects.filter(name='New Employee Oasdasdanboarding System Design').order_by('-finish_date')  # or your preferred ordering
+    projects = Project.objects.all().order_by('-finish_date') 
     personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
     top_project = projects.first() if projects else None
@@ -654,36 +654,6 @@ def create_folder_in_drive(request):
     messages.error(request, "Invalid request method.")
     return redirect('core:saved')  # Redirect to the saved view for invalid request methods
 
-
-def delete_folders(request):
-    if request.method == 'POST':
-        folder_ids = request.POST.getlist('folder_ids[]')
-        
-        creds_data = request.session.get('credentials')
-        if not creds_data:
-            return JsonResponse({'error': 'You must authorize Google Drive to delete folders.'}, status=403)
-            
-        creds = Credentials(**creds_data)
-        
-        try:
-            service = build('drive', 'v3', credentials=creds)
-            
-            deleted_count = 0
-            for folder_id in folder_ids:
-                service.files().delete(fileId=folder_id).execute()
-                deleted_count += 1
-                
-            return JsonResponse({
-                'success': True, 
-                'message': f'{deleted_count} folder(s) deleted successfully.'
-            })
-            
-        except Exception as e:
-            print("Error deleting folders from Google Drive:", str(e))
-            return JsonResponse({'error': str(e)}, status=500)
-            
-    return JsonResponse({'error': 'Invalid request method.'}, status=400)
-
 def view_folder_contents(request, folder_id):
     creds_data = request.session.get('credentials')
     if not creds_data:
@@ -879,44 +849,6 @@ def empty_trash(request):
             return redirect('core:saved')
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
-
-
-def restore_from_trash(request):
-    if request.method == 'POST':
-        creds_data = request.session.get('credentials')
-        if not creds_data:
-            return redirect('core:google_drive_auth')
-
-        creds = Credentials(**creds_data)
-
-        try:
-            service = build('drive', 'v3', credentials=creds)
-            
-            # Get files in trash
-            results = service.files().list(
-                q="trashed=true",
-                fields="files(id, name)"
-            ).execute()
-            
-            trashed_files = results.get('files', [])
-            
-            # Restore each file
-            restored_count = 0
-            for file in trashed_files:
-                service.files().update(
-                    fileId=file['id'],
-                    body={'trashed': False}
-                ).execute()
-                restored_count += 1
-                
-            messages.success(request, f"Successfully restored {restored_count} files from trash")
-            return redirect('core:saved')
-            
-        except Exception as e:
-            messages.error(request, f"Error restoring files: {str(e)}")
-            return redirect('core:saved')
-            
-    return redirect('core:saved')
 
 def credentials_to_dict(creds):
     return {
