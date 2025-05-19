@@ -91,11 +91,35 @@
     overflow: hidden; /* Ensure content doesn't overflow */
 }
 
+.under-image::after {
+  content: ''; /* Add a pseudo-element for the gradient */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0)); /* Dark gradient effect */
+  border-radius: inherit; /* Match the container's border radius */
+  z-index: 2; /* Ensure it appears above the background but below the content */
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
 .under-image img {
+  width: 100%; /* Make the image fill the container's width */
+  height: 100%; /* Make the image fill the container's height */
+  object-fit: cover; /* Scale the image proportionally to cover the container */
+  border-radius: inherit; /* Match the container's border radius */
+  z-index: 0; /* Ensure the image is below the gradient */
+}
+
+.background-image{
+    position: absolute; /* Position it absolutely relative to the parent container */
     width: 100%; /* Make the image fill the container's width */
     height: 100%; /* Make the image fill the container's height */
     object-fit: cover; /* Scale the image proportionally to cover the container */
     border-radius: inherit; /* Match the container's border radius */
+    z-index: 0; /* Place it below other elements */
+    background-color: #1e1c1c;
 }
 
 .project-details {
@@ -530,7 +554,7 @@
   .project-details {
     display: flex;
     flex-direction: column  ;
-    gap: 10px; 
+    gap: 5px; 
   }
   
   .date-group {
@@ -730,4 +754,17 @@
 .nav-btn:hover {
   background: #2a2f45;
 }
-  
+
+/* Scrollable description container */
+.project-description-container {
+  max-height: 4.8em; /* Approximately 3 lines of text (adjust if needed) */
+  overflow-y: auto; /* Enable vertical scrolling when content overflows */
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+  margin-bottom: 10px;
+}
+
+.project-description-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
+}
+

@@ -120,7 +120,13 @@
                             {% endfor %}
                         {% endwith %}
                     </p>
-                    <p class="status">Status: <span class="status-ongoing">{{project.project_status}}</span></p>
+                    {% if project.project_status == 'Complete' %}
+                        <p class="status" >Status: <span class="status-ongoing" style="color: #6AFF3C">{{ project.project_status }}</span></p>
+                    {% elif project.project_status == 'Ongoing' %}
+                        <p class="status" >Status: <span class="status-ongoing" style="color: orange">{{ project.project_status }}</span></p>
+                    {% elif project.project_status == 'Missing' %}
+                        <p class="status" >Status: <span class="status-ongoing" style="color: red">{{ project.project_status }}</span></p>
+                    {% endif %}
                 </div>
                 <div class="project-actions">
                     <a href="{% url 'core:admin_edit_project_details' project.id %}" class="edit-btn">
@@ -143,4 +149,3 @@
     <script src="{% static 'js/adprojpage.js' %}"></script>
 </body>
 </html>
-  

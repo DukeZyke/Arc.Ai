@@ -419,7 +419,7 @@ def home(request):
     return render(request, 'core/home.html')
 
 def organization(request):
-    projects = Project.objects.filter(name='New Employee Oasdasdanboarding System Design').order_by('-finish_date')  # or your preferred ordering
+    projects = Project.objects.all().order_by('-project_id')  # or your preferred ordering
     personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
     top_project = projects.first() if projects else None
