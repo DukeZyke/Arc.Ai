@@ -115,7 +115,7 @@
                     <h3>Team</h3>
                     <p>
                         {% for member in top_project.members.all %}
-                            {{member.member_name}} {% if not forloop.last %}, {% endif %}
+                            {{member.member_name}}{% if not forloop.last %}, {% endif %}
                         {% empty %}
                             No members assigned.
                         {% endfor %}
