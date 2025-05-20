@@ -110,21 +110,25 @@
                 <!-- Folder Creation -->
                 <form action="{% url 'core:create_folder_in_drive' %}" method="post">
                     {% csrf_token %}
-                    <input type="text" name="folder_name" placeholder="Folder Name" required>
-                    <button type="submit">Create</button>
+                    <input class="Fn" type="text" name="folder_name" placeholder="Folder Name" required>
+                     <hr class="dropdown-divider">
+                    <button class="create" type="submit">Create</button>
                 </form>
                 <hr class="dropdown-divider">
 
                 <!-- DELETE Button -->
-                <a href="#" onclick="toggleFolderCheckboxes()">DELETE</a>
+                <button class="delete"  onclick="toggleFolderCheckboxes()">DELETE</button>
+                 <hr class="dropdown-divider">
             </div>
         </div>
 
             <div id="folder_items">
                 {% for folder in folders %}
                     <div class="folder-item">
-                        <input type="checkbox" class="folder-checkbox" style="display: none;" data-folder-id="{{ folder.id }}">
-                        <a href="{% url 'core:view_folder_contents' folder.id %}">{{ folder.name }}</a>
+                            <div class="folder-content">
+                                <input type="checkbox" class="folder-checkbox" style="display: none;" data-folder-id="{{ folder.id }}">
+                                    <a href="{% url 'core:view_folder_contents' folder.id %}">{{ folder.name }}</a>
+                             </div>
                     </div>
                 {% empty %}
                     <p>No folders found.</p>
@@ -148,17 +152,19 @@
                     
                     <!-- Dropdown Button -->
                     <img src="{% static 'Images/dots.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownFiles()" style="width: 40px; height: 40px; cursor: pointer;">
-                    <div class="dropdown-content" id="myDropdown">
+                    <div class="dropdown-content2" id="myDropdown">
                         <!-- File Upload -->
                         <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
-                            <input type="file" name="file" multiple required>
-                            <button type="submit">Upload</button>
+                            <input  style=" margin: 10px auto auto 5px; padding: 8px 16px; width:auto;"type="file" name="file" multiple required>
+                            <hr class="dropdown-divider">
+                            <button class="upload" type="submit">Upload</button>
                         </form>
                         <hr class="dropdown-divider">
 
-                        <!-- DELETE Button --><a href="#" onclick="toggleCheckboxes()">MOVE TO TRASH</a>
+                        <!-- DELETE Button --> <button class="trash" onclick="toggleCheckboxes()">MOVE TO TRASH</button>
+                          <hr class="dropdown-divider">
                     </div>
                 </div>
 
@@ -179,7 +185,10 @@
                                         <span class="file-size">{{ file.size }}</span>
                                     </div>
                                     <div class="file-actions">
-                                        <button class="action-button">⋮</button>
+                                        <button class="action-button" onclick="showFileOptions(this)">⋮</button>
+                                            <div class="file-options-dropdown" style="display: none;">
+                                            <div class="option" onclick="handleSingleFileTrash(this)">Move to Trash</div>
+                                        </div>
                                     </div>
                                 </li>
                                 <div class="horizontal-line"></div>
@@ -189,7 +198,10 @@
                         </ul>
 
                     <!-- Single Delete Button that appears when checkboxes are shown -->
-                    <button id="delete-selected-btn" style="display: none;" onclick="moveToTrashSelectedFiles()">Move Selected Files to Trash</button>
+                    <div class="action-buttons-group" id="action-buttons-group" style="display: none;">
+                        <button id="delete-selected-btn" onclick="moveToTrashSelectedFiles()">Move Selected Files to Trash</button>
+                        <button id="undo-selection-btn" onclick="undoSelection()">Undo</button>
+                    </div>
 
                     <!-- Keep the form for the CSRF token and folder ID -->
                     <form id="delete-files-form" action="{% url 'core:move_files_to_trash' %}" method="post" style="display: none;">
@@ -207,18 +219,18 @@
             <div class="horizontal-line"></div>
             <!-- Dropdown Button -->
             <img src="{% static 'Images/dots copy 2.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownTrash()" style="width: 40px; height: 40px; cursor: pointer;">
-                <div class="dropdown-content" id="trashDropdown">
+                <div class="dropdown-content3" id="trashDropdown">
                     <!-- Remove All Trash Button -->
                     <form action="{% url 'core:empty_trash' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
+                        <button class="rat" type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
                     </form>
                     
                     <!-- Restore Files Button -->
                     <hr class="dropdown-divider">
                     <form action="{% url 'core:restore_from_trash' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Restore all files from trash?')">Restore All Files</button>
+                        <button class="raf" type="submit" onclick="return confirm('Restore all files from trash?')">Restore All Files</button>
                     </form>
                 </div>
 
@@ -226,19 +238,27 @@
 
 
             </div>
-            <div id="file_items">
-                <ul>
-                {% for file in trash %}
-                    <li>
-                        <a href="{{ file.webViewLink }}" target="_blank">{{ file.name }}</a>
-                    </li>
-                {% empty %}
-                    <li>Trash is empty</li>
-                {% endfor %}
-                </ul>
-
-
-            </div>
+    <div id="file_items">
+    <ul class="file-list">
+        {% for file in trash %}
+            <div class="horizontal-line"></div>
+            <li class="file-item">
+                <div class="file-icon">
+                    <img src="{% static file.icon %}" alt="File Icon">
+                </div>
+                <div class="file-details">
+                    <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
+                    <span class="file-owner">{{ file.owner }}</span>
+                    <span class="file-date">{{ file.date }}</span>
+                    <span class="file-size">{{ file.size }}</span>
+                </div>
+            </li>
+            <div class="horizontal-line"></div>
+        {% empty %}
+            <li>Trash is empty</li>
+        {% endfor %}
+    </ul>
+</div>
     </div>
     <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="{% static 'js/saved.js' %}"></script>
@@ -344,6 +364,81 @@
             });
         }
     }
+
+    function showFileOptions(button) {
+    // Close any open dropdowns first
+    const allDropdowns = document.querySelectorAll('.file-options-dropdown');
+    allDropdowns.forEach(dropdown => {
+        if (dropdown !== button.nextElementSibling) {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    // Toggle the clicked dropdown
+    const dropdown = button.nextElementSibling;
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.matches('.action-button')) {
+        const dropdowns = document.querySelectorAll('.file-options-dropdown');
+        dropdowns.forEach(dropdown => {
+            dropdown.style.display = 'none';
+        });
+    }
+});
+
+function handleSingleFileTrash(optionElement) {
+    // Find the parent file-item
+    const fileItem = optionElement.closest('.file-item');
+    const checkbox = fileItem.querySelector('.file-checkbox');
+    
+    // Show all checkboxes
+    const allCheckboxes = document.querySelectorAll('.file-checkbox');
+    allCheckboxes.forEach(cb => {
+        cb.style.display = 'inline-block';
+        cb.checked = false; // Uncheck all checkboxes first
+    });
+    
+    // Check only the selected file's checkbox
+    checkbox.checked = true;
+    
+    // Show the action buttons group
+    document.getElementById('action-buttons-group').style.display = 'flex';
+    
+    // Close the dropdown
+    optionElement.closest('.file-options-dropdown').style.display = 'none';
+}
+
+function toggleCheckboxes() {
+    const checkboxes = document.querySelectorAll('.file-checkbox');
+    const actionButtonsGroup = document.getElementById('action-buttons-group');
+    
+    // Check if checkboxes are currently hidden
+    const isHidden = checkboxes.length > 0 && checkboxes[0].style.display === 'none';
+    
+    // Toggle visibility
+    checkboxes.forEach(checkbox => {
+        checkbox.style.display = isHidden ? 'inline-block' : 'none';
+        checkbox.checked = false; // Uncheck when toggling
+    });
+    
+    // Toggle action buttons group visibility
+    actionButtonsGroup.style.display = isHidden ? 'flex' : 'none';
+}
+
+function undoSelection() {
+    // Hide all checkboxes
+    const checkboxes = document.querySelectorAll('.file-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.style.display = 'none';
+        checkbox.checked = false;
+    });
+    
+    // Hide the action buttons group
+    document.getElementById('action-buttons-group').style.display = 'none';
+}
 </script>
     
 </html>

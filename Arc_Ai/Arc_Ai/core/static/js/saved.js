@@ -92,24 +92,19 @@ let checkboxesVisible = false; // Track the visibility state of checkboxes
 
 function toggleCheckboxes() {
     const checkboxes = document.querySelectorAll('.file-checkbox');
-    const deleteButton = document.getElementById('delete-selected-btn');
+   const actionButtonsGroup = document.getElementById('action-buttons-group');
     
-    checkboxesVisible = !checkboxesVisible; // Toggle state
+    // Check if checkboxes are currently hidden
+    const isHidden = checkboxes.length > 0 && checkboxes[0].style.display === 'none';
     
-    // Show/hide checkboxes
+    // Toggle visibility
     checkboxes.forEach(checkbox => {
-        checkbox.style.display = checkboxesVisible ? 'inline-block' : 'none';
-        
-        // Add event listeners only when making visible
-        if (checkboxesVisible) {
-            checkbox.addEventListener('change', updateDeleteButtonVisibility);
-        }
+        checkbox.style.display = isHidden ? 'inline-block' : 'none';
+        checkbox.checked = false; // Uncheck when toggling
     });
     
-    // Always hide the button initially when toggling checkboxes
-    if (deleteButton) {
-        deleteButton.style.display = 'none';
-    }
+    // Toggle action buttons group visibility
+    actionButtonsGroup.style.display = isHidden ? 'flex' : 'none'; 
 }
 
 // New function to update button visibility
