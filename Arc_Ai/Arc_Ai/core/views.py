@@ -652,12 +652,20 @@ def saved(request):
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
-            fields="files(id, name, mimeType, webViewLink)"
+            fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
         ).execute()
 
         trash_files = trashed_results.get('files', [])
     # Add metadata for each file
         for file in drive_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
+        # Add metadata for each trashed file
+        for file in trash_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
@@ -948,7 +956,7 @@ def view_folder_contents(request, folder_id):
         file_results = service.files().list(
             q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder'",
             pageSize=100,
-            fields="files(id, name, mimeType, webViewLink, parents)"
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
 
         drive_files = file_results.get('files', [])
@@ -957,7 +965,7 @@ def view_folder_contents(request, folder_id):
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
-            fields="files(id, name, mimeType, webViewLink)"
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
 
         trash_files = trashed_results.get('files', [])
@@ -965,7 +973,18 @@ def view_folder_contents(request, folder_id):
         # Add this to your view_folder_contents function after fetching files
         for file in drive_files:
             file['file_id'] = file['id']
-            # Add any other metadata processing you need
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+            file['webViewLink'] = file.get('webViewLink', '')
+
+            # Add metadata for each trashed file
+        for file in trash_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
 
     except Exception as e:
