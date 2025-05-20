@@ -80,146 +80,56 @@
             </button>
         </div>
         <div class="user-count">
-            <span>Total Users: <strong id="total-users">69</strong></span>
+            <span>Total Users: <strong id="total-users">{{ total_users }}</strong></span>
             <span class="status-indicator"></span>
         </div>
         <div class="search-results-count">
             <span>Active Users: </span>
-            <strong id="active-users">69</strong>
+            <strong id="active-users">{{ active_users }}</strong>
             <span class="search-indicator"></span>
         </div>
     </div>
 
     <div class="user-list">
-        <!-- User Card Example (Repeat for each user) -->
-        <div class="user-card">
-            <div class="user-avatar">
-                <img src="{% static 'Images/avatar.png' %}" alt="User">
-            </div>
-            <div class="user-info">
-                <h3>Jack</h3>
-                <span class="user-email">(Jack@gmail.com)</span>
-            </div>
-            <div class="user-details">
-                <div class="department">
-                    <span>Department: Accounting</span>
+        {% if users %}
+            {% for user in users %}
+            <div class="user-card">
+                <div class="user-avatar">
+                    <img src="{% static 'Images/avatar.png' %}" alt="{{ user.username }}">
                 </div>
-                <div class="position">
-                    <span>Position: Senior Accountant</span>
+                <div class="user-info">
+                    <h3>{{ user.username }}</h3>
+                    <span class="user-email">({{ user.email }})</span>
                 </div>
-            </div>
-            <div class="level-control-container">
-                <span>Level:</span>
-                <div class="level-control">
-                    <span class="level-value">1</span>
-                    <div class="level-buttons">
-                        <button class="level-up"><i class="bx bx-caret-up"></i></button>
-                        <button class="level-down"><i class="bx bx-caret-down"></i></button>
+                <div class="user-details">
+                    <div class="department">
+                        <span>Department: {% if user.profile.department %}{{ user.profile.department }}{% else %}Not Set{% endif %}</span>
+                    </div>
+                    <div class="position">
+                        <span>Position: {% if user.profile.position %}{{ user.profile.position }}{% else %}Not Set{% endif %}</span>
                     </div>
                 </div>
-            </div>
-            <div class="user-actions">
-                <button class="edit-btn"><i class="bx bx-edit"></i></button>
-                <button class="delete-btn"><i class="bx bx-trash"></i></button>
-            </div>
-        </div>
-
-        <!-- Repeat for other users -->
-        <div class="user-card">
-            <div class="user-avatar">
-                <img src="{% static 'Images/avatar.png' %}" alt="John Doe">
-            </div>
-            <div class="user-info">
-                <h3>John Doe</h3>
-                <span class="user-email">(John.Doe@gmail.com)</span>
-            </div>
-            <div class="user-details">
-                <div class="department">
-                    <span>Department: Accounting</span>
-                </div>
-                <div class="position">
-                    <span>Position: Senior Acountant</span>
-                </div>
-            </div>
-            <div class="level-control-container">
-                <span>Level:</span>
-                <div class="level-control">
-                    <span class="level-value">1</span>
-                    <div class="level-buttons">
-                        <button class="level-up"><i class="bx bx-caret-up"></i></button>
-                        <button class="level-down"><i class="bx bx-caret-down"></i></button>
+                <div class="level-control-container">
+                    <span>Level:</span>
+                    <div class="level-control">
+                        <span class="level-value">{% if user.is_superuser %}3{% elif user.is_staff %}2{% else %}1{% endif %}</span>
+                        <div class="level-buttons">
+                            <button class="level-up" data-user-id="{{ user.id }}"><i class="bx bx-caret-up"></i></button>
+                            <button class="level-down" data-user-id="{{ user.id }}"><i class="bx bx-caret-down"></i></button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="user-actions">
-                <button class="edit-btn"><i class="bx bx-edit"></i></button>
-                <button class="delete-btn"><i class="bx bx-trash"></i></button>
-            </div>
-        </div>
-
-        <div class="user-card">
-            <div class="user-avatar">
-                <img src="{% static 'Images/avatar.png' %}" alt="John Doe">
-            </div>
-            <div class="user-info">
-                <h3>John Doe</h3>
-                <span class="user-email">(John.Doe@gmail.com)</span>
-            </div>
-            <div class="user-details">
-                <div class="department">
-                    <span>Department: Accounting</span>
-                </div>
-                <div class="position">
-                    <span>Position: Senior Acountant</span>
+                <div class="user-actions">
+                    <button class="edit-btn" data-user-id="{{ user.id }}"><i class="bx bx-edit"></i></button>
+                    <button class="delete-btn" data-user-id="{{ user.id }}"><i class="bx bx-trash"></i></button>
                 </div>
             </div>
-            <div class="level-control-container">
-                <span>Level:</span>
-                <div class="level-control">
-                    <span class="level-value">1</span>
-                    <div class="level-buttons">
-                        <button class="level-up"><i class="bx bx-caret-up"></i></button>
-                        <button class="level-down"><i class="bx bx-caret-down"></i></button>
-                    </div>
-                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-users-message">
+                <p>No users found in the database.</p>
             </div>
-            <div class="user-actions">
-                <button class="edit-btn"><i class="bx bx-edit"></i></button>
-                <button class="delete-btn"><i class="bx bx-trash"></i></button>
-            </div>
-        </div>
-
-        <div class="user-card">
-            <div class="user-avatar">
-                <img src="{% static 'Images/avatar.png' %}" alt="John Doe">
-            </div>
-            <div class="user-info">
-                <h3>John Doe</h3>
-                <span class="user-email">(John.Doe@gmail.com)</span>
-            </div>
-            <div class="user-details">
-                <div class="department">
-                    <span>Department: Accounting</span>
-                </div>
-                <div class="position">
-                    <span>Position: Senior Acountant</span>
-                </div>
-            </div>
-            <div class="level-control-container">
-                <span>Level:</span>
-                <div class="level-control">
-                    <span class="level-value">1</span>
-                    <div class="level-buttons">
-                        <button class="level-up"><i class="bx bx-caret-up"></i></button>
-                        <button class="level-down"><i class="bx bx-caret-down"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="user-actions">
-                <button class="edit-btn"><i class="bx bx-edit"></i></button>
-                <button class="delete-btn"><i class="bx bx-trash"></i></button>
-            </div>
-        </div>
+        {% endif %}
     </div>
 </div>
 

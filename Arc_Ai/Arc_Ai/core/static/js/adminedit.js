@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // File upload handler
     initFileUpload();
+    
+    // Add member button click handler
+    const addMemberBtn = document.getElementById('add_member_btn');
+    if (addMemberBtn) {
+        addMemberBtn.addEventListener('click', function() {
+            addMember();
+        });
+    }
+    
+    // Initialize member count on page load
+    updateDropdownCount();
 });
 
 /**
@@ -25,34 +36,133 @@ function initFileRemoval() {
  * Initialize and manage team member input fields
  */
 function initTeamMemberFields() {
-    const teamCountSelect = document.getElementById('team_count');
-    const teamList = document.getElementById('team_list');
+    const teamCountInput = document.getElementById('team_count');
+    const teamList = document.getElementById('members');
     
-    if (teamCountSelect && teamList) {
-        // Update team member fields based on selected count
-        function updateTeamMemberFields() {
-            const count = parseInt(teamCountSelect.value);
-            
-            // Clear existing fields
-            teamList.innerHTML = '';
-            
-            // Add new fields based on count
-            for (let i = 1; i <= count; i++) {
-                const input = document.createElement('input');
-                input.type = 'email';
-                input.className = 'adminedit-input';
-                input.name = `team_member_${i}`;
-                input.placeholder = `team${i}@example.com`;
-                teamList.appendChild(input);
-            }
-        }
-        
-        // Initialize with default selection
-        updateTeamMemberFields();
-        
-        // Update when selection changes
-        teamCountSelect.addEventListener('change', updateTeamMemberFields);
+    if (teamCountInput && teamList) {
+        // Initialize remove member button event handlers
+        document.querySelectorAll('.remove-member-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                removeMember(this);
+            });
+        });
     }
+}
+
+/**
+ * Add a new team member field
+ */
+function addMember() {
+    const membersDiv = document.getElementById('members');
+    if (!membersDiv) return;
+    
+    // Create member row elements
+    const wrapper = document.createElement('div');
+    wrapper.className = 'member-row';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'member_names';
+    input.className = 'adminedit-input';
+    input.placeholder = 'Enter team member name';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-member-btn';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove member';
+    removeBtn.addEventListener('click', function() {
+        removeMember(this);
+    });
+    
+    // Assemble and add to the DOM
+    wrapper.appendChild(input);
+    wrapper.appendChild(removeBtn);
+    membersDiv.appendChild(wrapper);
+    
+    // Update the counter
+    updateDropdownCount();
+}
+
+/**
+ * Remove a team member field
+ */
+function removeMember(btn) {
+    const row = btn.closest('.member-row') || btn.parentElement;
+    if (row) {
+        row.remove();
+        updateDropdownCount();
+    }
+}
+
+/**
+ * Update team member fields based on count
+ */
+function updateMemberFields() {
+    const membersDiv = document.getElementById('members');
+    if (!membersDiv) return;
+    
+    const count = parseInt(document.getElementById('team_count').value);
+    const currentInputs = membersDiv.querySelectorAll('input[name="member_names"]');
+    
+    // Store current values
+    const currentValues = Array.from(currentInputs).map(input => input.value);
+    
+    // Clear existing fields
+    membersDiv.innerHTML = '';
+    
+    // Add new fields based on count
+    for (let i = 0; i < count; i++) {
+        createMemberRow(membersDiv, currentValues[i] || '');
+    }
+}
+
+/**
+ * Update count to match the number of member fields
+ */
+function updateDropdownCount() {
+    const membersDiv = document.getElementById('members');
+    if (!membersDiv) return;
+    
+    const teamCountInput = document.getElementById('team_count');
+    const teamCountDisplay = document.getElementById('team_count_display');
+    const count = membersDiv.querySelectorAll('.member-row').length;
+    
+    // Update hidden input and display
+    if (teamCountInput && teamCountDisplay) {
+        teamCountInput.value = count;
+        teamCountDisplay.textContent = count;
+    }
+}
+
+/**
+ * Create a member row with input field and remove button
+ */
+function createMemberRow(container, value = '') {
+    const row = document.createElement('div');
+    row.className = 'member-row';
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'member_names';
+    input.className = 'adminedit-input';
+    input.placeholder = 'Enter team member name';
+    input.value = value;
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'remove-member-btn';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.title = 'Remove member';
+    removeBtn.addEventListener('click', function() {
+        removeMember(this);
+    });
+    
+    row.appendChild(input);
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+    
+    return row;
 }
 
 /**

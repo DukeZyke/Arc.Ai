@@ -124,8 +124,10 @@ def practice1(request):
         'current_address': current_address
     })
 
-#[PRACTICE TEMPLATES] ====================================================================
+#[PRACTICE TEMPLATES] ====================================================================\
 
+def admin_create_project_details(request):
+    return render(request, 'core/admin_create_project_details.html')
 
 def user_involved_map(request):
     return render(request, 'core/user_involved_map.html')
@@ -147,7 +149,21 @@ def admin_project_page(request):
     })
     
 def admin_users_page(request):
-    return render(request,'core/admin_users_page.html', {
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')
+    
+    # Get all users
+    users = User.objects.all().order_by('username')
+    
+    # Count active users
+    active_users = User.objects.filter(is_active=True).count()
+    
+    return render(request, 'core/admin_users_page.html', {
+        'users': users,
+        'total_users': users.count(),
+        'active_users': active_users,
     })
     
 def admin_edit_project_details(request):
@@ -166,9 +182,9 @@ def admin_edit_project_details(request, project_id):
     if request.method == 'POST':
         # Update project fields
         project.name = request.POST.get('name')
-        # project.project_id = request.POST.get('project_id')
+        project.project_desc = request.POST.get('project_desc')
         project.start_date = request.POST.get('start_date')
-        project.finish_date = request.POST.get('finish_date')
+        project.finish_date = request.POST.get('finish_date')   
         project.project_status = request.POST.get('project_status')
         project.project_manager = request.POST.get('project_manager')
         project.save()
@@ -417,7 +433,7 @@ def home(request):
     return render(request, 'core/home.html')
 
 def organization(request):
-    projects = Project.objects.filter(name='New Employee Oasdasdanboarding System Design').order_by('-finish_date')  # or your preferred ordering
+    projects = Project.objects.all().order_by('-project_id')  # or your preferred ordering
     personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
     top_project = projects.first() if projects else None

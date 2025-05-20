@@ -109,21 +109,29 @@
                 </div>
                 <div class="project-details">
                     <h3>Description</h3>
-                    <p>{{top_project.project_desc}}</p>
+                    <div class="project-description-container">
+                        <p>{{top_project.project_desc}}</p>
+                    </div>
                     <h3>Project Manager</h3>
                     <p>{{top_project.project_manager}}
                     <h3>Team</h3>
                     <p>
-                        {% for member in top_project.members.all %}
-                            {{member.member_name}} {% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                            No members assigned.
-                        {% endfor %}
+                        {% with total=top_project.members.count %}
+                            {% for member in top_project.members.all %}
+                                {% if forloop.counter <= 3 %}
+                                    {{ member.member_name }}{% if forloop.counter < 3 and forloop.counter < total %}, {% endif %}
+                                {% elif forloop.counter == 4 %}
+                                    and {{ total|add:"-3" }} others
+                                {% endif %}
+                            {% empty %}
+                                No members assigned.
+                            {% endfor %}
+                        {% endwith %}
                     </p>
                     <div class="details-row">
                         <div>
-                            <h3>Total Hours Spent</h3>
-                            <p>{{ top_project.total_hours|default:"-" }}</p>
+                            <h3>Start Date</h3>
+                            <p>{{ top_project.start_date|default:"-" }}</p>
                         </div>
                         <div>
                             <h3>Deadline</h3>
@@ -171,7 +179,7 @@
                             <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
                             {% elif project.project_status == 'Ongoing' %}
                             <p class="status" style="color: orange">{{project.project_status}}</p>
-                            {% elif project.project_status == 'Missed' %}
+                            {% elif project.project_status == 'Missing' %}
                             <p class="status" style="color: red">{{project.project_status}}</p>
                             {% endif %}
 

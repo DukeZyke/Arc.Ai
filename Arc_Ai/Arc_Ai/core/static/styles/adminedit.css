@@ -2,10 +2,22 @@
 .adminedit-content {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    gap: 2.5rem;
     margin-top: 2.5rem;
     font-family: 'Inter', sans-serif;
+}
+
+.adminedit-content form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.adminedit-card-container {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    width: 100%;
 }
 
 /* Card Styles */
@@ -67,11 +79,10 @@
 .adminedit-row {
     font-size: 1.08rem;
     color: #444;
-    margin-bottom: 0.2rem;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    margin-bottom: -5px;
 }
 
 .adminedit-label {
@@ -135,8 +146,9 @@
     background: #363c54;
     color: #fff;
     border: none;
+    margin: 0 0 0 396px;
     border-radius: 8px;
-    padding: 0.7rem 2.5rem;
+    padding: 5px 12px;
     font-size: 1.15rem;
     font-weight: 500;
     cursor: pointer;
@@ -192,9 +204,24 @@
     font-size: 1rem;
 }
 
+.adminedit-team-count-display {
+    display: inline-block;
+    background: #f5f7fa;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.2rem 0.8rem;
+    min-width: 1.5rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
 .adminedit-team-list {
     margin-top: 10px;
-    width: 340px;
+    width: 100%;
+    overflow-y: auto;
+    max-height: 300px;
+    padding-right: 5px;
 }
 
 /* Form Input Styles */
@@ -279,4 +306,118 @@
     opacity: 0;
     overflow: hidden;
     z-index: -1;
+}
+
+/* Team Section Enhancements */
+.adminedit-team-card hr {
+    margin: 0.8rem 0 1rem 0;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+}
+
+.adminedit-team-list {
+    margin-top: 10px;
+    width: 100%;
+    overflow-y: auto;
+    max-height: 300px;
+    padding-right: 5px;
+}
+
+.adminedit-team-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.adminedit-add-member-btn {
+    background: #eff2f7;
+    color: #363c54;
+    border: 1px solid #bfc7d1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.adminedit-add-member-btn:hover {
+    background: #e5e9f0;
+}
+
+.adminedit-add-member-btn .add-icon {
+    margin-right: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.adminedit-team-list .member-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.adminedit-team-list .remove-member-btn {
+    background: none;
+    color: #c00;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+
+.adminedit-team-list .remove-member-btn:hover {
+    background-color: #ffebee;
+    color: #e53935;
+}
+
+/* Reset some styles to ensure consistency */
+.adminedit-team-section .adminedit-row {
+    margin-bottom: 0;
+}
+
+.adminedit-team-section .adminedit-input {
+    margin-left: 0;
+    margin-top: 5px;
+}
+
+/* Dropdown Styles */
+.adminedit-dropdown {
+    font-family: inherit;
+    font-size: 1rem;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: auto;
+    min-width: 150px;
+    background: #fafbfc;
+    color: #222;
+    box-sizing: border-box;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+.adminedit-dropdown:focus {
+    outline: none;
+    border-color: #a1aab8;
+    box-shadow: 0 0 0 2px rgba(54, 60, 84, 0.1);
 }
