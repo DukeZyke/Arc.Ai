@@ -419,3 +419,26 @@
 .toggle_dropdown, .files_dropdown {
     pointer-events: auto;
 }
+
+/* Add to your CSS file */
+.user_bubble.level-3 {
+    border: 2px solid #FF9800;  /* Orange for superusers */
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+}
+
+.user_bubble.level-2 {
+    border: 2px solid #2196F3;  /* Blue for staff users */
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+}
+
+.user_bubble.level-1 {
+    border: 2px solid #4CAF50;  /* Green for regular users */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.user_level {
+    font-size: 0.8em;
+    color: #666;
+    display: block;
+    margin-top: 2px;
+}

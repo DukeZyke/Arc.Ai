@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin_users_page/', views.admin_users_page, name='admin_users_page'),
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
+    path('api/users-for-map/', views.get_users_for_map, name='get_users_for_map'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/', views.profilepage, name='profilepage'),
     path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),

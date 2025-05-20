@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
-
+from django.contrib.auth.models import User
 
 
 class Email(models.Model):
@@ -63,9 +63,20 @@ class EmployeeAward(models.Model):
         return f'{self.award_title} ({self.award_date})'
 
 class DriveFile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drive_files')
     name = models.CharField(max_length=255)
     file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class DriveFolder(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drive_folders')
+    name = models.CharField(max_length=255)
+    folder_id = models.CharField(max_length=255, db_index=True)
+    parent_folder_id = models.CharField(max_length=255, blank=True, null=True)  # For folder hierarchy
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.name} ({self.user.username})"
 
 class SignupDetails(models.Model):
     profile_avatar = models.ImageField(upload_to='avatars/')
@@ -145,6 +156,6 @@ class ProjectMember(models.Model):
 #         member_names = models.CharField(max_length=200)
 
 # class EditProject(models.Model):
-#     project = models.OneToOneField(Project, on_delete=models.CASCADE) 
+#     project = models.OneToOneField(Project, on_delete=models.CASCADE)
 
 
