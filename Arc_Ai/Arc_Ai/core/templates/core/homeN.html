@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <!-- <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0"> -->
+    <link rel="stylesheet" href="{% static 'styles/homeN.css' %}?v=1.0">
+</head>
+<body>  
+    <div id="header">
+        <img src="{% static 'Images/Account.png' %}" alt="Account">
+    </div>
+    <div id="sidebar">
+        <div id="logo">
+            <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+            <hr>
+        </div>
+        <div id="upload">
+            <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
+            <h1>Upload</h1>
+        </div>
+        <div id="sidebar_cont">
+            <div id="navigate">
+                <h1>Navigate</h1>
+                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+            </div>
+            <div id="settings">
+                <h1>Settings</h1>
+                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Profile</a>
+                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
+            </div>
+        </div>
+        <div id="logout">
+            <img src="{% static 'Images/Logout.png' %}" alt="">
+            <h1>Logout</h1>
+        </div>
+    </div>
+</body>
+</html>

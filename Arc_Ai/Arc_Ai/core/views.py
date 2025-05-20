@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import PersonalInformation
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
@@ -30,8 +33,68 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-def edit_user(request):
-    return render(request, 'core/edit_user.html')
+def homeN(request):
+    return render(request, 'core/homeN.html')
+
+@login_required
+def edit_user_profile(request):
+    # Fetch the current user's personal information
+    personal_info = PersonalInformation.objects.filter(user=request.user).first()
+
+    if request.method == 'POST':
+        # Collect form data
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        middle_initial = request.POST.get('middle_initial')
+        last_name = request.POST.get('last_name')
+        complete_address = request.POST.get('complete_address')
+        contact_no = request.POST.get('contact_no')
+        age = request.POST.get('age')
+        gender = request.POST.get('gender')
+        department = request.POST.get('department')
+        position = request.POST.get('position')
+        profile_avatar = request.FILES.get('profile_avatar')  # For profile picture upload
+
+        # Update or create the user's personal information
+        if personal_info:
+            personal_info.email = email
+            personal_info.first_name = first_name
+            personal_info.middle_initial = middle_initial
+            personal_info.last_name = last_name
+            personal_info.complete_address = complete_address
+            personal_info.contact_number = contact_no
+            personal_info.age = age
+            personal_info.gender = gender
+            personal_info.department = department
+            personal_info.position = position
+            if profile_avatar:
+                personal_info.profile_avatar = profile_avatar
+            personal_info.save()
+            messages.success(request, "Your profile has been updated successfully!")
+        else:
+            PersonalInformation.objects.create(
+                user=request.user,
+                email=email,
+                first_name=first_name,
+                middle_initial=middle_initial,
+                last_name=last_name,
+                complete_address=complete_address,
+                contact_number=contact_no,
+                age=age,
+                gender=gender,
+                department=department,
+                position=position,
+                profile_avatar=profile_avatar
+            )
+            messages.success(request, "Your profile has been created successfully!")
+
+        return redirect('core:edit_user_profile')
+
+    # Render the form with the current user's information
+    return render(request, 'core/edit_user_profile.html', {
+        'personal_info': personal_info,
+        'range': range(1, 16),  # For profile picture selection
+    })
 
 def signup_details(request):
     if request.method == 'POST':
