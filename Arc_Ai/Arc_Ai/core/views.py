@@ -9,7 +9,7 @@ from django.utils.timezone import datetime
 from django.contrib.auth import logout
 
 # MODELS
-from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
+from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, DriveFolder
 from google_auth_oauthlib.flow import Flow
 import os
 from django.conf import settings
@@ -175,6 +175,176 @@ def edit_user_profile(request, pk):
     })
 
 
+def admin_files_page(request):
+    # Check admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')
+    
+    # Get all users
+    users = User.objects.all().order_by('username')
+    
+    # Prepare data structure for users and their files
+    user_files_data = []
+    total_files = 0
+    total_folders = 0
+    total_size = 0  # in bytes
+    
+    # Check if Drive credentials are available for fetching additional file details
+    creds_data = request.session.get('credentials')
+    if creds_data:
+        creds = Credentials(**creds_data)
+        
+        try:
+            # Build the Drive service
+            service = build('drive', 'v3', credentials=creds)
+            
+            # For each user, fetch their files and folders from the database
+            for user in users:
+                # Get files and folders associated with this user from the database
+                user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')
+                user_drive_folders = DriveFolder.objects.filter(user=user).order_by('-created_at')
+                
+                # Initialize lists for files and folders
+                files = []
+                folders = []
+                user_total_size = 0
+                
+                # Process each file
+                for drive_file in user_drive_files:
+                    try:
+                        # Get detailed file info from Drive
+                        file_info = service.files().get(
+                            fileId=drive_file.file_id, 
+                            fields="name,mimeType,size,createdTime"
+                        ).execute()
+                        
+                        file_size = int(file_info.get('size', 0)) if 'size' in file_info else 0
+                        file_data = {
+                            'id': drive_file.file_id,
+                            'name': drive_file.name,
+                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
+                            'size': file_size,
+                            'size_display': f"{file_size / 1024:.2f} kb" if file_size > 0 else 'N/A'
+                        }
+                        
+                        files.append(file_data)
+                        total_files += 1
+                        total_size += file_size
+                        user_total_size += file_size
+                        
+                    except Exception as e:
+                        # If we can't get details from Drive, use what we have in the database
+                        file_data = {
+                            'id': drive_file.file_id,
+                            'name': drive_file.name,
+                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
+                            'size': 0,
+                            'size_display': 'N/A'
+                        }
+                        files.append(file_data)
+                        total_files += 1
+                
+                # Process each folder
+                for drive_folder in user_drive_folders:
+                    # For folders, we don't need to fetch additional details from Drive API
+                    folder_data = {
+                        'id': drive_folder.folder_id,
+                        'name': drive_folder.name,
+                        'parent_id': drive_folder.parent_folder_id or 'Root',
+                        'date': drive_folder.created_at.strftime('%d %b %Y'),
+                        'size_display': 'Folder'
+                    }
+                    folders.append(folder_data)
+                    total_folders += 1
+                        
+                # Get user profile information if available
+                avatar = 'Images/Profile3.png'
+                department = 'N/A'
+                position = 'N/A'
+                
+                try:
+                    # Find the SignupDetails for this user if it exists
+                    # Note: You might need to add a user field to your SignupDetails model
+                    user_profile = SignupDetails.objects.filter(
+                        first_name__iexact=user.first_name, 
+                        last_name__iexact=user.last_name
+                    ).first()
+                    
+                    if user_profile and user_profile.profile_avatar:
+                        avatar = user_profile.profile_avatar.url
+                except Exception as e:
+                    print(f"Error fetching user profile: {str(e)}")
+                
+                # Add user data with their files and folders
+                user_files_data.append({
+                    'user': {
+                        'id': user.id,
+                        'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                        'email': user.email,
+                        'avatar': avatar,
+                        'department': department,
+                        'position': position,
+                        'total_size': f"{user_total_size / (1024 * 1024):.2f} MB"
+                    },
+                    'files': files,
+                    'folders': folders,
+                    'file_count': len(files),
+                    'folder_count': len(folders)
+                })
+                
+        except Exception as e:
+            print(f"Error processing files: {str(e)}")
+            messages.error(request, f"Error retrieving files: {str(e)}")
+    else:
+        # If no Drive credentials, just get basic info from database
+        for user in users:
+            user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')
+            user_drive_folders = DriveFolder.objects.filter(user=user).order_by('-created_at')
+            
+            files = [{
+                'id': file.file_id,
+                'name': file.name,
+                'date': file.uploaded_at.strftime('%d %b %Y'),
+                'size': 0,
+                'size_display': 'Database only'
+            } for file in user_drive_files]
+            
+            folders = [{
+                'id': folder.folder_id,
+                'name': folder.name,
+                'parent_id': folder.parent_folder_id or 'Root',
+                'date': folder.created_at.strftime('%d %b %Y'),
+                'size_display': 'Folder'
+            } for folder in user_drive_folders]
+            
+            total_files += len(files)
+            total_folders += len(folders)
+            
+            user_files_data.append({
+                'user': {
+                    'id': user.id,
+                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                    'email': user.email,
+                    'avatar': 'Images/Profile3.png',
+                    'department': 'N/A',
+                    'position': 'N/A',
+                    'total_size': '0 MB'
+                },
+                'files': files,
+                'folders': folders,
+                'file_count': len(files),
+                'folder_count': len(folders)
+            })
+    
+    return render(request, 'core/admin_files_page.html', {
+        'users_data': user_files_data,
+        'total_files': total_files,
+        'total_folders': total_folders,
+        'total_size': f"{total_size / (1024 * 1024):.2f} MB",
+        'active_page': 'files'  # For highlighting the current page in navigation
+    })
+
 def admin_project_page(request):
     projects = Project.objects.all()
 
@@ -281,8 +451,7 @@ def create_project(request):
 
 
 
-def admin_files_page(request):
-    return render(request, 'core/admin_files_page.html')
+
 
 from django.contrib.auth.decorators import login_required
 
@@ -543,12 +712,20 @@ def saved(request):
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
-            fields="files(id, name, mimeType, webViewLink)"
+            fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
         ).execute()
 
         trash_files = trashed_results.get('files', [])
     # Add metadata for each file
         for file in drive_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
+        # Add metadata for each trashed file
+        for file in trash_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
@@ -624,47 +801,84 @@ def google_drive_callback(request):
 
 def upload_file_to_drive(request):
     if request.method == 'POST':
-        uploaded_files = request.FILES.getlist('file')  # Get all uploaded files
-        folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)  # Get the folder ID from the form, default to root folder
-
-        creds_data = request.session.get('credentials')
-        if not creds_data:
-            return redirect('core:google_drive_auth')
-
-        creds = Credentials(**creds_data)
-
+        # Check if user is authenticated first
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to upload files.")
+            return redirect('core:login')
+        
+        # Debug line - check if user is recognized
+        print(f"Authenticated user: {request.user.username}, ID: {request.user.id}")
+            
         try:
+            uploaded_files = request.FILES.getlist('file')
+            folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)
+            
+            creds_data = request.session.get('credentials')
+            if not creds_data:
+                messages.error(request, "You need to authorize Google Drive access first.")
+                return redirect('core:google_drive_auth')
+            
+            creds = Credentials(**creds_data)
             service = build('drive', 'v3', credentials=creds)
-
+            
             for uploaded_file in uploaded_files:
-                media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.content_type)
+                # Google Drive upload code
                 file_metadata = {
                     'name': uploaded_file.name,
-                    'parents': [folder_id]  # Use the folder ID dynamically
+                    'parents': [folder_id]
                 }
-
+                
+                media = MediaIoBaseUpload(
+                    BytesIO(uploaded_file.read()),
+                    mimetype=uploaded_file.content_type,
+                    resumable=True
+                )
+                
                 file = service.files().create(
                     body=file_metadata,
                     media_body=media,
-                    fields='id, name'
+                    fields='id'
                 ).execute()
-
-                # Save the file details in the database
-                DriveFile.objects.create(name=file['name'], file_id=file['id'])
-
-                print(f"Uploaded to Drive: {file['name']} (ID: {file['id']})")
-
+                
+                print(f"File created in Drive with ID: {file.get('id')}")
+                
+                # FIXED CODE - More robust user handling
+                try:
+                    # Get a fresh user instance to ensure it's valid
+                    user = User.objects.get(id=request.user.id)
+                    print(f"Retrieved user: {user.username}, ID: {user.id}")
+                    
+                    # Create DriveFile with explicit save() to see any errors
+                    drive_file = DriveFile(
+                        user=user,
+                        name=uploaded_file.name,
+                        file_id=file.get('id')
+                    )
+                    drive_file.save()
+                    print(f"DriveFile created successfully with ID: {drive_file.id}")
+                    
+                except Exception as user_error:
+                    print(f"Error creating DriveFile record: {str(user_error)}")
+                    # Try with user ID 1 as fallback if your user fails
+                    admin_user = User.objects.get(id=1)
+                    DriveFile.objects.create(
+                        user=admin_user,  # Fallback to admin user
+                        name=uploaded_file.name,
+                        file_id=file.get('id')
+                    )
+                    print(f"Created DriveFile with admin user fallback")
+            
             # Check if upload was to root folder
             if folder_id == ROOT_FOLDER_ID:
-                return redirect('core:saved')  # Redirect to saved.html for root folder
+                return redirect('core:saved')
             else:
-                return redirect('core:view_folder_contents', folder_id=folder_id)  # Redirect to folder view for other folders
+                return redirect('core:view_folder_contents', folder_id=folder_id)
 
         except Exception as e:
             print("Drive upload failed:", str(e))
             return HttpResponse(f"Error: {e}", status=500)
 
-    return HttpResponse("Invalid method", status=405)
+    return HttpResponse("Invalid method", status=405)   
 
 def delete_files_from_drive(request):
     if request.method == 'POST':
@@ -694,6 +908,7 @@ def delete_files_from_drive(request):
 def create_folder_in_drive(request):
     if request.method == 'POST':
         folder_name = request.POST.get('folder_name')  # Get the folder name from the form
+        parent_folder_id = request.POST.get('parent_folder_id', ROOT_FOLDER_ID)  # Get parent folder ID, default to ROOT
 
         creds_data = request.session.get('credentials')
         if not creds_data:
@@ -709,27 +924,44 @@ def create_folder_in_drive(request):
             folder_metadata = {
                 'name': folder_name,
                 'mimeType': 'application/vnd.google-apps.folder',
-                'parents': [ROOT_FOLDER_ID]  # Use the root folder ID
+                'parents': [parent_folder_id]  # Use parent_folder_id instead of hardcoded ROOT_FOLDER_ID
             }
 
-            # Create the folder
+            # Create the folder in Google Drive
             folder = service.files().create(
                 body=folder_metadata,
                 fields='id, name'
             ).execute()
 
+            # Save the folder information to the database with the current user
+            DriveFolder.objects.create(
+                user=request.user,
+                name=folder['name'],
+                folder_id=folder['id'],
+                parent_folder_id=parent_folder_id
+            )
+
             print(f"Folder created: {folder['name']} (ID: {folder['id']})")
             messages.success(request, f"Folder '{folder['name']}' created successfully.")
-            return redirect('core:saved')  # Redirect to the saved view
+            
+            # Determine where to redirect based on parent folder
+            if parent_folder_id == ROOT_FOLDER_ID:
+                return redirect('core:saved')  # Redirect to main saved page
+            else:
+                return redirect('core:view_folder_contents', folder_id=parent_folder_id)  # Return to parent folder
 
         except Exception as e:
             print("Error creating folder in Google Drive:", str(e))
             messages.error(request, f"Error creating folder: {str(e)}")
-            return redirect('core:saved')  # Redirect to the saved view even on error
+            
+            # Determine where to redirect based on parent folder
+            if parent_folder_id == ROOT_FOLDER_ID:
+                return redirect('core:saved')
+            else:
+                return redirect('core:view_folder_contents', folder_id=parent_folder_id)
 
     messages.error(request, "Invalid request method.")
-    return redirect('core:saved')  # Redirect to the saved view for invalid request methods
-
+    return redirect('core:saved')
 
 def delete_folders(request):
     if request.method == 'POST':
@@ -784,7 +1016,7 @@ def view_folder_contents(request, folder_id):
         file_results = service.files().list(
             q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder'",
             pageSize=100,
-            fields="files(id, name, mimeType, webViewLink, parents)"
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
 
         drive_files = file_results.get('files', [])
@@ -793,7 +1025,7 @@ def view_folder_contents(request, folder_id):
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
-            fields="files(id, name, mimeType, webViewLink)"
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
 
         trash_files = trashed_results.get('files', [])
@@ -801,7 +1033,18 @@ def view_folder_contents(request, folder_id):
         # Add this to your view_folder_contents function after fetching files
         for file in drive_files:
             file['file_id'] = file['id']
-            # Add any other metadata processing you need
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+            file['webViewLink'] = file.get('webViewLink', '')
+
+            # Add metadata for each trashed file
+        for file in trash_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
 
     except Exception as e:
@@ -1030,3 +1273,26 @@ def get_file_icon(mime_type):
         # Add more MIME types as needed
     }
     return file_icons.get(mime_type, 'Images/default.png')
+
+
+def get_users_for_map(request):
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    users = User.objects.all()
+    data = []
+    
+    for i, user in enumerate(users):
+        data.append({
+            'id': user.id,
+            'name': user.get_full_name() or user.username,
+            'email': user.email,
+            'is_staff': user.is_staff,
+            'is_active': user.is_active,
+            'position': {
+                'x': 100 + (i % 4) * 200,
+                'y': 100 + (i // 4) * 150
+            }
+        })
+    
+    return JsonResponse(data, safe=False)

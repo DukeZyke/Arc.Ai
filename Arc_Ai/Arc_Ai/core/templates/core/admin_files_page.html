@@ -60,11 +60,11 @@
         <div>
             <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
         </div>
-        <div id="header_nav" class="text_white">
-            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
-            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
-            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
-        </div>
+    <div id="header_nav" class="text_white">
+        <p><a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
+        <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
+        <p><a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+    </div>
         <div>
             <button class="logout">Log out</button>
         </div>
@@ -80,109 +80,91 @@
                 </button>
         </div>
         <div class="files-count">
-            <span>Total Files: <strong>69</strong></span>
+            <span>Total Files: <strong>{{ total_files }}</strong></span>
             <span class="status-indicator"></span>
         </div>
         <div class="Used-Space">
             <span>Used Space: </span>
-            <strong id="Total-space">0</strong>
+            <strong id="Total-space">{{ total_size }}</strong>
             <span class="space-indicator"></span>
         </div>
     </div>
-    <!-- user section -->
+    
+    <!-- User sections - loop through all users -->
+    {% for user_data in users_data %}
     <div class="card-container">
-     <div class="avatar">
-        <img src="{% static 'Images/Profile3.png' %}" alt="User Avatar">
-    </div>
-    <div class="user-details">
-        <div class="user-name">John Doe</div>
-        <div class="user-email">(John.Doe@gmail.com)</div>
-    </div>
-    <div class="job-info">
-        <div class="department">Department: Accounting</div>
-        <div class="position">Position: Senior Accountant</div>
-    </div>
-    <div class="file-info">
-        <div class="files">Total Files: 3</div>
-        <div class="Folders">Total Folders: 3</div>
-    </div>
-    <div class="icon-placeholder">
-        <button class="icon-button" id="dropdown-toggle">
-            <i class="bx bx-caret-down"></i>
-        </button>
-    </div>
+        <div class="avatar">
+            <img src="{% static user_data.user.avatar %}" alt="User Avatar">
+        </div>
+        <div class="user-details">
+            <div class="user-name">{{ user_data.user.name }}</div>
+            <div class="user-email">({{ user_data.user.email }})</div>
+        </div>
+        <div class="job-info">
+            <div class="department">Department: {{ user_data.user.department }}</div>
+            <div class="position">Position: {{ user_data.user.position }}</div>
+        </div>
+        <div class="file-info">
+            <div class="files">Total Files: {{ user_data.file_count }}</div>
+            <div class="Folders">Total Folders: {{ user_data.folder_count }}</div>
+        </div>
+        <div class="icon-placeholder">
+            <button class="icon-button dropdown-toggle">
+                <i class="bx bx-caret-down"></i>
+            </button>
+        </div>
 
-<div class="content-box hidden" id="content-box">
-    <div class="section-titles">
-    <div class="files">
-        <div class="title-files">Files</div>
-        <div class="file-item">
-            <img src="https://placehold.co/37x32" alt="File Icon" />
-            <div class="name">Untitled Presentation</div>
-            <div class="date">2 Mar 2021</div>
-            <div class="size">28 kb</div>
-            <div class="checkbox"></div>
-            <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-            </button>
-        </div>
-        <div class="file-item">
-            <img src="https://placehold.co/37x32" alt="File Icon" />
-            <div class="name">Untitled Presentation</div>
-            <div class="date">2 Mar 2021</div>
-            <div class="size">28 kb</div>
-            <div class="checkbox"></div>
-            <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-            </button>
-        </div>
-        <div class="file-item">
-            <img src="https://placehold.co/37x32" alt="File Icon" />
-            <div class="name">Untitled Presentation</div>
-            <div class="date">2 Mar 2021</div>
-            <div class="size">28 kb</div>
-            <div class="checkbox"></div>
-            <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-            </button>
-        </div>
-    </div>
-    
-    
-    <div class="folderss">
-        <div class="title-Folders">Folders</div>
-        <div class="folder-item">
-            <div class="arrow"></div>
-            <div class="name">Folder 1</div>
-            <div class="date">2 Mar 2021</div>
-            <div class="size">28 kb</div>
-            <div class="checkbox"></div>
-            <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-            </button>
-        </div>
-        <div class="folder-item">
-            <div class="arrow"></div>
-            <div class="name">Folder 1</div>
-            <div class="date">2 Mar 2021</div>
-            <div class="size">28 kb</div>
-            <div class="checkbox"></div>
-            <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-            </button>
-        </div>
-        <div class="folder-item">
-            <div class="arrow"></div>
-            <div class="name">Folder 1</div>
-            <div class="date">2 Mar 2023</div>
-            <div class="size">28 kb</div>
-            <div class="checkbox"></div>
-            <button class="delete-btn">
-                    <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
-            </button>
+        <div class="content-box hidden">
+            <div class="section-titles">
+                <div class="files">
+                    <div class="title-files">Files</div>
+                    {% if user_data.files %}
+                        {% for file in user_data.files %}
+                        <div class="file-item">
+                            <img src="{% static 'Images/default.png' %}" alt="File Icon" />
+                            <div class="name">{{ file.name }}</div>
+                            <div class="date">{{ file.date }}</div>
+                            <div class="size">{{ file.size_display }}</div>
+                            <div class="checkbox"></div>
+                            <button class="delete-btn" data-file-id="{{ file.id }}">
+                                <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="file-item">No files found</div>
+                    {% endif %}
+                </div>
+                
+                <div class="folderss">
+                    <div class="title-Folders">Folders</div>
+                    {% if user_data.folders %}
+                        {% for folder in user_data.folders %}
+                        <div class="folder-item">
+                            <div class="arrow"></div>
+                            <div class="name">{{ folder.name }}</div>
+                            <div class="date">{{ folder.date }}</div>
+                            <div class="size">{{ folder.size_display }}</div>
+                            <div class="checkbox"></div>
+                            <button class="delete-btn" data-folder-id="{{ folder.id }}">
+                                <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="folder-item">No folders found</div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-</div>
+    {% empty %}
+    <div class="card-container">
+        <div class="user-details">
+            <div class="user-name">No users found</div>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
     <script src="{% static 'js/sidebar.js' %}"></script>
