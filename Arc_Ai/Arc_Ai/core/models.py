@@ -67,14 +67,21 @@ class DriveFile(models.Model):
     file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+
+from django.contrib.auth.models import User
+
 class SignupDetails(models.Model):
-    profile_avatar = models.ImageField(upload_to='avatars/')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
+    profile_avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     complete_address = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=255)
+    age = models.CharField(max_length=3)
     gender = models.CharField(max_length=255)
+    position = models.CharField(max_length=100)
+    department = models.CharField(max_length=100)
     
 # For notification sidebar Popup TEST
 class Notification(models.Model):
@@ -85,12 +92,6 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
-# =======================================================
-
-
-
-
-
 
 
 # PRACTICE TEMPLATES =================================================

@@ -13,7 +13,7 @@
 <body>
     <div id="sidebar">
         <div id="sidebar_content" class="hidden">
-            <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
+            <p><a href="{% url 'core:profilepage' request.user.pk %}">Profile</a></p>
             <p><a href="{% url 'core:home' %}">Home</a></p>
             <p><a href="{% url 'core:organization' %}">Organization</a></p>
             <p><a href="{% url 'core:saved' %}">Saved</a></p>
@@ -91,7 +91,7 @@
               <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
               <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
               <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
-              <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
+              <p><a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
               <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="logout">Log out</button>
@@ -100,16 +100,18 @@
         </div>
         <div id="main-content">
     <section class="MainProfile">
-        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+    <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
 
-        {% if personal_information %}
+    {% if signup_details %}
         <div class="userInfo">
-            <h1 class="username">{{ personal_information.name }}</h1>
-            <h3 class="email">{{ personal_information.email }}</h3>
-            <h3 class="user-title">{{ personal_information.user_title }}</h3>
+            <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>
+            <h3 class="email">{{ user.email }}</h3>
+            <!-- <h3 class="user-title">{{ signup_details.gender }}</h3> chnange to role!! -->
         </div>
         <div class="setting-icon">
-            <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
+            <a href="{% url 'core:edit_user_profile' request.user.pk %}">
+                <img src="{% static 'Images/dots.png' %}" alt="Settings Icon">
+            </a>
         </div>
     </section>
 
@@ -121,27 +123,23 @@
         <div class="info-grid">
             <div class="info">
                 <span class="label">Email:</span>
-                <span class="value">{{ personal_information.email }}</span>
+                <span class="value">{{ user.email }}</span>
             </div>
             <div class="info">
                 <span class="label">Address:</span>
-                <span class="value">{{ personal_information.address }}</span>
+                <span class="value">{{ signup_details.complete_address }}</span>
             </div>
             <div class="info">
                 <span class="label">Contact Number:</span>
-                <span class="value">{{ personal_information.contact_number }}</span>
+                <span class="value">{{ signup_details.contact_number }}</span>
             </div>
             <div class="info">
                 <span class="label">Age:</span>
-                <span class="value">{{ personal_information.age }}</span>
-            </div>
-            <div class="info">
-                <span class="label">Birth Date:</span>
-                <span class="value">{{ personal_information.birth_date }}</span>
+                <span class="value">{{ signup_details.age }}</span>
             </div>
             <div class="info">
                 <span class="label">Gender:</span>
-                <span class="value">{{ personal_information.gender }}</span>
+                <span class="value">{{ signup_details.gender }}</span>
             </div>
         </div>
         {% else %}
