@@ -14,7 +14,7 @@
 
 <div id="sidebar">
     <div id="sidebar_content" class="hidden">
-        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:profilepage' request.user.pk %}">Users</a></p>
         <p><a href="{% url 'core:home' %}">Projects</a></p>
         <p><a href="{% url 'core:organization' %}">Files</a></p>
     </div>

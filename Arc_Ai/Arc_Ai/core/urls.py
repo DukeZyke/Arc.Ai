@@ -48,7 +48,4 @@ urlpatterns = [
     # FOR DELETING PROJECTS
     path('core/project/<int:project_id>/delete/', views.delete_project, name='delete_project'),
 
-    # PRACTICE TEMPLATES
-    path('practice/', views.practice, name='practice'),
-    path('practice1/', views.practice1, name='practice1'),
 ]

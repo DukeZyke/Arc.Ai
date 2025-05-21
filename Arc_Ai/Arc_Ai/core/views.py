@@ -39,92 +39,6 @@ ROOT_FOLDER_ID = '1wdS3rmcuuiZ-mr2aH7SfYSTAF6Uvlv5z'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 # This is for local development only. In production, use HTTPS.
 
-#[PRACTICE TEMPLATES] ====================================================================
-from .models import UserProfile
-
-def practice(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        address = request.POST.get('address')
-
-        if UserProfile.objects.filter(email=email).exists():
-            return render(request, 'core/practice.html', {
-                'error': 'Email already exists. Please use a different email.'
-            })
-
-        UserProfile.objects.create(
-            email=email,
-            address=address,
-            password=password
-        )
-
-        # Store email and address in session
-        request.session['current_email'] = email
-        request.session['current_address'] = address
-
-        return redirect('core:practice1')  # redirect after POST (best practice)
-
-    return render(request, 'core/practice.html')
-
-from .models import EditProfile
-
-def practice1(request):
-    # Get defaults from session
-    current_email = request.session.get('current_email', '')
-    current_address = request.session.get('current_address', '')
-
-    if request.method == 'POST':
-        # Use session values if not provided in POST (for first load, use session)
-        current_email = request.POST.get('current_email', current_email)
-        new_email = request.POST.get('new_email')
-        current_address = request.POST.get('current_address', current_address)
-        new_address = request.POST.get('new_address')
-
-        if not (current_email and new_email and current_address and new_address):
-            return render(request, 'core/practice1.html', {
-                'error': 'All fields are required.',
-                'current_email': current_email,
-                'current_address': current_address
-            })
-
-        if UserProfile.objects.filter(email=new_email).exclude(email=current_email).exists():
-            return render(request, 'core/practice1.html', {
-                'error': 'New email already exists.',
-                'current_email': current_email,
-                'current_address': current_address
-            })
-
-        try:
-            user = UserProfile.objects.get(email=current_email, address=current_address)
-            EditProfile.objects.update_or_create(
-                user=user,
-                defaults={'new_email': new_email, 'new_address': new_address}
-            )
-            user.email = new_email
-            user.address = new_address
-            user.save()
-            # Update session to new values
-            request.session['current_email'] = new_email
-            request.session['current_address'] = new_address
-            return render(request, 'core/practice1.html', {
-                'success': 'Email and Address updated!',
-                'current_email': new_email,
-                'current_address': new_address
-            })
-        except UserProfile.DoesNotExist:
-            return render(request, 'core/practice1.html', {
-                'error': 'User not found.',
-                'current_email': current_email,
-                'current_address': current_address
-            })
-
-    return render(request, 'core/practice1.html', {
-        'current_email': current_email,
-        'current_address': current_address
-    })
-
-#[PRACTICE TEMPLATES] ====================================================================\
 
 def admin_create_project_details(request):
     return render(request, 'core/admin_create_project_details.html')
@@ -279,7 +193,7 @@ def admin_files_page(request):
                 # Add user data with their files and folders
                 user_files_data.append({
                     'user': {
-                        'id': user.id,
+                        'id': user.username,
                         'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
                         'email': user.email,
                         'avatar': avatar,
@@ -323,7 +237,7 @@ def admin_files_page(request):
             
             user_files_data.append({
                 'user': {
-                    'id': user.id,
+                    'id': user.username,
                     'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
                     'email': user.email,
                     'avatar': 'Images/Profile3.png',
@@ -342,7 +256,8 @@ def admin_files_page(request):
         'total_files': total_files,
         'total_folders': total_folders,
         'total_size': f"{total_size / (1024 * 1024):.2f} MB",
-        'active_page': 'files'  # For highlighting the current page in navigation
+        'active_page': 'files',  # For highlighting the current page in navigation
+        'signup_details': signup_details
     })
 
 def admin_project_page(request):
