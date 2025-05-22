@@ -387,8 +387,8 @@ def delete_project(request, project_id):
 @login_required
 def signup_details(request):
 
-    if SignupDetails.objects.filter(user=request.user).exists():
-        return redirect('core:profilepage', pk=request.user.pk)
+    # if SignupDetails.objects.filter(user=request.user).exists():  
+    #     return redirect('core:profilepage', pk=request.user.pk)
 
     if request.method == 'POST':
         profile_avatar_id = request.POST.get('profile_avatar_id', '1')
@@ -401,12 +401,11 @@ def signup_details(request):
         gender = request.POST.get('gender')
         
 
-
         # Create or update SignupDetails for the logged-in user
         signup_details, created = SignupDetails.objects.update_or_create(
             user=request.user,
             defaults={
-                'profile_avatar_id': profile_avatar_id,
+                'profile_avatar_id': int(profile_avatar_id),
                 'first_name': first_name,
                 'middle_name': middle_name,
                 'last_name': last_name,

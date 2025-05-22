@@ -82,7 +82,7 @@ class DriveFolder(models.Model):
 
 class SignupDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
-    profile_avatar_id = models.CharField(max_length=2, default='1')  # Save avatar as id (1-15)
+    profile_avatar_id = models.IntegerField(default=1)  # Save avatar as id (1-15)
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -95,7 +95,6 @@ class SignupDetails(models.Model):
 
     @property
     def avatar_url(self):
-        # This constructs the path for the static image
         return f'/static/Images/Profile{self.profile_avatar_id}.png'
 
     
@@ -108,8 +107,6 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
-
-
 
 
 class Project(models.Model):

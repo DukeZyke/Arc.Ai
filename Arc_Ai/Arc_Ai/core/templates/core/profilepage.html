@@ -48,9 +48,9 @@
                 <div id="cont">
                     <div id="MainProfile">
                         {% if signup_details %}
-                        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+                        <img src="{{ signup_details.avatar_url }}" alt="User avatar" class="Avatar"/>
                         <div id="userInfo">
-                            <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>
+                            <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|default_if_none:""|slice:"1" }}. {{ signup_details.last_name }}</h1>
                             <h2>{{user.email}}</h2>
                             <h2>{{signup_details.position}}</h2>
                         </div>
