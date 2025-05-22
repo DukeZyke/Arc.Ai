@@ -4,6 +4,13 @@ body {
     padding: 0;
 }
 
+/* Responsive scaling for different display settings */
+html {
+    zoom: 1;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
 /*================================================== ID's */
 
 #login_cntr {
@@ -213,4 +220,70 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Media queries for different display scales */
+@media screen and (-webkit-min-device-pixel-ratio: 1.25), 
+       screen and (min-resolution: 120dpi) {
+    html {
+        zoom: 0.8; /* Counteract 125% scaling */
+    }
+    
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+    
+    #login_cntr {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    #container {
+        max-width: 750px;
+        width: 90%;
+        height: auto;
+        min-height: 500px;
+        margin: 0 auto;
+    }
+    
+    #logo_container {
+        max-width: 400px;
+        width: 50%;
+        height: auto;
+        min-height: 500px;
+    }
+}
+
+/* General responsive adjustments */
+@media screen and (max-width: 768px) {
+    #container {
+        width: 90%;
+        height: auto;
+        flex-direction: column;
+    }
+    
+    #logo_container {
+        width: 100%;
+        height: auto;
+        padding: 30px 0;
+    }
+    
+    #form_container {
+        width: 100%;
+        padding: 20px;
+    }
+    
+    .continue_with_button {
+        width: 100%;
+    }
 }
