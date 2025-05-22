@@ -21,6 +21,7 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
     path('api/users-for-map/', views.get_users_for_map, name='get_users_for_map'),
+    path('api/load-user-map/', views.load_user_map, name='load_user_map'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/<int:pk>/', views.profilepage, name='profilepage'),
     path('edit_user_profile/<int:pk>/', views.edit_user_profile, name='edit_user_profile'),

@@ -1,48 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Add console logs to debug
     console.log("DOM fully loaded");
     
-    // Make all dropdown toggles work with better selector
-    const toggleButtons = document.querySelectorAll('.icon-button.dropdown-toggle, .dropdown-toggle');
-    console.log("Found toggle buttons:", toggleButtons.length);
+    // Check if dropdown elements exist
+    const dropdownButtons = document.querySelectorAll('.icon-button.dropdown-toggle');
+    console.log("Found dropdown buttons:", dropdownButtons.length);
     
-    toggleButtons.forEach(function (button) {
-        button.addEventListener('click', function (e) {
-            console.log("Button clicked");
-            e.preventDefault();
-            const cardContainer = this.closest('.card-container');
-            if (!cardContainer) {
-                console.error("No card container found for this button");
-                return;
-            }
-            
-            const contentBox = cardContainer.querySelector('.content-box');
-            if (!contentBox) {
-                console.error("No content box found in this card container");
-                return;
-            }
-            
-            console.log("Content box found:", contentBox);
-            contentBox.classList.toggle('hidden');
-        });
-    });
-
-    // Add event delegation for dynamically added toggle buttons
-    document.addEventListener('click', function(event) {
-        const target = event.target;
-        
-        // Check if clicked element or its parent is a dropdown toggle button
-        const toggleButton = target.closest('.dropdown-toggle');
-        
-        if (toggleButton) {
-            console.log("Delegation: toggle button clicked");
-            event.preventDefault();
-            const cardContainer = toggleButton.closest('.card-container');
-            const contentBox = cardContainer.querySelector('.content-box');
-            contentBox.classList.toggle('hidden');
-        }
-    });
-
+    // Check for content boxes
+    const contentBoxes = document.querySelectorAll('.content-box');
+    console.log("Found content boxes:", contentBoxes.length);
+    
+    // Verify file items
+    const fileItems = document.querySelectorAll('.file-item');
+    console.log("Found file items:", fileItems.length);
+    
+    // Set up dropdown toggle functionality
+    setupDropdownToggles();
+    
     // Handle file/folder delete functionality
     document.querySelectorAll('.delete-btn').forEach(function (button) {
         button.addEventListener('click', function () {
@@ -77,6 +50,84 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         });
+    }
+    
+    // Functions for dropdown handling
+    function setupDropdownToggles() {
+        // Add click handlers for all dropdown toggles
+        document.querySelectorAll('.icon-button.dropdown-toggle').forEach(button => {
+            console.log("Adding click event to button:", button);
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleDropdown(this);
+            });
+        });
+        
+        // Close all dropdowns when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown-toggle') && !e.target.closest('.content-box')) {
+                document.querySelectorAll('.content-box:not(.hidden)').forEach(box => {
+                    const container = box.closest('.card-container');
+                    if (container) {
+                        const button = container.querySelector('.icon-button.dropdown-toggle');
+                        if (button) {
+                            const icon = button.querySelector('i');
+                            if (icon) {
+                                icon.className = 'bx bx-caret-down';
+                            }
+                        }
+                        box.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    }
+    
+    /**
+     * Toggles the dropdown content for file/folder details
+     * @param {HTMLElement} button - The dropdown toggle button
+     */
+    function toggleDropdown(button) {
+        console.log("Toggle dropdown called for:", button);
+        
+        // Find the parent card container
+        const container = button.closest('.card-container');
+        if (!container) {
+            console.error("No card container found");
+            return;
+        }
+        
+        // Find the content box to toggle
+        const contentBox = container.querySelector('.content-box');
+        if (!contentBox) {
+            console.error("No content box found");
+            return;
+        }
+        
+        // Find the icon element
+        const icon = button.querySelector('i');
+        
+        // Toggle the hidden class and add expanded state
+        contentBox.classList.toggle('hidden');
+        container.classList.toggle('expanded');
+        console.log("Content box visibility:", !contentBox.classList.contains('hidden'));
+        
+        // Rotate the icon based on dropdown state
+        if (icon) {
+            if (contentBox.classList.contains('hidden')) {
+                icon.className = 'bx bx-caret-down';
+            } else {
+                icon.className = 'bx bx-caret-up';
+            }
+        }
+        
+        // If we're showing the dropdown, scroll it into view
+        if (!contentBox.classList.contains('hidden')) {
+            setTimeout(() => {
+                contentBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
     }
 
     // Functions for delete operations
@@ -126,62 +177,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    /**
-     * Toggles the dropdown content for file/folder details
-     * @param {HTMLElement} button - The dropdown toggle button
-     */
-    function toggleDropdown(button) {
-        // Find the parent card container
-        const container = button.closest('.card-container');
-        if (!container) return;
-        
-        // Find the content box to toggle
-        const contentBox = container.querySelector('.content-box');
-        if (!contentBox) return;
-        
-        // Find the icon element
-        const icon = button.querySelector('i');
-        
-        // Toggle the hidden class
-        contentBox.classList.toggle('hidden');
-        
-        // Rotate the icon based on dropdown state
-        if (contentBox.classList.contains('hidden')) {
-            icon.className = 'bx bx-caret-down';
-        } else {
-            icon.className = 'bx bx-caret-up';
-        }
-        
-        // Log for debugging
-        console.log('Dropdown toggled');
-    }
-
-    // Add event listeners when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add click handlers for all dropdown toggles
-        document.querySelectorAll('.icon-button.dropdown-toggle').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleDropdown(this);
-            });
-        });
-        
-        // Close all dropdowns when clicking elsewhere on the page
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.card-container')) {
-                document.querySelectorAll('.content-box:not(.hidden)').forEach(box => {
-                    const container = box.closest('.card-container');
-                    const button = container.querySelector('.icon-button.dropdown-toggle');
-                    const icon = button.querySelector('i');
-                    
-                    box.classList.add('hidden');
-                    icon.className = 'bx bx-caret-down';
-                });
-            }
-        });
-    });
-
     // Helper function to get CSRF token
     function getCookie(name) {
         let cookieValue = null;
@@ -198,3 +193,4 @@ document.addEventListener('DOMContentLoaded', function () {
         return cookieValue;
     }
 });
+

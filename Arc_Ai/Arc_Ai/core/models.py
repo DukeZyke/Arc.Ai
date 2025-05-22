@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 
 
+
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
     sender_icon = models.ImageField(upload_to='icons/')

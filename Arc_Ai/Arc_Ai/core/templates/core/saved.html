@@ -123,7 +123,7 @@
                                     </div>
                                     <div class="file-details">
                                         <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
-                                        <span class="file-owner">{{ file.owner }}</span>
+                                        <span class="file-owner">{{ file.uploader_username }}</span>
                                         <span class="file-date">{{ file.date }}</span>
                                         <span class="file-size">{{ file.size }}</span>
                                     </div>
@@ -191,7 +191,7 @@
                 </div>
                 <div class="file-details">
                     <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
-                    <span class="file-owner">{{ file.owner }}</span>
+                     <span class="file-owner">{{ file.uploader_username }}</span>
                     <span class="file-date">{{ file.date }}</span>
                     <span class="file-size">{{ file.size }}</span>
                 </div>
