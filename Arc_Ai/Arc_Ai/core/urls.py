@@ -15,8 +15,7 @@ urlpatterns = [
     path('email/', views.email, name='email'),
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('admin_edit_project_details/', views.admin_edit_project_details, name='admin_edit_project_details'),
-    path('admin_create_project_details/', views.admin_create_project_details, name='admin_create_project_details'),
-    path('admin_create_project/', views.admin_create_project, name='admin_create_project'),
+    path('create_project/', views.create_project_details, name='create_project_details'),
 
     path('admin_users_page/', views.admin_users_page, name='admin_users_page'),
     path('home/', views.home, name='home'),

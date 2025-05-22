@@ -102,7 +102,7 @@
                         <div class="adminedit-row">
                             <label class="adminedit-label" for="project_status">Status:</label>
                             <select id="project_status" name="project_status" class="adminedit-dropdown">
-                                <option value="Complete" {% if project.project_status == "Complete" %}selected{% endif %}>Complete</option>
+                                <option value="Completed" {% if project.project_status == "Completed" %}selected{% endif %}>Completed</option>
                                 <option value="Ongoing" {% if project.project_status == "Ongoing" %}selected{% endif %}>Ongoing</option>
                                 <option value="Missing" {% if project.project_status == "Missing" %}selected{% endif %}>Missing</option>
                             </select>
@@ -141,7 +141,7 @@
                     <div class="adminedit-team-section">
                         <div class="adminedit-row">
                             <div class="adminedit-team-label">Project Manager</div>
-                            <input type="text" class="adminedit-input" name="manager_name" value="{{project.project_manager}}" placeholder="Project Manager Name">
+                            <input type="text" class="adminedit-input" name="project_manager" value="{{project.project_manager}}" placeholder="Project Manager Name">
                         </div>
                         <hr>
                         <div class="adminedit-team-members-row">
