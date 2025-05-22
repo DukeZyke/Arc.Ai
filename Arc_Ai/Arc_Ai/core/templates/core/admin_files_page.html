@@ -119,7 +119,7 @@
         <div class="content-box hidden">
             <div class="section-titles">
                 <div class="files">
-                    <div class="title-files">Files</div>
+                    <div class="title-files">Files ({{ user_data.file_count }})</div>
                     {% if user_data.files %}
                         {% for file in user_data.files %}
                         <div class="file-item">
@@ -127,34 +127,32 @@
                             <div class="name">{{ file.name }}</div>
                             <div class="date">{{ file.date }}</div>
                             <div class="size">{{ file.size_display }}</div>
-                            <div class="checkbox"></div>
-                            <button class="delete-btn" data-file-id="{{ file.id }}">
+                            <button class="delete-btn" data-file-id="{{ file.id }}" title="Delete file">
                                 <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
                             </button>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="file-item">No files found</div>
+                        <div class="file-item no-files">No files found</div>
                     {% endif %}
                 </div>
                 
-                <div class="folders">
-                    <div class="title-Folders">Folders</div>
+                <div class="Folders">
+                    <div class="title-Folders">Folders ({{ user_data.folder_count }})</div>
                     {% if user_data.folders %}
                         {% for folder in user_data.folders %}
                         <div class="folder-item">
-                            <div class="arrow"></div>
+                            <div class="arrow">📁</div>
                             <div class="name">{{ folder.name }}</div>
                             <div class="date">{{ folder.date }}</div>
                             <div class="size">{{ folder.size_display }}</div>
-                            <div class="checkbox"></div>
-                            <button class="delete-btn" data-folder-id="{{ folder.id }}">
+                            <button class="delete-btn" data-folder-id="{{ folder.id }}" title="Delete folder">
                                 <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
                             </button>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="folder-item">No folders found</div>
+                        <div class="folder-item no-folders">No folders found</div>
                     {% endif %}
                 </div>
             </div>

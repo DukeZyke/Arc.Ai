@@ -282,12 +282,14 @@ def admin_users_page(request):
     
     # Get all users
     users = User.objects.all().order_by('username')
+    signup_details = SignupDetails.objects.all()
     
     # Count active users
     active_users = User.objects.filter(is_active=True).count()
     
     return render(request, 'core/admin_users_page.html', {
-        'users': users,
+        'signup_details': signup_details,
+        'users': users, 
         'total_users': users.count(),
         'active_users': active_users,
     })
@@ -595,6 +597,8 @@ def landingpage(request):
 
 def saved(request):
     folder_id = ROOT_FOLDER_ID
+    user_id = request.GET.get('user_id')
+    user_name = request.GET.get('user_name')
     
     creds_data = request.session.get('credentials')
     if not creds_data:
@@ -631,14 +635,13 @@ def saved(request):
             fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
         ).execute()
         
-
         trash_files = trashed_results.get('files', [])
 
         # Get all drive files from database for mapping to their uploaders
         db_files = DriveFile.objects.select_related('user').all()
         file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
 
-    # Add metadata for each file
+        # Add metadata for each file
         for file in drive_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
@@ -666,8 +669,9 @@ def saved(request):
     return render(request, 'core/saved.html', {
         'folders': folders,
         'files': drive_files,
-        'trash': trash_files,  # Now passing actual trashed files
+        'trash': trash_files,
         'ROOT_FOLDER_ID': ROOT_FOLDER_ID,
+        'user_filter': user_name,  # Pass the user filter to the template
     })
 def email(request):
     online_users = User.objects.all() 
@@ -1206,23 +1210,150 @@ def get_file_icon(mime_type):
 
 
 def get_users_for_map(request):
-    if not request.user.is_authenticated or not request.user.is_staff:
+    if not request.user.is_authenticated:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
     
-    users = User.objects.all()
-    data = []
+    # Get all users
+    users = User.objects.all().order_by('username')
     
-    for i, user in enumerate(users):
-        data.append({
-            'id': user.id,
-            'name': user.get_full_name() or user.username,
-            'email': user.email,
-            'is_staff': user.is_staff,
-            'is_active': user.is_active,
-            'position': {
-                'x': 100 + (i % 4) * 200,
-                'y': 100 + (i // 4) * 150
-            }
-        })
+    # Prepare data structure for users and their files
+    user_data = []
     
-    return JsonResponse(data, safe=False)
+    # Check if Drive credentials are available for fetching file details
+    creds_data = request.session.get('credentials')
+    if creds_data:
+        creds = Credentials(**creds_data)
+        
+        try:
+            # Build the Drive service
+            service = build('drive', 'v3', credentials=creds)
+            
+            # For each user, fetch their files and folders
+            for user in users:
+                # Get files and folders associated with this user
+                user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')[:10]  # Limit to 5 most recent files
+                
+                # Initialize lists for files
+                files = []
+                
+                # Process each file
+                for drive_file in user_drive_files:
+                    try:
+                        print(f"Processing file {drive_file.name} for user {user.username}")
+                        # Get detailed file info from Drive
+                        file_info = service.files().get(
+                            fileId=drive_file.file_id, 
+                            fields="name,mimeType,size,createdTime"
+                        ).execute()
+                        
+                        file_size = int(file_info.get('size', 0)) if 'size' in file_info else 0
+                        file_type = get_file_type_letter(file_info.get('mimeType', ''))
+                        
+                        file_data = {
+                            'name': drive_file.name,
+                            'size': f"{file_size / 1024:.2f} kb",
+                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
+                            'type': file_type,
+                            'fileId': drive_file.file_id
+                        }
+                        
+                        files.append(file_data)
+                        
+                    except Exception as e:
+                        # If we can't get details from Drive, estimate size based on file type
+                        file_extension = drive_file.name.split('.')[-1].lower() if '.' in drive_file.name else ''
+                        
+                        # Provide estimated file size based on extension
+                        estimated_size = '~0 kb'
+                        if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
+                            estimated_size = '~150 kb'
+                        elif file_extension in ['pdf']:
+                            estimated_size = '~300 kb'
+                        elif file_extension in ['docx', 'doc']:
+                            estimated_size = '~100 kb'
+                        elif file_extension in ['xlsx', 'xls']:
+                            estimated_size = '~80 kb'
+                        elif file_extension in ['pptx', 'ppt']:
+                            estimated_size = '~500 kb'
+                        elif file_extension in ['mp3']:
+                            estimated_size = '~3000 kb'
+                        elif file_extension in ['mp4', 'mov']:
+                            estimated_size = '~8000 kb'
+                        
+                        file_data = {
+                            'name': drive_file.name,
+                            'size': estimated_size,  # Estimated size based on file type
+                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
+                            'type': get_file_type_letter(file_extension),  # Get type from extension
+                            'fileId': drive_file.file_id
+                        }
+                        files.append(file_data)
+                
+                # Get user position or generate default
+                position = {
+                    'x': 100 + ((user.id * 200) % 800),
+                    'y': 100 + ((user.id * 150) // 800) * 150
+                }
+                
+                # Add user data with their files
+                user_data.append({
+                    'id': user.id,
+                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                    'position': position,
+                    'files': files
+                })
+                
+        except Exception as e:
+            print(f"Error processing files: {str(e)}")
+            # Return basic user data without files
+            for user in users:
+                user_data.append({
+                    'id': user.id,
+                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                    'position': {
+                        'x': 100 + ((user.id * 200) % 800),
+                        'y': 100 + ((user.id * 150) // 800) * 150
+                    },
+                    'files': []
+                })
+    else:
+        # If no Drive credentials, just get basic user info
+        for user in users:
+            user_data.append({
+                'id': user.id,
+                'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                'position': {
+                    'x': 100 + ((user.id * 200) % 800),
+                    'y': 100 + ((user.id * 150) // 800) * 150
+                },
+                'files': []
+            })
+    
+    return JsonResponse(user_data, safe=False)
+
+# Helper function to determine file type letter
+def get_file_type_letter(mime_type):
+    if 'presentation' in mime_type:
+        return 'P'
+    elif 'spreadsheet' in mime_type:
+        return 'S'
+    elif 'document' in mime_type:
+        return 'D'
+    elif 'image' in mime_type:
+        return 'I'
+    elif 'pdf' in mime_type:
+        return 'P'
+    else:
+        return 'F'  # Generic file
+
+def load_user_map(request):
+    """Load saved user map arrangement"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=403)
+    
+    # This is a simple implementation - you might want to store this in a database
+    # For now, we'll return an empty response which will fall back to localStorage
+    return JsonResponse({
+        'users': [],
+        'connections': []
+    })

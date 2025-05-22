@@ -24,68 +24,69 @@ document.addEventListener('DOMContentLoaded', function() {
             ]);
         });
     
-    function initializeUserMap(users) {
-        // Sample connections data
-        let connections = [];
+        function initializeUserMap(users) {
+            // Sample connections data
+            let connections = [];
 
-        const organizationMap = document.getElementById('organization_map');
-        const arrowsContainer = document.getElementById('arrows_container');
+            const organizationMap = document.getElementById('organization_map');
+            const arrowsContainer = document.getElementById('arrows_container');
+            
+            // Clear any existing content in the map
+            organizationMap.innerHTML = '';
+            arrowsContainer.innerHTML = '';
+            
+            // Create user bubbles and add them to the map
+            users.forEach((user, index) => {
+        const userBubble = document.createElement('div');
+        userBubble.className = 'user_bubble';
+        userBubble.setAttribute('data-user-id', index);
         
-        // Clear any existing content in the map
-        organizationMap.innerHTML = '';
-        arrowsContainer.innerHTML = '';
+        // Position the bubble
+        userBubble.style.left = `${user.position.x}px`;
+        userBubble.style.top = `${user.position.y}px`;
         
-        // Create user bubbles and add them to the map
-        users.forEach((user, index) => {
-            const userBubble = document.createElement('div');
-            userBubble.className = 'user_bubble';
-            userBubble.setAttribute('data-user-id', index);
-            
-            // Position the bubble
-            userBubble.style.left = `${user.position.x}px`;
-            userBubble.style.top = `${user.position.y}px`;
-            
-            // Sample file data for each user
-            const recentFiles = [
-                { name: 'Untitled Presentation', size: '28 kb', date: '2 Mar 2021', type: 'P', fileId: '10001' },
-                { name: 'Financial Report', size: '42 kb', date: '15 Apr 2021', type: 'D', fileId: '10002' },
-                { name: 'Project Proposal', size: '35 kb', date: '8 May 2021', type: 'P', fileId: '10003' },
-                { name: 'Marketing Strategy', size: '19 kb', date: '22 Jun 2021', type: 'D', fileId: '10004' },
-                { name: 'Budget Analysis', size: '31 kb', date: '17 Jul 2021', type: 'S', fileId: '10005' }
-            ];
-            
-            // Create files list HTML
-            const filesHTML = recentFiles.map(file => `
+        // Get real file data for this user
+        const recentFiles = user.files || [];
+        
+        // Create files list HTML
+        const filesHTML = recentFiles.length > 0 ? 
+            recentFiles.map(file => `
                 <div class="file_item">
-                    <div class="file_icon">${file.type}</div>
+                    <div class="file_icon">${file.type || 'F'}</div>
                     <div class="file_name">${file.name}</div>
                     <div class="file_size">${file.size}</div>
-                    <a href="/files/${file.fileId}" class="file_date" title="View file details">${file.date}</a>
+                    <div class="file_date">${file.date}</div>
                 </div>
-            `).join('');
-            
-            // Construct user bubble HTML
-            userBubble.innerHTML = `
-                <img src="/static/Images/avatar.png" alt="User" class="user_avatar">
-                <div class="user_info">
-                    <span class="user_name">${user.name}</span>
-                </div>
-                <div class="toggle_dropdown">
-                    <img src="/static/Images/chevron-down.png" alt="Toggle">
-                </div>
-                <div class="files_dropdown">
-                    ${filesHTML}
-                </div>
-            `;
-            
-            organizationMap.appendChild(userBubble);
-            
-            // Set up dropdown toggle functionality
-            setupDropdown(userBubble);
-            
-            // Set up drag functionality
-            makeDraggable(userBubble);
-        });
+            `).join('') : 
+            '<div class="file_item no_files">No files found</div>';
+        
+        // Calculate number of files
+        const fileCount = recentFiles.length;
+        
+        // Construct user bubble HTML
+        userBubble.innerHTML = `
+            <img src="/static/Images/avatar.png" alt="User" class="user_avatar">
+            <div class="user_info">
+                <span class="user_name">${user.name}</span>
+                <span class="file_count">${fileCount} files</span>
+            </div>
+            <div class="toggle_dropdown">
+                <img src="/static/Images/chevron-down.png" alt="Toggle">
+            </div>
+            <div class="files_dropdown">
+                <div class="files_header">Recent Files</div>
+                ${filesHTML}
+            </div>
+        `;
+        
+        organizationMap.appendChild(userBubble);
+        
+        // Set up dropdown toggle functionality
+        setupDropdown(userBubble);
+        
+        // Set up drag functionality
+        makeDraggable(userBubble);
+    });
         
         // Setup dropdown toggle functionality
         function setupDropdown(bubble) {

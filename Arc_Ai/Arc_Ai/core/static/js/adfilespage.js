@@ -1,6 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("DOM fully loaded");
     
+    // Check if dropdown elements exist
+    const dropdownButtons = document.querySelectorAll('.icon-button.dropdown-toggle');
+    console.log("Found dropdown buttons:", dropdownButtons.length);
+    
+    // Check for content boxes
+    const contentBoxes = document.querySelectorAll('.content-box');
+    console.log("Found content boxes:", contentBoxes.length);
+    
+    // Verify file items
+    const fileItems = document.querySelectorAll('.file-item');
+    console.log("Found file items:", fileItems.length);
+    
     // Set up dropdown toggle functionality
     setupDropdownToggles();
     
@@ -96,8 +108,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Find the icon element
         const icon = button.querySelector('i');
         
-        // Toggle the hidden class
+        // Toggle the hidden class and add expanded state
         contentBox.classList.toggle('hidden');
+        container.classList.toggle('expanded');
         console.log("Content box visibility:", !contentBox.classList.contains('hidden'));
         
         // Rotate the icon based on dropdown state
@@ -107,6 +120,13 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 icon.className = 'bx bx-caret-up';
             }
+        }
+        
+        // If we're showing the dropdown, scroll it into view
+        if (!contentBox.classList.contains('hidden')) {
+            setTimeout(() => {
+                contentBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
     }
 
@@ -173,3 +193,4 @@ document.addEventListener('DOMContentLoaded', function () {
         return cookieValue;
     }
 });
+

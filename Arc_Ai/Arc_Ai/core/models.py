@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 
 
+
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
     sender_icon = models.ImageField(upload_to='icons/')
@@ -77,6 +78,8 @@ class DriveFolder(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.user.username})"
+    
+
 
 class SignupDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
@@ -88,8 +91,11 @@ class SignupDetails(models.Model):
     contact_number = models.CharField(max_length=255)
     age = models.CharField(max_length=3)
     gender = models.CharField(max_length=255)
-    position = models.CharField(max_length=100)
-    department = models.CharField(max_length=100)
+    position = models.CharField(max_length=100, blank=True, null=True, default='No position provided')
+    department = models.CharField(max_length=100, blank=True, null=True, default='No department provided')
+
+    def __str__(self):
+        return f"{self.user.username}'s details"
     
 # For notification sidebar Popup TEST
 class Notification(models.Model):

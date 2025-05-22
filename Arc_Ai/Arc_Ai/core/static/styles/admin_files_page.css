@@ -175,14 +175,51 @@
   width: 1130px;
   height: 120px;
   flex-shrink: 0;
-  position: relative;
+  position: relative; /* Keep this */
   background: white;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
-  margin: 20px auto;
-  display:block;
-  border-bottom: 1px solid #ddd; /* Add a bottom border */
-padding-bottom: 10px;
+  margin: auto auto 15px auto;
+  display: block;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  transition: all 0.3s ease;
+  z-index: 10; /* Base z-index */
+}
+
+.card-container.expanded {
+  margin-bottom: 520px; /* Increase space for content box + next user visibility */
+  z-index: 30; /* Keep higher z-index when expanded */
+  border-radius: 20px 20px 0 0; /* Rounded corners only on top when expanded */
+}
+
+/* Content box styling */
+.content-box {
+  position: absolute;
+  top: 100%; /* Position below the card */
+  left: 0;
+  width: 97.5%;
+  border-radius: 0 0 8px 8px; /* Round only bottom corners */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-top: 0; /* Connect directly to card */
+  overflow-y: auto; /* Allow scrolling within the box */
+  padding: 15px;
+  transition: all 0.3s ease;
+  height: 450px; /* Fixed height */
+  max-height: 450px; /* Enforce maximum height */
+  background-color: white;
+  z-index: 20; /* Between normal and expanded cards */
+}
+
+/* Hidden state */
+.content-box.hidden {
+  display: none;
+}
+
+/* Add a container for the content box to maintain stacking context */
+.content-box-container {
+  position: relative;
+  z-index: 1;
 }
 
 .user-info {
@@ -254,6 +291,9 @@ padding-bottom: 10px;
   font-size: 18px;
   font-weight: 500;
   color: black;
+  flex: 1;
+  min-width: 0; /* Allow flex items to shrink below content size */
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .icon-placeholder {
@@ -309,18 +349,7 @@ padding-bottom: 10px;
     transform: rotate(180deg);
 }
 
-.content-box {
-    margin-top: 20px; /* Add spacing below the user card container */
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-out, padding 0.5s ease-out; /* Smooth transition */
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  
-    
-}
+
 
 /* Hidden class to hide the content box initially */
 .hidden {
@@ -329,7 +358,7 @@ padding-bottom: 10px;
 
 /* Expanded class to show the content box */
 .content-box.expanded {
-    max-height: 1000px; /* Adjust this value based on your content */
+    max-height: 1200px; /* Adjust this value based on your content */
     
 }
 
@@ -343,10 +372,10 @@ padding-bottom: 10px;
   display: flex;
   justify-content: space-between;
   font-weight: bold;
-  margin-top: 150px;
-  margin-bottom: 10px;
-  background-color: #f4f6f9;
-  gap:50px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  gap: 50px;
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 .title-files{
@@ -361,9 +390,6 @@ padding-bottom: 10px;
     font-size: 28px;
 }
 
-.files, .folders {
-  flex: 1;
-}
 
 .file-item, .folder-item {
     font-family: 'Inter', sans-serif;
@@ -373,32 +399,79 @@ padding-bottom: 10px;
     justify-content: space-between;
     padding: 5px 0;
     font-size: 18px;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    transition: background-color 0.2s;
 }
 
-.arrow {
-  width: 10px;
-  height: 10px;
-  border: solid black;
-  border-width: 0 2px 2px 0;
-  display: inline-block;
-  padding: 3px;
-  transform: rotate(45deg);
-  margin-left: 15px;
-  margin-right: -15px;
+.file-item:hover, .folder-item:hover {
+    background-color: #f5f5f5;
 }
 
 .file-item img, .folder-item .arrow {
+    width: 24px;
     margin-right: 10px;
 }
+
+.file-item .name, .folder-item .name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-item .date, .folder-item .date {
+    width: 120px;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.file-item .size, .folder-item .size {
+    width: 80px;
+    font-size: 0.85em;
+    color: #666;
+}
+
 .delete-btn {
     background: none;
     border: none;
     cursor: pointer;
+    padding: 5px;
 }
 
 .delete-btn img {
-    width: 30px; /* Increase size for better proportion */
-    height: 30px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Title sections */
+.section-titles .title-files,
+.section-titles .title-Folders {
+    font-weight: 600;
+    padding: 8px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Enhanced dropdown button */
+.icon-button.dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.icon-button.dropdown-toggle i {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.expanded .icon-button.dropdown-toggle i {
+    transform: rotate(180deg);
 }
 
 
