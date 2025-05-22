@@ -389,7 +389,7 @@ def signup_details(request):
         return redirect('core:profilepage', pk=request.user.pk)
 
     if request.method == 'POST':
-        profile_avatar = request.FILES.get('profile_avatar')
+        profile_avatar_id = request.POST.get('profile_avatar_id', '1')
         first_name = request.POST.get('first_name')
         middle_name = request.POST.get('middle_name')
         last_name = request.POST.get('last_name')
@@ -404,7 +404,7 @@ def signup_details(request):
         signup_details, created = SignupDetails.objects.update_or_create(
             user=request.user,
             defaults={
-                'profile_avatar': profile_avatar,
+                'profile_avatar_id': profile_avatar_id,
                 'first_name': first_name,
                 'middle_name': middle_name,
                 'last_name': last_name,
@@ -435,6 +435,8 @@ def profilepage(request, pk):
     projects = Project.objects.all()
     employee_awards = EmployeeAward.objects.all()
     personal_information = PersonalInformation.objects.first()
+
+    
 
     return render(request, 'core/profilepage.html', {
         'projects': projects,

@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" href="{% static 'styles/homeN.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/home.css' %}?v=1.0">
 </head>
 <body>
     <div id="header">
@@ -35,7 +36,10 @@
         </div>
         <div id="logout">
             <img src="{% static 'Images/Logout.png' %}" alt="">
-            <h1>Logout</h1>
+            <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout">Log out</button>
+            </form>
         </div>
     </div>
 </body>

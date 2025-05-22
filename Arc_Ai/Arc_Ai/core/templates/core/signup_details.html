@@ -20,26 +20,26 @@
                 <form id="form" method="post" action="{% url 'core:signup_details' %}">
                     {% csrf_token %}
                     <div id="signin_form">
-                        <h1 class="titles justify-center">Acount Setup</h1>
+                        <h1 class="titles justify-center">Account Setup</h1>
                         <div class="form-group">
                             <label for="first_name">First Name:</label>
-                            <input type="first_name" id="first_name" name="first_name" required>
+                            <input type="text" id="first_name" name="first_name" required>
                         </div>
                         <div class="form-group">
                             <label for="middle_name">Middle Name:</label>
-                            <input type="middle_name" id="middle_name" name="middle_name" required>
+                            <input type="text" id="middle_name" name="middle_name" required>
                         </div>
                         <div class="form-group">
                             <label for="last_name">Last Name:</label>
-                            <input type="last_name" id="last_name" name="last_name" required>
+                            <input type="text" id="last_name" name="last_name" required>
                         </div>
                         <div class="form-group">
                             <label for="complete_address">Complete Address:</label>
-                            <input type="complete_address" id="complete_address" name="complete_address" required>
+                            <input type="text" id="complete_address" name="complete_address" required>
                         </div>
                         <div class="form-group">
                             <label for="contact_number">Contact Number:</label>
-                            <input type="contact_number" id="contact_number" name="contact_number" required>
+                            <input type="text" id="contact_number" name="contact_number" required>
                         </div>
                         <div id="age-gender-container">
                             <div class="form-group">
@@ -56,6 +56,8 @@
                                 </select>
                             </div>
                         </div>
+                        <!-- Hidden input to store the selected profile avatar id -->
+                        <input type="hidden" id="profile_avatar_id" name="profile_avatar_id" value="1">
                     </div>
                     <div id="footer">
                         <button id="login_button" type="submit">Submit</button>
@@ -65,28 +67,15 @@
             <div id="logo_container" class="gap">
                 <div id="select_profile">
                     <div id="active_profile_pic">
-                        <img id="selected_profile_pic" src="{% static 'Images/Profile.png' %}">
+                        <img id="selected_profile_pic" src="{% static 'Images/Profile1.png' %}">
                     </div>
                     <p>Select Profile Picture</p>
                     <div class="profile_pic_cntr">
-                        <!-- Add 15 clickable images -->
                         {% for i in range %}
-                            {% with "Images/Profile" as base_path %}
-                            <img class="profile_pic_option" src="{% static base_path %}{{ i }}.png" alt="Profile Picture {{ i }}" onclick="selectProfilePicture(this)">
-                            {% endwith %}
+                            <img class="profile_pic_option" src="{% static 'Images/Profile' %}{{ i }}.png" alt="Profile Picture {{ i }}" onclick="selectProfilePicture(this, '{{ i }}')">
                         {% endfor %}
                     </div>
                 </div>
-
-                <!-- <script>
-                    function selectProfilePicture(img) {
-                        // Update the selected profile picture
-                        document.getElementById('selected_profile_pic').src = img.src;
-                
-                        // Save the selected image path in the hidden input field
-                        document.getElementById('profile_avatar').value = img.src;
-                    }
-                </script> -->
                     
                 <div id="main_logo">
                     <img id="welcome_logo" src="{% static 'Images/LogoV2.png' %}" alt="Arc.Ai Logo">
@@ -95,5 +84,16 @@
             </div>
         </div>
     </div>
+    <script>
+        function selectProfilePicture(img, avatarId) {
+            // Update the currently selected avatar image
+            document.getElementById('selected_profile_pic').src = img.src;
+            // Save the selected avatar ID in the hidden input
+            document.getElementById('profile_avatar_id').value = avatarId;
+            // Highlight logic (optional):
+            document.querySelectorAll('.profile_pic_option').forEach(i => i.classList.remove('selected'));
+            img.classList.add('selected');
+        }
+    </script>
 </body>
 </html>
