@@ -118,6 +118,7 @@ def edit_user_profile(request, pk):
     return render(request, 'core/edit_user_profile.html', {
         'signup_details': signup_details,
         'user': user,
+        'range': range(1, 16)  # Add this line to match signup_details view
     })
 
 
@@ -402,7 +403,7 @@ def signup_details(request):
         signup_details, created = SignupDetails.objects.update_or_create(
             user=request.user,
             defaults={
-                # Remove profile_avatar_id field since it doesn't exist
+                'profile_avatar_id': int(profile_avatar_id),
                 'first_name': first_name,
                 'middle_name': middle_name,
                 'last_name': last_name,

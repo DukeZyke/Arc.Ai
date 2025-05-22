@@ -34,13 +34,13 @@
                 <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
             </div>
         </div>
-        <div id="logout">
-            <img src="{% static 'Images/Logout.png' %}" alt="">
-            <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
+        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="logout">Log out</button>
-            </form>
-        </div>
+            <button type="submit" class="logout">
+                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                Log out
+            </button>
+        </form>
     </div>
 </body>
 </html>
