@@ -82,7 +82,6 @@ class DriveFolder(models.Model):
 
 class SignupDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
-    profile_avatar_id = models.CharField(max_length=2, default='1')  # Save avatar as id (1-15)
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)

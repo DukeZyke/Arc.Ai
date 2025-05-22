@@ -386,12 +386,10 @@ def delete_project(request, project_id):
 
 @login_required
 def signup_details(request):
-
     if SignupDetails.objects.filter(user=request.user).exists():
         return redirect('core:profilepage', pk=request.user.pk)
 
     if request.method == 'POST':
-        profile_avatar_id = request.POST.get('profile_avatar_id', '1')
         first_name = request.POST.get('first_name')
         middle_name = request.POST.get('middle_name')
         last_name = request.POST.get('last_name')
@@ -400,13 +398,11 @@ def signup_details(request):
         age = request.POST.get('age')
         gender = request.POST.get('gender')
         
-
-
         # Create or update SignupDetails for the logged-in user
         signup_details, created = SignupDetails.objects.update_or_create(
             user=request.user,
             defaults={
-                'profile_avatar_id': profile_avatar_id,
+                # Remove profile_avatar_id field since it doesn't exist
                 'first_name': first_name,
                 'middle_name': middle_name,
                 'last_name': last_name,
@@ -416,6 +412,11 @@ def signup_details(request):
                 'gender': gender,
             }
         )
+
+        # Handle profile avatar separately if needed
+        if 'profile_avatar' in request.FILES:
+            signup_details.profile_avatar = request.FILES['profile_avatar']
+            signup_details.save()
 
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:profilepage', pk=request.user.pk)
