@@ -29,9 +29,3 @@ class ProjectAdmin(admin.ModelAdmin):
     
 admin.site.register(Project, ProjectAdmin)
 # admin.site.register(ProjectMember)
-
-
-#PRACTICE TEMPLATES
-from .models import UserProfile, EditProfile
-admin.site.register(UserProfile)
-admin.site.register(EditProfile)
