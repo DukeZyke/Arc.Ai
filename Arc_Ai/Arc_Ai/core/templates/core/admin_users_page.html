@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Admin | ARC.AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/adminstyles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/aduserpage.css' %}">
+</head>
+<body>
+
+<div id="sidebar">
+    <div id="sidebar_content" class="hidden">
+        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:home' %}">Projects</a></p>
+        <p><a href="{% url 'core:organization' %}">Files</a></p>
+    </div>
+    <hr class="divider_sidebar"/>
+
+    <div class="notification_container">
+    <!-- Notification Pop-Up -->
+    <div id="notification_popup" class="hidden">
+        <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
+        <div id="notification_list">
+            <ul>
+                <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                    <div class="title-and-date">
+                        <p>Schedule Update</p>
+                        <span>Yesterday</span>
+                    </div>
+                    <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 202</p>
+                    <p class="posted-by">- Imee Duterte</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Detailed Notification -->
+    <div id="detailed_notification" class="hidden">
+        <h2 id="notification_title">Schedule Update</h2>
+        <p class="notification_date">Yesterday, January 29, 2025</p>
+        <button id="close_detailed_notification" class="close-btn">&times;</button>
+        <p id="notification_detail"></p>
+        <p class="posted-by">- Imee Duterte, Team Head</p>
+        <button class="respond-btn">Respond</button>
+    </div>
+    </div>
+
+    <div id="sidebar_icns_grp">
+        <div class="nav_item">
+            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <p id="navigation_paragraph">Navigate</p>
+        </div>
+    </div>
+</div>
+
+<div id="header">
+    <div>
+        <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+    </div>
+    <div id="header_nav" class="text_white">
+        <p><a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
+        <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
+        <p><a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+    </div>
+    <div>
+                <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout">Log out</button>
+            </form>
+    </div>
+</div>
+
+<div id="user-management">
+    <div class="user-admin-header">
+        <h1>User Admin</h1>
+        <div class="search-bar">
+            <input type="text" placeholder="Search Users..." id="search-users">
+            <button id="search-button" class="search-icon-btn">
+                <i class="bx bx-search"></i>
+            </button>
+        </div>
+        <div class="user-count">
+            <span>Total Users: <strong id="total-users">{{ total_users }}</strong></span>
+            <span class="status-indicator"></span>
+        </div>
+        <div class="search-results-count">
+            <span>Active Users: </span>
+            <strong id="active-users">{{ active_users }}</strong>
+            <span class="search-indicator"></span>
+        </div>
+    </div>
+
+    <div class="user-list">
+        {% if users %}
+            {% for user in users %}
+            <div class="user-card">
+                <div class="user-avatar">
+                    <img src="{% static 'Images/avatar.png' %}" alt="{{ user.username }}">
+                </div>
+                <div class="user-info">
+                    <h3>{{ user.username }}</h3>
+                    <span class="user-email">({{ user.email }})</span>
+                </div>
+                <div class="user-details">
+                    <div class="department">
+                        <span>Department: {% if user.profile.department %}{{ user.profile.department }}{% else %}Not Set{% endif %}</span>
+                    </div>
+                    <div class="position">
+                        <span>Position: {% if user.profile.position %}{{ user.profile.position }}{% else %}Not Set{% endif %}</span>
+                    </div>
+                </div>
+                <div class="level-control-container">
+                    <span>Level:</span>
+                    <div class="level-control">
+                        <span class="level-value">{% if user.is_superuser %}3{% elif user.is_staff %}2{% else %}1{% endif %}</span>
+                        <div class="level-buttons">
+                            <button class="level-up" data-user-id="{{ user.id }}"><i class="bx bx-caret-up"></i></button>
+                            <button class="level-down" data-user-id="{{ user.id }}"><i class="bx bx-caret-down"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <button class="edit-btn" data-user-id="{{ user.id }}"><i class="bx bx-edit"></i></button>
+                    <button class="delete-btn" data-user-id="{{ user.id }}"><i class="bx bx-trash"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-users-message">
+                <p>No users found in the database.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script src="{% static 'js/aduserpage.js' %}"></script>
+</body>
+</html>

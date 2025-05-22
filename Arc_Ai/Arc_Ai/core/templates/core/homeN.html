@@ -30,7 +30,7 @@
             </div>
             <div id="settings">
                 <h1>Settings</h1>
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Profile</a>
+                <a href="{% url 'core:profilepage' %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
                 <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
             </div>
         </div>

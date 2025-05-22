@@ -5,12 +5,11 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from .models import Notification
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import PersonalInformation
+from django.utils.timezone import datetime
+from django.contrib.auth import logout
 
 # MODELS
-from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails
+from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, DriveFolder
 from google_auth_oauthlib.flow import Flow
 import os
 from django.conf import settings
@@ -26,75 +25,397 @@ import googleapiclient.discovery
 from googleapiclient.http import MediaIoBaseUpload
 import io
 from io import BytesIO
+from googleapiclient.errors import HttpError
 
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
 
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+SCOPES = [
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.file"
+]
+
+ROOT_FOLDER_ID = '1wdS3rmcuuiZ-mr2aH7SfYSTAF6Uvlv5z'
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+# This is for local development only. In production, use HTTPS.
 
+#[PRACTICE TEMPLATES] ====================================================================
+from .models import UserProfile
+
+def practice(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        address = request.POST.get('address')
+
+        if UserProfile.objects.filter(email=email).exists():
+            return render(request, 'core/practice.html', {
+                'error': 'Email already exists. Please use a different email.'
+            })
+
+        UserProfile.objects.create(
+            email=email,
+            address=address,
+            password=password
+        )
+
+        # Store email and address in session
+        request.session['current_email'] = email
+        request.session['current_address'] = address
+
+        return redirect('core:practice1')  # redirect after POST (best practice)
+
+    return render(request, 'core/practice.html')
+
+from .models import EditProfile
+
+def practice1(request):
+    # Get defaults from session
+    current_email = request.session.get('current_email', '')
+    current_address = request.session.get('current_address', '')
+
+    if request.method == 'POST':
+        # Use session values if not provided in POST (for first load, use session)
+        current_email = request.POST.get('current_email', current_email)
+        new_email = request.POST.get('new_email')
+        current_address = request.POST.get('current_address', current_address)
+        new_address = request.POST.get('new_address')
+
+        if not (current_email and new_email and current_address and new_address):
+            return render(request, 'core/practice1.html', {
+                'error': 'All fields are required.',
+                'current_email': current_email,
+                'current_address': current_address
+            })
+
+        if UserProfile.objects.filter(email=new_email).exclude(email=current_email).exists():
+            return render(request, 'core/practice1.html', {
+                'error': 'New email already exists.',
+                'current_email': current_email,
+                'current_address': current_address
+            })
+
+        try:
+            user = UserProfile.objects.get(email=current_email, address=current_address)
+            EditProfile.objects.update_or_create(
+                user=user,
+                defaults={'new_email': new_email, 'new_address': new_address}
+            )
+            user.email = new_email
+            user.address = new_address
+            user.save()
+            # Update session to new values
+            request.session['current_email'] = new_email
+            request.session['current_address'] = new_address
+            return render(request, 'core/practice1.html', {
+                'success': 'Email and Address updated!',
+                'current_email': new_email,
+                'current_address': new_address
+            })
+        except UserProfile.DoesNotExist:
+            return render(request, 'core/practice1.html', {
+                'error': 'User not found.',
+                'current_email': current_email,
+                'current_address': current_address
+            })
+
+    return render(request, 'core/practice1.html', {
+        'current_email': current_email,
+        'current_address': current_address
+    })
+
+#[PRACTICE TEMPLATES] ====================================================================\
 def homeN(request):
     return render(request, 'core/homeN.html')
 
-@login_required
+def admin_create_project_details(request):
+    return render(request, 'core/admin_create_project_details.html')
+
+def user_involved_map(request):
+    return render(request, 'core/user_involved_map.html')
+
 def edit_user_profile(request):
-    # Fetch the current user's personal information
-    personal_info = PersonalInformation.objects.filter(user=request.user).first()
+    return render(request, 'core/edit_user_profile.html')
+
+def admin_files_page(request):
+    # Check admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')
+    
+    # Get all users
+    users = User.objects.all().order_by('username')
+    
+    # Prepare data structure for users and their files
+    user_files_data = []
+    total_files = 0
+    total_folders = 0
+    total_size = 0  # in bytes
+    
+    # Check if Drive credentials are available for fetching additional file details
+    creds_data = request.session.get('credentials')
+    if creds_data:
+        creds = Credentials(**creds_data)
+        
+        try:
+            # Build the Drive service
+            service = build('drive', 'v3', credentials=creds)
+            
+            # For each user, fetch their files and folders from the database
+            for user in users:
+                # Get files and folders associated with this user from the database
+                user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')
+                user_drive_folders = DriveFolder.objects.filter(user=user).order_by('-created_at')
+                
+                # Initialize lists for files and folders
+                files = []
+                folders = []
+                user_total_size = 0
+                
+                # Process each file
+                for drive_file in user_drive_files:
+                    try:
+                        # Get detailed file info from Drive
+                        file_info = service.files().get(
+                            fileId=drive_file.file_id, 
+                            fields="name,mimeType,size,createdTime"
+                        ).execute()
+                        
+                        file_size = int(file_info.get('size', 0)) if 'size' in file_info else 0
+                        file_data = {
+                            'id': drive_file.file_id,
+                            'name': drive_file.name,
+                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
+                            'size': file_size,
+                            'size_display': f"{file_size / 1024:.2f} kb" if file_size > 0 else 'N/A'
+                        }
+                        
+                        files.append(file_data)
+                        total_files += 1
+                        total_size += file_size
+                        user_total_size += file_size
+                        
+                    except Exception as e:
+                        # If we can't get details from Drive, use what we have in the database
+                        file_data = {
+                            'id': drive_file.file_id,
+                            'name': drive_file.name,
+                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
+                            'size': 0,
+                            'size_display': 'N/A'
+                        }
+                        files.append(file_data)
+                        total_files += 1
+                
+                # Process each folder
+                for drive_folder in user_drive_folders:
+                    # For folders, we don't need to fetch additional details from Drive API
+                    folder_data = {
+                        'id': drive_folder.folder_id,
+                        'name': drive_folder.name,
+                        'parent_id': drive_folder.parent_folder_id or 'Root',
+                        'date': drive_folder.created_at.strftime('%d %b %Y'),
+                        'size_display': 'Folder'
+                    }
+                    folders.append(folder_data)
+                    total_folders += 1
+                        
+                # Get user profile information if available
+                avatar = 'Images/Profile3.png'
+                department = 'N/A'
+                position = 'N/A'
+                
+                try:
+                    # Find the SignupDetails for this user if it exists
+                    # Note: You might need to add a user field to your SignupDetails model
+                    user_profile = SignupDetails.objects.filter(
+                        first_name__iexact=user.first_name, 
+                        last_name__iexact=user.last_name
+                    ).first()
+                    
+                    if user_profile and user_profile.profile_avatar:
+                        avatar = user_profile.profile_avatar.url
+                except Exception as e:
+                    print(f"Error fetching user profile: {str(e)}")
+                
+                # Add user data with their files and folders
+                user_files_data.append({
+                    'user': {
+                        'id': user.id,
+                        'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                        'email': user.email,
+                        'avatar': avatar,
+                        'department': department,
+                        'position': position,
+                        'total_size': f"{user_total_size / (1024 * 1024):.2f} MB"
+                    },
+                    'files': files,
+                    'folders': folders,
+                    'file_count': len(files),
+                    'folder_count': len(folders)
+                })
+                
+        except Exception as e:
+            print(f"Error processing files: {str(e)}")
+            messages.error(request, f"Error retrieving files: {str(e)}")
+    else:
+        # If no Drive credentials, just get basic info from database
+        for user in users:
+            user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')
+            user_drive_folders = DriveFolder.objects.filter(user=user).order_by('-created_at')
+            
+            files = [{
+                'id': file.file_id,
+                'name': file.name,
+                'date': file.uploaded_at.strftime('%d %b %Y'),
+                'size': 0,
+                'size_display': 'Database only'
+            } for file in user_drive_files]
+            
+            folders = [{
+                'id': folder.folder_id,
+                'name': folder.name,
+                'parent_id': folder.parent_folder_id or 'Root',
+                'date': folder.created_at.strftime('%d %b %Y'),
+                'size_display': 'Folder'
+            } for folder in user_drive_folders]
+            
+            total_files += len(files)
+            total_folders += len(folders)
+            
+            user_files_data.append({
+                'user': {
+                    'id': user.id,
+                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                    'email': user.email,
+                    'avatar': 'Images/Profile3.png',
+                    'department': 'N/A',
+                    'position': 'N/A',
+                    'total_size': '0 MB'
+                },
+                'files': files,
+                'folders': folders,
+                'file_count': len(files),
+                'folder_count': len(folders)
+            })
+    
+    return render(request, 'core/admin_files_page.html', {
+        'users_data': user_files_data,
+        'total_files': total_files,
+        'total_folders': total_folders,
+        'total_size': f"{total_size / (1024 * 1024):.2f} MB",
+        'active_page': 'files'  # For highlighting the current page in navigation
+    })
+
+def admin_project_page(request):
+    projects = Project.objects.all()
+
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')  # Or redirect to home
+    
+    # Continue with the admin page view for authorized users
+    return render(request,'core/admin_project_page.html', {
+        'projects': projects
+    })
+    
+def admin_users_page(request):
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')
+    
+    # Get all users
+    users = User.objects.all().order_by('username')
+    
+    # Count active users
+    active_users = User.objects.filter(is_active=True).count()
+    
+    return render(request, 'core/admin_users_page.html', {
+        'users': users,
+        'total_users': users.count(),
+        'active_users': active_users,
+    })
+    
+def admin_edit_project_details(request):
+    return render(request, 'core/admin_edit_project_details.html')
+
+# =================================== FOR EDITING OF PROJECTS ===================================
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Project, ProjectMember
+
+
+def admin_edit_project_details(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    members = project.members.all()
 
     if request.method == 'POST':
-        # Collect form data
-        email = request.POST.get('email')
-        first_name = request.POST.get('first_name')
-        middle_initial = request.POST.get('middle_initial')
-        last_name = request.POST.get('last_name')
-        complete_address = request.POST.get('complete_address')
-        contact_no = request.POST.get('contact_no')
-        age = request.POST.get('age')
-        gender = request.POST.get('gender')
-        department = request.POST.get('department')
-        position = request.POST.get('position')
-        profile_avatar = request.FILES.get('profile_avatar')  # For profile picture upload
+        # Update project fields
+        project.name = request.POST.get('name')
+        project.project_desc = request.POST.get('project_desc')
+        project.start_date = request.POST.get('start_date')
+        project.finish_date = request.POST.get('finish_date')   
+        project.project_status = request.POST.get('project_status')
+        project.project_manager = request.POST.get('project_manager')
+        project.save()
 
-        # Update or create the user's personal information
-        if personal_info:
-            personal_info.email = email
-            personal_info.first_name = first_name
-            personal_info.middle_initial = middle_initial
-            personal_info.last_name = last_name
-            personal_info.complete_address = complete_address
-            personal_info.contact_number = contact_no
-            personal_info.age = age
-            personal_info.gender = gender
-            personal_info.department = department
-            personal_info.position = position
-            if profile_avatar:
-                personal_info.profile_avatar = profile_avatar
-            personal_info.save()
-            messages.success(request, "Your profile has been updated successfully!")
-        else:
-            PersonalInformation.objects.create(
-                user=request.user,
-                email=email,
-                first_name=first_name,
-                middle_initial=middle_initial,
-                last_name=last_name,
-                complete_address=complete_address,
-                contact_number=contact_no,
-                age=age,
-                gender=gender,
-                department=department,
-                position=position,
-                profile_avatar=profile_avatar
-            )
-            messages.success(request, "Your profile has been created successfully!")
+        # Update members
+        member_names = request.POST.getlist('member_names')
+        # Remove all old members and add new ones
+        project.members.all().delete()
+        for name in member_names:
+            if name.strip():
+                ProjectMember.objects.create(project=project, member_name=name.strip())
 
-        return redirect('core:edit_user_profile')
+        return redirect('core:admin_project_page')  # or wherever you want to go after saving
 
-    # Render the form with the current user's information
-    return render(request, 'core/edit_user_profile.html', {
-        'personal_info': personal_info,
-        'range': range(1, 16),  # For profile picture selection
+    return render(request, 'core/admin_edit_project_details.html', {
+        'project': project,
+        'members': members,
     })
+
+# =================================== FOR EDITING OF PROJECTS ===================================
+
+# =================================== FOR DELETING OF PROJECTS ===================================
+
+
+def delete_project(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    project.delete()
+    return redirect('core:admin_project_page')
+
+# =================================== FOR DELETING OF PROJECTS ===================================
+
+# =================================== FOR CREATION OF PROJECTS ===================================
+
+def admin_create_project(request):
+    if request.method == 'POST':
+        # ... get other fields ...
+        name = request.POST.get('name')
+        project_id = request.POSt.get('project_id')
+        start_date = request.POST.get('start_date')
+        finish_date = request.POST.get('finish_date')
+        project_status = request.POST.get('project_status')
+        project_manager = request.POST.get('project_manager')
+
+        project = Project.objects.create(
+            name=name,
+            project_id=project_id,
+            start_date=start_date,
+            finish_date=finish_date,
+            project_status=project_status,
+            project_manager=project_manager
+        )
+        return redirect('core:admin_project_page')
+    return render(request, 'core/admin_create_project.html')
+
+# =================================== FOR CREATION OF PROJECTS ===================================
+
+
+
+
 
 def signup_details(request):
     if request.method == 'POST':
@@ -105,8 +426,6 @@ def signup_details(request):
         complete_address = request.POST.get('complete_address')
         contact_number = request.POST.get('contact_number')
         gender = request.POST.get('gender')
-        age = request.POST.get('age')
-        birth_date = request.POST.get('birth_date')
 
         # Create SignupDetails instance
         signup_details = SignupDetails.objects.create(
@@ -119,19 +438,6 @@ def signup_details(request):
             gender=gender
         )
 
-        # Create PersonalInformation instance linked to SignupDetails
-        PersonalInformation.objects.create(
-            signup_details=signup_details,
-            name=f"{first_name} {last_name}",
-            email=request.POST.get('email'),
-            address=complete_address,
-            contact_number=contact_number,
-            age=age,
-            birth_date=birth_date,
-            gender=gender,
-            user_title=request.POST.get('user_title', 'User')  # Default title if not provided
-        )
-
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:home')
 
@@ -139,16 +445,12 @@ def signup_details(request):
         'range': range(1, 16)  # Pass numbers 1 to 15 to the template
     })
 
+
+
 def profilepage(request):
     projects = Project.objects.all()
     employee_awards = EmployeeAward.objects.all()
-
-    # Fetch the PersonalInformation linked to the logged-in user's SignupDetails
-    personal_information = None
-    if request.user.is_authenticated:
-        signup_details = SignupDetails.objects.filter(first_name=request.user.first_name).first()
-        if signup_details:
-            personal_information = PersonalInformation.objects.filter(signup_details=signup_details).first()
+    personal_information = PersonalInformation.objects.first()
 
     return render(request, 'core/profilepage.html', {
         'projects': projects,
@@ -159,23 +461,72 @@ def profilepage(request):
 def landingpage(request):
     return render(request, 'core/landingpage.html')
 
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('core:login')
+
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('core:home')  # Already logged in, go to home
+        
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Authenticate user
-        user = authenticate(email=email, password=password)
+        # Find user by email first (keep your existing authentication logic)
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(username=user.username, password=password)
+            
+            if user is not None:
+                auth_login(request, user)
+                
+                # Set no-cache headers to prevent back button issues
+                response = redirect('core:home')
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
+                return response
+            else:
+                messages.error(request, 'Invalid credentials. Please try again.')
+        except User.DoesNotExist:
+            messages.error(request, 'User not found.')
+        
+        return redirect('core:login')
 
-        if user is not None:
-            auth_login(request, user)
-            messages.success(request, 'You have successfully logged in.')
-            return redirect('core:home')  # Redirect to a valid URL name
-        else:
-            messages.error(request, 'Invalid credentials. Please try again.')
-            return redirect('core:login')  # Redirect back to login page
+    # Set no-cache headers even on GET requests
+    response = render(request, 'core/login.html')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
-    return render(request, 'core/login.html')
+
+def admin_login(request):
+    if request.method == 'POST':
+        admin_email = request.POST.get('admin_email')
+        admin_password = request.POST.get('admin_password')
+
+        # Find user by email first
+        try:
+            user = User.objects.get(email=admin_email)
+            # Authenticate with username and password
+            user = authenticate(username=user.username, password=admin_password)
+            
+            if user is not None and (user.is_staff or user.is_superuser):
+                auth_login(request, user)
+                messages.success(request, 'Admin login successful.')
+                return redirect('core:admin_project_page')
+            else:
+                messages.error(request, 'Invalid admin credentials or insufficient privileges.')
+        except User.DoesNotExist:
+            messages.error(request, 'Admin account not found.')
+        
+        return redirect('core:admin_login')
+
+    return render(request, 'core/admin_login.html')
+
 
 def signup(request):
     if request.method == 'POST':
@@ -205,6 +556,42 @@ def signup(request):
 
     return render(request, 'core/signup.html')
 
+def admin_signup(request):
+    if request.method == 'POST':
+        # Extracting data from the form
+        email = request.POST.get('admin_email')
+        username = request.POST.get('admin_username')
+        password = request.POST.get('admin_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'Your passwords do not match. Please try again.')
+            return redirect('core:admin_signup')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email is already taken. Please try again.')
+            return redirect('core:admin_signup')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username is already taken. Please try again.')
+            return redirect('core:admin_signup')
+
+        # Create a user with admin privileges
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.is_staff = True  # Grant staff permissions
+        user.is_superuser = False  # Optional: can make True for full superuser privileges
+        user.save()
+        
+        messages.success(request, 'Admin account created successfully. You can now log in.')
+        return redirect('core:admin_login')
+
+    return render(request, 'core/admin_signup.html')
+
+# Add this helper function to your views.py
+def is_admin(user):
+    """Check if a user has admin privileges"""
+    return user.is_authenticated and user.is_staff
+
 
 from allauth.account.views import SignupView
 
@@ -217,23 +604,24 @@ def home(request):
     return render(request, 'core/home.html')
 
 def organization(request):
-    projects = Project.objects.all()
+    projects = Project.objects.all().order_by('-project_id')  # or your preferred ordering
     personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
+    top_project = projects.first() if projects else None
 
     return render(request, 'core/organization.html', {
-        'projects' : projects,
-        'personal_information' : personal_information,
-        'employee_awards' : employee_awards,
-        })
+        'projects': projects,
+        'top_project': top_project,
+        'personal_information': personal_information,
+        'employee_awards': employee_awards,
+    })
 
 def landingpage(request):
     return render(request, 'core/landingpage.html')
 
 def saved(request):
-    folders = [f"Folder {i}" for i in range(1, 21)]
-    trash = [f"Trash File {i}" for i in range(1, 21)]
-
+    folder_id = ROOT_FOLDER_ID
+    
     creds_data = request.session.get('credentials')
     if not creds_data:
         messages.error(request, "You must authorize Google Drive to fetch files.")
@@ -244,24 +632,61 @@ def saved(request):
     try:
         service = build('drive', 'v3', credentials=creds)
 
-        results = service.files().list(
-            pageSize=50,
-            fields="files(id, name, mimeType, webViewLink, parents)"
+        # Fetch folders from the root folder
+        folder_results = service.files().list(
+            q=f"'{folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+            pageSize=100,
+            fields="files(id, name, parents)"
         ).execute()
 
-        drive_files = results.get('files', [])
+        folders = folder_results.get('files', [])
+
+        # Fetch files from the root folder
+        file_results = service.files().list(
+            q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+            pageSize=100,
+            fields="files(id, name, mimeType, size, createdTime, owners)"
+        ).execute()
+
+        drive_files = file_results.get('files', [])
+        
+        # Fetch trashed files
+        trashed_results = service.files().list(
+            q="trashed = true",
+            pageSize=20,
+            fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
+        ).execute()
+
+        trash_files = trashed_results.get('files', [])
+    # Add metadata for each file
+        for file in drive_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
+        # Add metadata for each trashed file
+        for file in trash_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
 
     except Exception as e:
-        print("Error fetching files from Google Drive:", str(e))
-        messages.error(request, "Failed to fetch files from Google Drive.")
+        print("Error fetching files or folders from Google Drive:", str(e))
+        messages.error(request, "Failed to fetch files or folders from Google Drive.")
+        folders = []
         drive_files = []
+        trash_files = []
 
     return render(request, 'core/saved.html', {
         'folders': folders,
         'files': drive_files,
-        'trash': trash,
+        'trash': trash_files,  # Now passing actual trashed files
+        'ROOT_FOLDER_ID': ROOT_FOLDER_ID,
     })
-
 def email(request):
     online_users = User.objects.all() 
     emails = Email.objects.all()
@@ -318,43 +743,89 @@ def google_drive_callback(request):
 
 def upload_file_to_drive(request):
     if request.method == 'POST':
-        uploaded_file = request.FILES.get('file')
-        print("Received file:", uploaded_file.name)
-
-        creds_data = request.session.get('credentials')
-        if not creds_data:
-            print("No credentials in session. Redirecting to auth.")
-            return redirect('core:google_drive_auth')
-
-        creds = Credentials(**creds_data)
-
+        # Check if user is authenticated first
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to upload files.")
+            return redirect('core:login')
+        
+        # Debug line - check if user is recognized
+        print(f"Authenticated user: {request.user.username}, ID: {request.user.id}")
+            
         try:
+            uploaded_files = request.FILES.getlist('file')
+            folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)
+            
+            creds_data = request.session.get('credentials')
+            if not creds_data:
+                messages.error(request, "You need to authorize Google Drive access first.")
+                return redirect('core:google_drive_auth')
+            
+            creds = Credentials(**creds_data)
             service = build('drive', 'v3', credentials=creds)
-            media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.content_type)
-            file_metadata = {'name': uploaded_file.name,
-                            'parents': ['1katYIAY6Xzw1fOorjULbdMAneODhdVpl']}
-
-            file = service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields='id, name'
-            ).execute()
-
-            DriveFile.objects.create(name=file['name'], file_id=file['id'])
-
-            print(f"Uploaded to Drive: {file['name']} (ID: {file['id']})")
-
-            return redirect('core:saved')
+            
+            for uploaded_file in uploaded_files:
+                # Google Drive upload code
+                file_metadata = {
+                    'name': uploaded_file.name,
+                    'parents': [folder_id]
+                }
+                
+                media = MediaIoBaseUpload(
+                    BytesIO(uploaded_file.read()),
+                    mimetype=uploaded_file.content_type,
+                    resumable=True
+                )
+                
+                file = service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id'
+                ).execute()
+                
+                print(f"File created in Drive with ID: {file.get('id')}")
+                
+                # FIXED CODE - More robust user handling
+                try:
+                    # Get a fresh user instance to ensure it's valid
+                    user = User.objects.get(id=request.user.id)
+                    print(f"Retrieved user: {user.username}, ID: {user.id}")
+                    
+                    # Create DriveFile with explicit save() to see any errors
+                    drive_file = DriveFile(
+                        user=user,
+                        name=uploaded_file.name,
+                        file_id=file.get('id')
+                    )
+                    drive_file.save()
+                    print(f"DriveFile created successfully with ID: {drive_file.id}")
+                    
+                except Exception as user_error:
+                    print(f"Error creating DriveFile record: {str(user_error)}")
+                    # Try with user ID 1 as fallback if your user fails
+                    admin_user = User.objects.get(id=1)
+                    DriveFile.objects.create(
+                        user=admin_user,  # Fallback to admin user
+                        name=uploaded_file.name,
+                        file_id=file.get('id')
+                    )
+                    print(f"Created DriveFile with admin user fallback")
+            
+            # Check if upload was to root folder
+            if folder_id == ROOT_FOLDER_ID:
+                return redirect('core:saved')
+            else:
+                return redirect('core:view_folder_contents', folder_id=folder_id)
 
         except Exception as e:
             print("Drive upload failed:", str(e))
             return HttpResponse(f"Error: {e}", status=500)
 
-    return HttpResponse("Invalid method", status=405)
+    return HttpResponse("Invalid method", status=405)   
 
 def delete_files_from_drive(request):
     if request.method == 'POST':
-        file_ids = request.POST.getlist('file_ids[]')
+        file_ids = request.POST.getlist('file_ids[]')  # Get the list of file IDs to delete
+        folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)  # Get the folder ID from the form, default to root folder
 
         creds_data = request.session.get('credentials')
         if not creds_data:
@@ -368,13 +839,345 @@ def delete_files_from_drive(request):
             for file_id in file_ids:
                 service.files().delete(fileId=file_id).execute()
 
-            return JsonResponse({'success': True, 'message': 'Files deleted successfully.'})
+            return JsonResponse({'success': True, 'message': 'Files deleted successfully.', 'folder_id': folder_id})
 
         except Exception as e:
             print("Error deleting files from Google Drive:", str(e))
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+def create_folder_in_drive(request):
+    if request.method == 'POST':
+        folder_name = request.POST.get('folder_name')  # Get the folder name from the form
+        parent_folder_id = request.POST.get('parent_folder_id', ROOT_FOLDER_ID)  # Get parent folder ID, default to ROOT
+
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            messages.error(request, "You must authorize Google Drive to create folders.")
+            return redirect('core:google_drive_auth')
+
+        creds = Credentials(**creds_data)
+
+        try:
+            service = build('drive', 'v3', credentials=creds)
+
+            # Define folder metadata
+            folder_metadata = {
+                'name': folder_name,
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [parent_folder_id]  # Use parent_folder_id instead of hardcoded ROOT_FOLDER_ID
+            }
+
+            # Create the folder in Google Drive
+            folder = service.files().create(
+                body=folder_metadata,
+                fields='id, name'
+            ).execute()
+
+            # Save the folder information to the database with the current user
+            DriveFolder.objects.create(
+                user=request.user,
+                name=folder['name'],
+                folder_id=folder['id'],
+                parent_folder_id=parent_folder_id
+            )
+
+            print(f"Folder created: {folder['name']} (ID: {folder['id']})")
+            messages.success(request, f"Folder '{folder['name']}' created successfully.")
+            
+            # Determine where to redirect based on parent folder
+            if parent_folder_id == ROOT_FOLDER_ID:
+                return redirect('core:saved')  # Redirect to main saved page
+            else:
+                return redirect('core:view_folder_contents', folder_id=parent_folder_id)  # Return to parent folder
+
+        except Exception as e:
+            print("Error creating folder in Google Drive:", str(e))
+            messages.error(request, f"Error creating folder: {str(e)}")
+            
+            # Determine where to redirect based on parent folder
+            if parent_folder_id == ROOT_FOLDER_ID:
+                return redirect('core:saved')
+            else:
+                return redirect('core:view_folder_contents', folder_id=parent_folder_id)
+
+    messages.error(request, "Invalid request method.")
+    return redirect('core:saved')
+
+def delete_folders(request):
+    if request.method == 'POST':
+        folder_ids = request.POST.getlist('folder_ids[]')
+        
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to delete folders.'}, status=403)
+            
+        creds = Credentials(**creds_data)
+        
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            
+            deleted_count = 0
+            for folder_id in folder_ids:
+                service.files().delete(fileId=folder_id).execute()
+                deleted_count += 1
+                
+            return JsonResponse({
+                'success': True, 
+                'message': f'{deleted_count} folder(s) deleted successfully.'
+            })
+            
+        except Exception as e:
+            print("Error deleting folders from Google Drive:", str(e))
+            return JsonResponse({'error': str(e)}, status=500)
+            
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+def view_folder_contents(request, folder_id):
+    creds_data = request.session.get('credentials')
+    if not creds_data:
+        messages.error(request, "You must authorize Google Drive to view folder contents.")
+        return redirect('core:google_drive_auth')
+
+    creds = Credentials(**creds_data)
+
+    try:
+        service = build('drive', 'v3', credentials=creds)
+
+        # Fetch folders from the root folder
+        folder_results = service.files().list(
+            q=f"'{ROOT_FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder'",
+            pageSize=100,
+            fields="files(id, name, parents)"
+        ).execute()
+
+        folders = folder_results.get('files', [])
+
+        # Fetch files inside the clicked folder
+        file_results = service.files().list(
+            q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder'",
+            pageSize=100,
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
+        ).execute()
+
+        drive_files = file_results.get('files', [])
+        
+        # Fetch trashed files - ADD THIS BLOCK
+        trashed_results = service.files().list(
+            q="trashed = true",
+            pageSize=20,
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
+        ).execute()
+
+        trash_files = trashed_results.get('files', [])
+
+        # Add this to your view_folder_contents function after fetching files
+        for file in drive_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+            file['webViewLink'] = file.get('webViewLink', '')
+
+            # Add metadata for each trashed file
+        for file in trash_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
+    except Exception as e:
+        print("Error fetching folder contents from Google Drive:", str(e))
+        messages.error(request, "Failed to fetch folder contents from Google Drive.")
+        folders = []
+        drive_files = []
+        trash_files = []  # Add this line
+
+    return render(request, 'core/saved.html', {
+        'folders': folders,  # Pass folders to the template
+        'files': drive_files,  # Pass files inside the clicked folder
+        'folder_id': folder_id,  # Pass the current folder ID to the template
+        'ROOT_FOLDER_ID': ROOT_FOLDER_ID,  # Pass ROOT_FOLDER_ID to the template
+        'trash': trash_files,  # Add this line to pass trash files
+    })
+
+
+def move_files_to_trash(request):
+    if request.method == 'POST':
+        file_ids = request.POST.getlist('file_ids[]')
+        folder_id = request.POST.get('folder_id', ROOT_FOLDER_ID)
+
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to manage files.'}, status=403)
+
+        creds = Credentials(**creds_data)
+        
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Get current user's email for ownership comparison
+            user_info = service.about().get(fields="user").execute()
+            current_user_email = user_info['user']['emailAddress']
+            
+            trashed_files = []
+            deleted_files = []
+            skipped_files = []
+            
+            for file_id in file_ids:
+                try:
+                    # Get file info with owner information
+                    file_info = service.files().get(
+                        fileId=file_id, 
+                        fields="name,owners"
+                    ).execute()
+                    
+                    file_name = file_info.get("name", "Unknown")
+                    file_owners = file_info.get("owners", [])
+                    
+                    # Check if current user is the owner
+                    is_owner = any(owner.get('emailAddress') == current_user_email for owner in file_owners)
+                    
+                    if is_owner:
+                        # If owner, move to trash
+                        service.files().update(
+                            fileId=file_id,
+                            body={'trashed': True}
+                        ).execute()
+                        trashed_files.append({"id": file_id, "name": file_name})
+                    else:
+                        # If not owner, permanently delete
+                        service.files().delete(fileId=file_id).execute()
+                        deleted_files.append({"id": file_id, "name": file_name})
+                    
+                except HttpError as e:
+                    if e.resp.status == 403:
+                        # Permission error
+                        skipped_files.append({"id": file_id, "name": file_name})
+                        continue
+                    else:
+                        # Re-raise other errors
+                        raise
+            
+            # Create appropriate response message
+            message_parts = []
+            if trashed_files:
+                message_parts.append(f"Moved {len(trashed_files)} of your file(s) to trash")
+            if deleted_files:
+                message_parts.append(f"Permanently deleted {len(deleted_files)} file(s) owned by others")
+            if skipped_files:
+                message_parts.append(f"Skipped {len(skipped_files)} file(s) due to insufficient permissions")
+            
+            message = ". ".join(message_parts)
+            success = bool(trashed_files or deleted_files)
+            is_root_folder = (folder_id == ROOT_FOLDER_ID)
+            
+            return JsonResponse({
+                'success': success,
+                'message': message,
+                'folder_id': folder_id,
+                'is_root_folder': is_root_folder,
+                'trashed_files': trashed_files,
+                'deleted_files': deleted_files,
+                'skipped_files': skipped_files
+            })
+
+        except Exception as e:
+            print("Error processing files:", str(e))
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+
+def get_trashed_files(request):
+    creds_data = request.session.get('credentials')
+    if not creds_data:
+        return []
+
+    creds = Credentials(**creds_data)
+
+    try:
+        service = build('drive', 'v3', credentials=creds)
+        
+        # Fetch trashed files
+        trashed_results = service.files().list(
+            q="trashed = true",
+            pageSize=20,
+            fields="files(id, name, mimeType, webViewLink)"
+        ).execute()
+
+        return trashed_results.get('files', [])
+
+    except Exception as e:
+        print("Error fetching trashed files:", str(e))
+        return []
+    
+
+
+def empty_trash(request):
+    if request.method == 'POST':
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return JsonResponse({'error': 'You must authorize Google Drive to empty trash.'}, status=403)
+
+        creds = Credentials(**creds_data)
+
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Empty trash (deletes all trashed files permanently)
+            service.files().emptyTrash().execute()
+            
+            messages.success(request, "Trash emptied successfully.")
+            return redirect('core:saved')
+
+        except Exception as e:
+            print("Error emptying trash:", str(e))
+            messages.error(request, f"Error emptying trash: {str(e)}")
+            return redirect('core:saved')
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+
+def restore_from_trash(request):
+    if request.method == 'POST':
+        creds_data = request.session.get('credentials')
+        if not creds_data:
+            return redirect('core:google_drive_auth')
+
+        creds = Credentials(**creds_data)
+
+        try:
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Get files in trash
+            results = service.files().list(
+                q="trashed=true",
+                fields="files(id, name)"
+            ).execute()
+            
+            trashed_files = results.get('files', [])
+            
+            # Restore each file
+            restored_count = 0
+            for file in trashed_files:
+                service.files().update(
+                    fileId=file['id'],
+                    body={'trashed': False}
+                ).execute()
+                restored_count += 1
+                
+            messages.success(request, f"Successfully restored {restored_count} files from trash")
+            return redirect('core:saved')
+            
+        except Exception as e:
+            messages.error(request, f"Error restoring files: {str(e)}")
+            return redirect('core:saved')
+            
+    return redirect('core:saved')
 
 def credentials_to_dict(creds):
     return {
@@ -398,4 +1201,40 @@ def get_notifications(request):
         }
         for notification in notifications
     ]
+    return JsonResponse(data, safe=False)
+
+def get_file_icon(mime_type):
+    file_icons = {
+        'application/pdf': 'Images/pdf.png',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Images/docx.png',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Images/csv.png',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Images/pptx.png',
+        'image/jpeg': 'Images/image.png',
+        'image/png': 'Images/image.png',
+        'text/plain': 'Images/default.png',
+        # Add more MIME types as needed
+    }
+    return file_icons.get(mime_type, 'Images/default.png')
+
+
+def get_users_for_map(request):
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+    
+    users = User.objects.all()
+    data = []
+    
+    for i, user in enumerate(users):
+        data.append({
+            'id': user.id,
+            'name': user.get_full_name() or user.username,
+            'email': user.email,
+            'is_staff': user.is_staff,
+            'is_active': user.is_active,
+            'position': {
+                'x': 100 + (i % 4) * 200,
+                'y': 100 + (i // 4) * 150
+            }
+        })
+    
     return JsonResponse(data, safe=False)

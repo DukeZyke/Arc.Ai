@@ -1,0 +1,423 @@
+/* Main Layout */
+.adminedit-content {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.adminedit-content form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.adminedit-card-container {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    width: 100%;
+}
+
+/* Card Styles */
+.adminedit-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    padding: 2.5rem 2.5rem 2rem 2.5rem;
+    height: 590px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.adminedit-details-card {
+    min-width: 540px;
+    max-width: 600px;
+    flex: 1;
+    margin-left: 70px;
+}
+
+.adminedit-team-card {
+    min-width: 340px;
+    max-width: 370px;
+}
+
+.adminedit-card form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card Header */
+.adminedit-card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.adminedit-card-header h2 {
+    flex: 1;
+    font-size: 2.2rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.adminedit-back-link {
+    color: #222;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+/* Project Details Section */
+.adminedit-details-section {
+    margin-bottom: 1.2rem;
+    overflow: hidden; /* Change from overflow-y: auto to prevent scrolling */
+}
+
+.adminedit-row {
+    font-size: 1.08rem;
+    color: #444;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: -5px;
+}
+
+.adminedit-label {
+    font-weight: 500;
+}
+
+.adminedit-value {
+    font-weight: 400;
+}
+
+.adminedit-details-section hr {
+    margin: 0.5rem 0 1.1rem 0;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Files Section */
+.adminedit-files-section {
+    background: #fafbfc;
+    border: 2px dashed #bfc7d1;
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 0.5rem; /* Reduced bottom margin */
+    overflow-y: auto;
+    height: 70px;
+}
+
+.adminedit-file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.adminedit-file-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.adminedit-remove-file {
+    color: #c00;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 1.5rem;
+    transition: color 0.2s;
+}
+
+.adminedit-remove-file:hover {
+    color: #a00;
+}
+
+/* Submit Button */
+.adminedit-submit-row {
+    display: flex;
+    justify-content: center;
+}
+
+.adminedit-submit-btn {
+    background: #363c54;
+    color: #fff;
+    border: none;
+    margin: 0 0 0 396px;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 1.15rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.adminedit-submit-btn:hover {
+    background: #23263a;
+}
+
+/* Team Section */
+.adminedit-team-card h2 {
+    font-size: 2.2rem;
+    margin-top: 0;
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.adminedit-team-section {
+    margin-bottom: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.adminedit-team-label {
+    font-style: italic;
+    margin-bottom: 5px;
+    color: #444;
+    font-size: 1.08rem;
+}
+
+.adminedit-team-manager {
+    margin-bottom: 1.2rem;
+    font-size: 1.08rem;
+    color: #222;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.5rem;
+}
+
+.adminedit-team-members-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.98rem;
+}
+
+.adminedit-team-count {
+    border-radius: 8px;
+    border: 1px solid #bfc7d1;
+    padding: 0.2rem 0.7rem;
+    font-size: 1rem;
+}
+
+.adminedit-team-count-display {
+    display: inline-block;
+    background: #f5f7fa;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.2rem 0.8rem;
+    min-width: 1.5rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.adminedit-team-list {
+    margin-top: 10px;
+    width: 100%;
+    overflow-y: auto;
+    max-height: 300px;
+    padding-right: 5px;
+}
+
+/* Form Input Styles */
+.adminedit-input {
+    font-family: inherit;
+    font-size: 1rem;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: 340px;
+    background: #fafbfc;
+    color: #222;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.adminedit-row .adminedit-input[type="date"] {
+    max-width: 170px;
+}
+
+.adminedit-team-list .adminedit-input {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+.adminedit-team-list .adminedit-input:last-child {
+    margin-bottom: 0;
+}
+
+.adminedit-details-section textarea.adminedit-input {
+    height: 144px;
+    max-width: 100%;
+    width: 100%;
+    min-height: unset;
+    resize: none;
+}
+
+/* File upload styling */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.file-upload-label {
+    font-size: 0.98rem;
+    margin-right: 10px;
+}
+
+.file-upload-btn {
+    background: #363c54;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s;
+    margin-left: 0.5rem; /* Added margin to position the button */
+}
+
+.file-upload-btn:hover {
+    background: #23263a;
+}
+
+.file-upload-btn::before {
+    content: "+";
+    margin-right: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.file-upload-btn input[type="file"] {
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
+}
+
+/* Team Section Enhancements */
+.adminedit-team-card hr {
+    margin: 0.8rem 0 1rem 0;
+    border: none;
+    border-top: 1px solid #e0e0e0;
+}
+
+.adminedit-team-list {
+    margin-top: 10px;
+    width: 100%;
+    overflow-y: auto;
+    max-height: 300px;
+    padding-right: 5px;
+}
+
+.adminedit-team-controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.adminedit-add-member-btn {
+    background: #eff2f7;
+    color: #363c54;
+    border: 1px solid #bfc7d1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.adminedit-add-member-btn:hover {
+    background: #e5e9f0;
+}
+
+.adminedit-add-member-btn .add-icon {
+    margin-right: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.adminedit-team-list .member-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.adminedit-team-list .remove-member-btn {
+    background: none;
+    color: #c00;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+
+.adminedit-team-list .remove-member-btn:hover {
+    background-color: #ffebee;
+    color: #e53935;
+}
+
+/* Reset some styles to ensure consistency */
+.adminedit-team-section .adminedit-row {
+    margin-bottom: 0;
+}
+
+.adminedit-team-section .adminedit-input {
+    margin-left: 0;
+    margin-top: 5px;
+}
+
+/* Dropdown Styles */
+.adminedit-dropdown {
+    font-family: inherit;
+    font-size: 1rem;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: auto;
+    min-width: 150px;
+    background: #fafbfc;
+    color: #222;
+    box-sizing: border-box;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+.adminedit-dropdown:focus {
+    outline: none;
+    border-color: #a1aab8;
+    box-shadow: 0 0 0 2px rgba(54, 60, 84, 0.1);
+}

@@ -1,0 +1,39 @@
+<!-- edit_admin_project.html -->
+<form method="post">
+    {% csrf_token %}
+    <label>Project Name:</label>
+    <input type="text" name="name" value="{{ project.name }}" required><br>
+    <label>Project ID:</label>
+    <input type="text" name="project_id" value="{{ project.project_id }}" required><br>
+    <label>Start Date:</label>
+    <input type="date" name="start_date" value="{{ project.start_date|date:'Y-m-d' }}" required><br>
+    <label>Finish Date:</label>
+    <input type="date" name="finish_date" value="{{ project.finish_date|date:'Y-m-d' }}" required><br>
+    <label>Status:</label>
+    <input type="text" name="project_status" value="{{ project.project_status }}" required><br>
+    <label>Manager:</label>
+    <input type="text" name="project_manager" value="{{ project.project_manager }}" required><br>
+
+    <label>Project Members:</label>
+    <div id="members">
+        {% for member in members %}
+            <input type="text" name="member_names" value="{{ member.member_name }}">
+        {% endfor %}
+        <!-- Empty field for adding a new member -->
+        <input type="text" name="member_names" placeholder="Add new member">
+    </div>
+    <button type="button" onclick="addMember()">Add Another Member</button>
+    <br>
+    <button type="submit">Save Changes</button>
+</form>
+
+<script>
+function addMember() {
+    var membersDiv = document.getElementById('members');
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'member_names';
+    input.placeholder = 'Add new member';
+    membersDiv.appendChild(input);
+}
+</script>

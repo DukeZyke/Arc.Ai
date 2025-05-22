@@ -4,6 +4,14 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+#content {
+    max-height: 100%;
+    overflow-y: auto;
+    margin-left: 350px;
+    margin-right: 100px;
+    padding-top: 100px;
+}
+
 #header {
     display: flex;
     flex-direction: column;
@@ -153,4 +161,8 @@ hr {
     font-weight: 500;
     line-height: normal;
     margin: 0;
+}
+/* ============================= */
+#logout button {
+    text-decoration: none;
 }

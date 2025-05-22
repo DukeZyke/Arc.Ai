@@ -26,13 +26,13 @@
         <div id="sidebar_cont">
             <div id="navigate">
                 <h1>Navigate</h1>
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'core:homeN' %}" class="{% if active_page == 'homeN' %}active{% endif %}">Home</a>
                 <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
                 <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
             </div>
             <div id="settings">
                 <h1>Settings</h1>
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Profile</a>
+                <a href="{% url 'core:profilepage' %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
                 <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
             </div>
         </div>
@@ -42,12 +42,14 @@
         </div>
     </div>
     
-    <div class="contentorg">
+    <div id="content">
         <section class="continue-working">
             <div class="header-with-line">
                 <h1 class="Title">Continue Working</h1>
                 <hr class="divider"/>
             </div>
+
+            {% if top_project %}
             <div class="continue-card">
                 <div>
                     <div class="under-image">
@@ -58,36 +60,53 @@
                             <img src="{% static 'Images/projlogo.png' %}" alt="Project Logo">
                         </div>
                         <div class="FileInfo">
-                            <p><strong>New Employee Onboarding System Design</strong></p>
-                            <p>Project ID: HR-2024-ONB-01</p>
-                            <p class="space">Start Date: 2024/11/10</p>
-                            <p>Finished Date: -</p>
-                            <p class="status1">Ongoing</p>
+                            <p><strong>{{top_project.name}}</strong></p>
+                            <p>Project ID: HR-2024-ONB-{{top_project.project_id}}</p>
+                            <p class="space">Start Date: {{top_project.project_start_Date}}</p>
+                            <p>Finished Date: {{ top_project.finish_date|default:"-" }}</p>
+                            <p class="status1">{{ top_project.project_status }}</p>
                         </div>
                     </div>  
                 </div>
                 <div class="project-details">
                     <h3>Description</h3>
-                    <p>Design and planning phase for a new, streamlined digital system to improve the onboarding experience for new hires.</p>
-                    <h3>Role</h3>
-                    <p>Project Manager</p>
+                    <div class="project-description-container">
+                        <p>{{top_project.project_desc}}</p>
+                    </div>
+                    <h3>Project Manager</h3>
+                    <p>{{top_project.project_manager}}
                     <h3>Team</h3>
-                    <p>John Doe, Imee Duterte, Sarah Marcos, Ginno Arostique</p>
+                    <p>
+                        {% with total=top_project.members.count %}
+                            {% for member in top_project.members.all %}
+                                {% if forloop.counter <= 3 %}
+                                    {{ member.member_name }}{% if forloop.counter < 3 and forloop.counter < total %}, {% endif %}
+                                {% elif forloop.counter == 4 %}
+                                    and {{ total|add:"-3" }} others
+                                {% endif %}
+                            {% empty %}
+                                No members assigned.
+                            {% endfor %}
+                        {% endwith %}
+                    </p>
                     <div class="details-row">
                         <div>
-                            <h3>Total Hours Spent</h3>
-                            <p>32Hrs</p>
+                            <h3>Start Date</h3>
+                            <p>{{ top_project.start_date|default:"-" }}</p>
                         </div>
                         <div>
                             <h3>Deadline</h3>
-                            <p>2024/11/24</p>
+                            <p>{{ top_project.finish_date|default:"-" }}</p>
                         </div>
                         <div>
-                            <button class="continue-btn">Continue</button>
+                            <!-- <button class="continue-btn">Continue</button> -->
                         </div>
                     </div>
                 </div>
             </div>
+            {% else %}
+            <p>No projects available.</p>
+            {% endif %}
         </section>
     
         <section class="other-projects">
@@ -202,7 +221,7 @@
                 <button class="nav-btn" id="next-week">&gt;</button>
             </div>
         </section>
-</div> 
+    </div> 
     <script src="{% static 'js/org.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
 </body>

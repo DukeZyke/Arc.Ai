@@ -108,11 +108,10 @@
 
 label {
     position: absolute;
-    top: -10px;
+    top: auto;
     left: 0;
     font-size: 14px;
-    color: #555;
-    background: #fff;
+    color: #555; 
     padding: 0 5px;
 }
 
@@ -186,6 +185,9 @@ button:hover {
 
 .margin-top-50 {
     margin-top: 50px;
+    text-decoration: none;
+    color: #353A56;
+    border-bottom: 2px solid black;
 }
 .continue_with_button span {
     flex-grow: 1;

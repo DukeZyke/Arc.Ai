@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin-Project Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/adminstyles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/adminedit.css' %}">
+</head>
+<body>
+
+<div id="sidebar">
+    <div id="sidebar_content" class="hidden">
+        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:home' %}">Projects</a></p>
+        <p><a href="{% url 'core:organization' %}">Files</a></p>
+    </div>
+    <hr class="divider_sidebar"/>
+
+    <div class="notification_container">
+    <!-- Notification Pop-Up -->
+    <div id="notification_popup" class="hidden">
+        <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
+        <div id="notification_list">
+            <ul>
+                <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                    <div class="title-and-date">
+                        <p>Schedule Update</p>
+                        <span>Yesterday</span>
+                    </div>
+                    <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 2023</p>
+                    <p class="posted-by">- Imee Duterte</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Detailed Notification -->
+    <div id="detailed_notification" class="hidden">
+        <h2 id="notification_title">Schedule Update</h2>
+        <p class="notification_date">Yesterday, January 29, 2025</p>
+        <button id="close_detailed_notification" class="close-btn">&times;</button>
+        <p id="notification_detail"></p>
+        <p class="posted-by">- Imee Duterte, Team Head</p>
+        <button class="respond-btn">Respond</button>
+    </div>
+    </div>
+
+    <div id="sidebar_icns_grp">
+        <div class="nav_item">
+            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <p id="navigation_paragraph">Navigate</p>
+        </div>
+    </div>
+</div>
+
+    <div id="header">
+        <div>
+            <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+        </div>
+    <div id="header_nav" class="text_white">
+        <p><a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
+        <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
+        <p><a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+    </div>
+        <div>
+            <button class="logout">Log out</button>
+        </div>
+    </div>
+
+    <!-- Page Content Start -->
+    <div class="adminedit-content">
+        <form method="post" action="{% url 'core:admin_edit_project_details' project.id %}">
+        {% csrf_token %}
+            <div class="adminedit-card-container">
+                <!-- Edit Project Details Card -->
+                <div class="adminedit-card adminedit-details-card">
+                    <div class="adminedit-card-header">
+                        <h2>Edit Project Details</h2>
+                        <a href="{% url 'core:admin_project_page' %}" class="adminedit-back-link">&#8592; Back</a>
+                    </div>
+                    <div class="adminedit-details-section">
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_name">Project Name:</label>
+                            <input id="project_name" name="name" class="adminedit-input" type="text" value="{{project.name}}">
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_desc">Project Description:</label>
+                            <textarea id="project_desc" name="project_desc" class="adminedit-input" rows="2">{{ project.project_desc }}</textarea>
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="start_date">Start Date:</label>
+                            <input id="start_date" name="start_date" class="adminedit-input" type="date" value="{{ project.start_date|date:'Y-m-d' }}">
+                            <label class="adminedit-label" style="margin-left:2rem;" for="deadline">Deadline:</label>
+                            <input id="deadline" name="finish_date" class="adminedit-input" type="date" value="{{ project.finish_date|date:'Y-m-d' }}">
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_status">Status:</label>
+                            <select id="project_status" name="project_status" class="adminedit-dropdown">
+                                <option value="Complete" {% if project.project_status == "Complete" %}selected{% endif %}>Complete</option>
+                                <option value="Ongoing" {% if project.project_status == "Ongoing" %}selected{% endif %}>Ongoing</option>
+                                <option value="Missing" {% if project.project_status == "Missing" %}selected{% endif %}>Missing</option>
+                            </select>
+                        </div>
+                        <hr>
+                        <div class="adminedit-row">
+                            <label class="adminedit-label" for="project_manager">Manager:</label>
+                            <input id="project_manager" name="project_manager" class="adminedit-input" type="text" value="{{ project.project_manager }}">
+                        </div>
+                    </div>
+                    <div class="adminedit-files-section">
+                        <ul class="adminedit-file-list">
+                            <li>
+                                <span>Document 1.docx</span>
+                                <span class="adminedit-remove-file" title="Remove">&#10006;</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="file-upload-wrapper">
+                        <label for="add_file" class="file-upload-label"></label>
+                        <label class="file-upload-btn">
+                            Add File
+                            <input type="file" id="add_file" name="add_file" multiple>
+                        </label>
+                        <div class="adminedit-submit-row">
+                        <button class="adminedit-submit-btn" type="submit">Save</button>
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- Project Team Card -->
+                <div class="adminedit-card adminedit-team-card">
+                    <div class="adminedit-card-header">
+                        <h2>Project Team</h2>
+                    </div>
+                    <div class="adminedit-team-section">
+                        <div class="adminedit-row">
+                            <div class="adminedit-team-label">Project Manager</div>
+                            <input type="text" class="adminedit-input" name="manager_name" value="{{project.project_manager}}" placeholder="Project Manager Name">
+                        </div>
+                        <hr>
+                        <div class="adminedit-team-members-row">
+                            <span class="adminedit-team-label">Project Team</span>
+                            <div>
+                                Team Members: 
+                                <span id="team_count_display" class="adminedit-team-count-display">5</span>
+                                <input type="hidden" name="team_count" id="team_count" value="5">
+                            </div>
+                        </div>
+                        <div class="adminedit-team-list" id="members">
+                            {% for member in members %}
+                                <div class="member-row">
+                                    <input type="text" name="member_names" class="adminedit-input" value="{{ member.member_name }}">
+                                    <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
+                                </div>
+                            {% endfor %}
+                            <div class="member-row">
+                                <input type="text" name="member_names" class="adminedit-input" placeholder="Add new member">
+                                <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
+                            </div>
+                        </div>
+                        <div class="adminedit-team-controls">
+                            <button type="button" class="adminedit-add-member-btn" id="add_member_btn">
+                                <span class="add-icon-circle">+</span>
+                                <span>Add Team Member</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- Page Content End -->
+
+    <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="{% static 'js/adminedit.js' %}"></script>
+</body>
+</html>

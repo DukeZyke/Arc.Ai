@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
+from django.contrib.auth.models import User
+
 
 class Email(models.Model):
     sender_name = models.CharField(max_length=100)
@@ -11,12 +13,6 @@ class Email(models.Model):
     def __str__(self):
         return self.title
     
-class Project(models.Model):
-    name = models.CharField(max_length=100)
-    project_id = models.CharField(max_length=20, unique=True, blank=True)
-    start_date = models.DateField(max_length=20)
-    finish_date = models.DateField(max_length=20)
-    project_status = models.CharField(max_length=50)
 
     def save(self, *args, **kwargs):
         if not self.project_id:
@@ -34,11 +30,6 @@ class Project(models.Model):
         super().save(*args, **kwargs)
 
 class PersonalInformation(models.Model):
-    # signup_details = models.OneToOneField(
-    #     'SignupDetails', 
-    #     on_delete=models.CASCADE, 
-    #     related_name='personal_information'
-    # )
     name = models.CharField(max_length=100, default='Enter your name')
     email = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
@@ -47,6 +38,10 @@ class PersonalInformation(models.Model):
     birth_date = models.DateField(max_length=20)
     gender = models.CharField(max_length=10)
     user_title = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+    
 
 class EmployeeAward(models.Model):
     award_classif = models.CharField(max_length=100)
@@ -68,9 +63,20 @@ class EmployeeAward(models.Model):
         return f'{self.award_title} ({self.award_date})'
 
 class DriveFile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drive_files')
     name = models.CharField(max_length=255)
     file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class DriveFolder(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drive_folders')
+    name = models.CharField(max_length=255)
+    folder_id = models.CharField(max_length=255, db_index=True)
+    parent_folder_id = models.CharField(max_length=255, blank=True, null=True)  # For folder hierarchy
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.name} ({self.user.username})"
 
 class SignupDetails(models.Model):
     profile_avatar = models.ImageField(upload_to='avatars/')
@@ -91,3 +97,65 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 # =======================================================
+
+
+
+
+
+
+
+# PRACTICE TEMPLATES =================================================
+
+class UserProfile(models.Model):
+    email = models.EmailField(unique=True)
+    address = models.CharField(max_length=120, default=None)
+    password = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f"{self.email} ({self.address})"
+
+class EditProfile(models.Model):
+    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    new_email = models.EmailField()
+    new_address = models.CharField(max_length=120, default=None)
+
+    def __str__(self):
+        return f"Edit {self.user.email} to {self.new_email}\n Edit {self.user.address} to {self.new_address}"
+        
+
+# PRACTICE TEMPLATES =================================================
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    project_desc = models.CharField(max_length=100, blank=True, default='No description provided')
+    project_id = models.CharField(max_length=20, unique=True, blank=True)
+    start_date = models.DateField(max_length=20)
+    finish_date = models.DateField(max_length=20)
+    project_status = models.CharField(max_length=50)
+    project_manager = models.CharField(max_length=100)
+    
+
+    def __str__(self):
+        return f"{self.name} {self.project_id}"
+    
+class ProjectMember(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')
+    member_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.member_name} ({self.project.name})"
+    
+
+    
+# class CreateProject(models.Model):
+#     project = models.OneToOneField(Project, on_delete=models.CASCADE) 
+#     project_members = super(Project.project_members)
+
+#     for members in project_members:
+#         member_names = models.CharField(max_length=200)
+
+# class EditProject(models.Model):
+#     project = models.OneToOneField(Project, on_delete=models.CASCADE)
+
+

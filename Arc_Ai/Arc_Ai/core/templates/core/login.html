@@ -12,13 +12,19 @@
     <link rel="stylesheet" href="{% static 'styles/login.css' %}?v=1.0">
 </head>
 <body>
+
+      {% if user.is_authenticated %}
+        <script>
+            window.location.href = "{% url 'core:homeN' %}";
+        </script>
+      {% endif %}
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">
                 <h1 class="titles" style="margin-bottom: 12px;">Sign In</h1>
 
                 {% for message in messages %}
-                <h5 style="color: red; margin: 0 0 12px 0;">{{message}}</h5>
+                <h5 style="color: red; margin: auto;">{{message}}</h5>
                 {% endfor %}
 
                 <form id="form" method="post" action="{% url 'core:login' %}">
@@ -95,6 +101,24 @@
       }
     }, {scope: 'public_profile,email'});
   }
+
+  function preventBackToLogin() {
+      // This replaces the current history entry with this same page
+      // This makes the back button skip the login page in history
+      window.history.pushState(null, "", window.location.href);
+      
+      // When user clicks back button, push another state to prevent going back
+      window.onpopstate = function() {
+          window.history.pushState(null, "", window.location.href);
+      };
+  }
+
+  // Run the function when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+      preventBackToLogin();
+  });
+
+
 </script>
 
 </body>
