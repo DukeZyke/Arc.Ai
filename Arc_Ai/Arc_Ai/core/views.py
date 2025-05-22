@@ -239,7 +239,7 @@ def admin_files_page(request):
                 # Add user data with their files and folders
                 user_files_data.append({
                     'user': {
-                        'id': user.id,
+                        'id': user.username,
                         'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
                         'email': user.email,
                         'avatar': avatar,
@@ -654,12 +654,19 @@ def saved(request):
             pageSize=20,
             fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
         ).execute()
+        
 
         trash_files = trashed_results.get('files', [])
+
+        # Get all drive files from database for mapping to their uploaders
+        db_files = DriveFile.objects.select_related('user').all()
+        file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
+
     # Add metadata for each file
         for file in drive_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User") 
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
@@ -668,6 +675,7 @@ def saved(request):
         for file in trash_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User")
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
@@ -961,7 +969,7 @@ def view_folder_contents(request, folder_id):
 
         drive_files = file_results.get('files', [])
         
-        # Fetch trashed files - ADD THIS BLOCK
+        # Fetch trashed files
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
@@ -970,10 +978,15 @@ def view_folder_contents(request, folder_id):
 
         trash_files = trashed_results.get('files', [])
 
-        # Add this to your view_folder_contents function after fetching files
+        # Get all drive files from database for mapping to their uploaders
+        db_files = DriveFile.objects.select_related('user').all()
+        file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
+        
+        # Add metadata for files including uploader
         for file in drive_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User")
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
@@ -983,6 +996,7 @@ def view_folder_contents(request, folder_id):
         for file in trash_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User")
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
