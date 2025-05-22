@@ -88,8 +88,8 @@ class SignupDetails(models.Model):
     contact_number = models.CharField(max_length=255)
     age = models.CharField(max_length=3)
     gender = models.CharField(max_length=255)
-    position = models.CharField(max_length=100)
-    department = models.CharField(max_length=100)
+    position = models.CharField(max_length=100, default="No position yet")
+    department = models.CharField(max_length=100, default="No position yet")
     
 # For notification sidebar Popup TEST
 class Notification(models.Model):

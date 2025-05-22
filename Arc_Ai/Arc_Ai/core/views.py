@@ -26,6 +26,9 @@ from googleapiclient.http import MediaIoBaseUpload
 import io
 from io import BytesIO
 from googleapiclient.errors import HttpError
+from django.contrib.auth.decorators import login_required
+
+
 
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(settings.BASE_DIR, 'secret', 'client_secret.json')
 
@@ -41,8 +44,36 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 
-def admin_create_project_details(request):
-    return render(request, 'core/admin_create_project_details.html')
+@login_required
+def create_project_details(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('project_desc')
+        start_date = request.POST.get('start_date')
+        finish_date = request.POST.get('finish_date')
+        status = request.POST.get('project_status')
+        project_manager = request.POST.get('project_manager')
+        member_names = request.POST.getlist('member_names')
+
+        # Create project
+        project = Project.objects.create(
+            name=name,
+            project_desc=description,
+            start_date=start_date,
+            finish_date=finish_date,
+            project_status=status,
+            project_manager=project_manager
+        )
+
+        # Create project members (assuming you have a related model)
+        for member_name in member_names:
+            if member_name.strip():
+                ProjectMember.objects.create(project=project, member_name=member_name)
+
+        return redirect('core:admin_project_page')  # replace with your actual project list view name
+
+    return render(request, 'core/create_project_details.html')
+
 
 def user_involved_map(request):
     return render(request, 'core/user_involved_map.html')
@@ -342,26 +373,6 @@ def delete_project(request, project_id):
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
-def admin_create_project(request):
-    if request.method == 'POST':
-        # ... get other fields ...
-        name = request.POST.get('name')
-        project_id = request.POSt.get('project_id')
-        start_date = request.POST.get('start_date')
-        finish_date = request.POST.get('finish_date')
-        project_status = request.POST.get('project_status')
-        project_manager = request.POST.get('project_manager')
-
-        project = Project.objects.create(
-            name=name,
-            project_id=project_id,
-            start_date=start_date,
-            finish_date=finish_date,
-            project_status=project_status,
-            project_manager=project_manager
-        )
-        return redirect('core:admin_project_page')
-    return render(request, 'core/admin_create_project.html')
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
@@ -369,7 +380,7 @@ def admin_create_project(request):
 
 
 
-from django.contrib.auth.decorators import login_required
+
 
 @login_required
 def signup_details(request):
