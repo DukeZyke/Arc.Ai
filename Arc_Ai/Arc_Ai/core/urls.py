@@ -16,6 +16,7 @@ urlpatterns = [
     path('admin_project_page/', views.admin_project_page, name='admin_project_page'),
     path('admin_edit_project_details/', views.admin_edit_project_details, name='admin_edit_project_details'),
     path('admin_create_project_details/', views.admin_create_project_details, name='admin_create_project_details'),
+    path('admin_create_project/', views.admin_create_project, name='admin_create_project'),
 
     path('admin_users_page/', views.admin_users_page, name='admin_users_page'),
     path('home/', views.home, name='home'),
@@ -23,7 +24,7 @@ urlpatterns = [
     path('api/users-for-map/', views.get_users_for_map, name='get_users_for_map'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/<int:pk>/', views.profilepage, name='profilepage'),
-    path('edit_user_profile', views.edit_user_profile, name='edit_user_profile'),
+    path('edit_user_profile/<int:pk>/', views.edit_user_profile, name='edit_user_profile'),
     path('admin_login/', views.admin_login, name='admin_login'),
     path('admin_signup/', views.admin_signup, name='admin_signup'),
     path('admin_files_page/', views.admin_files_page, name='admin_files_page'),

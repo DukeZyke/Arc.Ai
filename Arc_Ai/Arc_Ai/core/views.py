@@ -40,6 +40,7 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 # This is for local development only. In production, use HTTPS.
 
 
+
 def admin_create_project_details(request):
     return render(request, 'core/admin_create_project_details.html')
 
@@ -341,7 +342,7 @@ def delete_project(request, project_id):
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
-def create_project(request):
+def admin_create_project(request):
     if request.method == 'POST':
         # ... get other fields ...
         name = request.POST.get('name')
@@ -360,7 +361,7 @@ def create_project(request):
             project_manager=project_manager
         )
         return redirect('core:admin_project_page')
-    return render(request, 'core/create_project.html')
+    return render(request, 'core/admin_create_project.html')
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
@@ -440,8 +441,8 @@ def logout_view(request):
     return redirect('core:login')
 
 def login(request):
-    # if request.user.is_authenticated:
-    #     return redirect('core:home')  # Already logged in, go to home
+    if request.user.is_authenticated:
+        return redirect('core:home')  # Already logged in, go to home
         
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -573,7 +574,7 @@ class CustomSignupView(SignupView):
         # Add any custom logic here if needed
         return super().get(*args, **kwargs)
 
-def home(request):
+def home(request,):
     return render(request, 'core/home.html')
 
 def organization(request):

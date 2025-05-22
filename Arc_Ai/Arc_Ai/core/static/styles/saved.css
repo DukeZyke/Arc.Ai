@@ -1,10 +1,4 @@
-#content {
-    max-height: 100%;
-    overflow-y: auto;
-    margin-left: 150px;
-    margin-right: 70px;
-    font-family: 'Inter', sans-serif;
-}
+
 
 #folder_items {
     display: grid;

@@ -106,7 +106,7 @@ class Notification(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
-    project_desc = models.CharField(max_length=100, blank=True)
+    project_desc = models.CharField(max_length=100, blank=True, default='No description provided')
     project_id = models.CharField(max_length=20, unique=True, blank=True)
     start_date = models.DateField(max_length=20)
     finish_date = models.DateField(max_length=20)
