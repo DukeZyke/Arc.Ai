@@ -6,7 +6,6 @@ body {
 
 /* Responsive scaling for different display settings */
 html {
-    zoom: 1;
     -ms-text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
@@ -226,41 +225,27 @@ button:hover {
 @media screen and (-webkit-min-device-pixel-ratio: 1.25), 
        screen and (min-resolution: 120dpi) {
     html {
-        zoom: 0.8; /* Counteract 125% scaling */
-    }
-    
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
+        /* Remove zoom property */
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
     }
     
     #login_cntr {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        transform: scale(0.8);
+        width: 100vw;
+        height: 100vh;
+        position: static; /* Remove absolute positioning */
+        top: auto;
+        left: auto;
+        transform-origin: center center;
     }
     
     #container {
+        position: relative;
         max-width: 750px;
-        width: 90%;
-        height: auto;
-        min-height: 500px;
+        width: 750px; /* Fixed width */
+        height: 500px; /* Fixed height */
         margin: 0 auto;
-    }
-    
-    #logo_container {
-        max-width: 400px;
-        width: 50%;
-        height: auto;
-        min-height: 500px;
     }
 }
 
