@@ -82,6 +82,7 @@ class DriveFolder(models.Model):
 
 class SignupDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
+    # profile_avatar_id = models.IntegerField(default=1)  # Save avatar as id (1-15)
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -92,9 +93,9 @@ class SignupDetails(models.Model):
     position = models.CharField(max_length=100, default="No position yet")
     department = models.CharField(max_length=100, default="No position yet")
 
-    @property
-    def avatar_url(self):
-        return f'/static/Images/Profile{self.profile_avatar_id}.png'
+    # @property
+    # def avatar_url(self):
+    #     return f'/static/Images/Profile{self.profile_avatar_id}.png'
 
     
 # For notification sidebar Popup TEST

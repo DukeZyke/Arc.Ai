@@ -398,12 +398,12 @@ def signup_details(request):
         contact_number = request.POST.get('contact_number')
         age = request.POST.get('age')
         gender = request.POST.get('gender')
+        # profile_avatar_id = request.POST.get('profile_avatar_id')
         
         # Create or update SignupDetails for the logged-in user
         signup_details, created = SignupDetails.objects.update_or_create(
             user=request.user,
             defaults={
-                'profile_avatar_id': int(profile_avatar_id),
                 'first_name': first_name,
                 'middle_name': middle_name,
                 'last_name': last_name,
