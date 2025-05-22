@@ -32,61 +32,9 @@
             <div id="settings">
                 <h1>Settings</h1>
                 <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
+                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
             </div>
         </div>
-<<<<<<< HEAD
-        <div id="content">
-                <div id="cont">
-                    <div id="MainProfile">
-                        {% if signup_details %}
-                        <img src="{{ signup_details.avatar_url }}" alt="User avatar" class="Avatar"/>
-                        <div id="userInfo">
-                            <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|default_if_none:""|slice:"1" }}. {{ signup_details.last_name }}</h1>
-                            <h2>{{user.email}}</h2>
-                            <h2>{{signup_details.position}}</h2>
-                        </div>
-                        <div id="setting">
-                            <a href="{% url 'core:edit_user_profile' user.pk %}">
-                                <img src="{% static 'Images/Settings.png' %}" alt="Settings Icon">
-                            </a>
-                        </div>
-                        <div id="vline"></div>
-                        <div id="personalInfo">
-                            <div id="header-with-line">
-                                <h1>Personal Information</h1>
-                                <hr>
-                            </div>
-                            <div class="info-grid">
-        
-                                <div class="info">
-                                    <span class="label">Email:</span>
-                                    <span class="value">{{user.email}}</span>
-                                </div>
-                                <div class="info">
-                                    <span class="label">Address:</span>
-                                    <span class="value">{{signup_details.complete_address}}</span>
-                                </div>
-                                <div class="info">
-                                    <span class="label">Contact Number:</span>
-                                    <span class="value">{{signup_details.contact_number}}</span>
-                                </div>
-                                <div class="info">
-                                    <span class="label">Age:</span>
-                                    <span class="value">{{signup_details.age}}</span>
-                                </div>
-                                <div class="info">
-                                    <span class="label">Birth Date:</span>
-                                    <span class="value">{{signup_details.birth_date}}</span>
-                                </div>
-                                <div class="info">
-                                    <span class="label">Gender:</span>
-                                    <span class="value">{{signup_details.gender}}</span>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-=======
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="logout">
@@ -104,7 +52,6 @@
                         <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>
                         <h2>{{user.email}}</h2>
                         <h2>{{signup_details.position}}</h2>
->>>>>>> ceaab28c6a30babf2ce7c74247c61b15c9a2c3fa
                     </div>
                     <div id="setting">
                         <a href="{% url 'core:edit_user_profile' user.pk %}">

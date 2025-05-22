@@ -37,7 +37,7 @@
                 {% else %}
                     <a href="{% url 'core:login' %}">Login</a>
                 {% endif %}
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
+                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
             </div>
         </div>
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
