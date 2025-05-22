@@ -39,92 +39,7 @@ ROOT_FOLDER_ID = '1wdS3rmcuuiZ-mr2aH7SfYSTAF6Uvlv5z'
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 # This is for local development only. In production, use HTTPS.
 
-#[PRACTICE TEMPLATES] ====================================================================
-from .models import UserProfile
 
-def practice(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        address = request.POST.get('address')
-
-        if UserProfile.objects.filter(email=email).exists():
-            return render(request, 'core/practice.html', {
-                'error': 'Email already exists. Please use a different email.'
-            })
-
-        UserProfile.objects.create(
-            email=email,
-            address=address,
-            password=password
-        )
-
-        # Store email and address in session
-        request.session['current_email'] = email
-        request.session['current_address'] = address
-
-        return redirect('core:practice1')  # redirect after POST (best practice)
-
-    return render(request, 'core/practice.html')
-
-from .models import EditProfile
-
-def practice1(request):
-    # Get defaults from session
-    current_email = request.session.get('current_email', '')
-    current_address = request.session.get('current_address', '')
-
-    if request.method == 'POST':
-        # Use session values if not provided in POST (for first load, use session)
-        current_email = request.POST.get('current_email', current_email)
-        new_email = request.POST.get('new_email')
-        current_address = request.POST.get('current_address', current_address)
-        new_address = request.POST.get('new_address')
-
-        if not (current_email and new_email and current_address and new_address):
-            return render(request, 'core/practice1.html', {
-                'error': 'All fields are required.',
-                'current_email': current_email,
-                'current_address': current_address
-            })
-
-        if UserProfile.objects.filter(email=new_email).exclude(email=current_email).exists():
-            return render(request, 'core/practice1.html', {
-                'error': 'New email already exists.',
-                'current_email': current_email,
-                'current_address': current_address
-            })
-
-        try:
-            user = UserProfile.objects.get(email=current_email, address=current_address)
-            EditProfile.objects.update_or_create(
-                user=user,
-                defaults={'new_email': new_email, 'new_address': new_address}
-            )
-            user.email = new_email
-            user.address = new_address
-            user.save()
-            # Update session to new values
-            request.session['current_email'] = new_email
-            request.session['current_address'] = new_address
-            return render(request, 'core/practice1.html', {
-                'success': 'Email and Address updated!',
-                'current_email': new_email,
-                'current_address': new_address
-            })
-        except UserProfile.DoesNotExist:
-            return render(request, 'core/practice1.html', {
-                'error': 'User not found.',
-                'current_email': current_email,
-                'current_address': current_address
-            })
-
-    return render(request, 'core/practice1.html', {
-        'current_email': current_email,
-        'current_address': current_address
-    })
-
-#[PRACTICE TEMPLATES] ====================================================================\
 
 def admin_create_project_details(request):
     return render(request, 'core/admin_create_project_details.html')
@@ -132,8 +47,48 @@ def admin_create_project_details(request):
 def user_involved_map(request):
     return render(request, 'core/user_involved_map.html')
 
-def edit_user_profile(request):
-    return render(request, 'core/edit_user_profile.html')
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, render, redirect
+from .models import SignupDetails  # Make sure you have this
+
+@login_required
+def edit_user_profile(request, pk):
+    user = get_object_or_404(User, pk=pk)
+
+    try:
+        signup_details = SignupDetails.objects.get(user=user)
+    except SignupDetails.DoesNotExist:
+        signup_details = SignupDetails(user=user)  # Create if missing
+
+    if request.method == 'POST':
+        # Update User model
+        user.email = request.POST.get('email')
+        user.save()
+
+        # Update SignupDetails
+        signup_details.first_name = request.POST.get('first_name')
+        signup_details.middle_name = request.POST.get('middle_name')
+        signup_details.last_name = request.POST.get('last_name')
+        signup_details.complete_address = request.POST.get('complete_address')
+        signup_details.contact_number = request.POST.get('contact_number')
+        signup_details.age = request.POST.get('age')
+        signup_details.gender = request.POST.get('gender')
+        signup_details.position = request.POST.get('position')
+        signup_details.department = request.POST.get('department')
+
+        if 'profile_avatar' in request.FILES:
+            signup_details.profile_avatar = request.FILES['profile_avatar']
+
+        signup_details.save()
+
+        return redirect('core:profilepage', pk=user.pk)  # Adjust to your actual view name
+
+    return render(request, 'core/edit_user_profile.html', {
+        'signup_details': signup_details,
+        'user': user,
+    })
+
 
 def admin_files_page(request):
     # Check admin privileges
@@ -283,7 +238,7 @@ def admin_files_page(request):
             
             user_files_data.append({
                 'user': {
-                    'id': user.id,
+                    'id': user.username,
                     'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
                     'email': user.email,
                     'avatar': 'Images/Profile3.png',
@@ -302,7 +257,8 @@ def admin_files_page(request):
         'total_files': total_files,
         'total_folders': total_folders,
         'total_size': f"{total_size / (1024 * 1024):.2f} MB",
-        'active_page': 'files'  # For highlighting the current page in navigation
+        'active_page': 'files',  # For highlighting the current page in navigation
+        'signup_details': signup_details
     })
 
 def admin_project_page(request):
@@ -335,9 +291,7 @@ def admin_users_page(request):
         'total_users': users.count(),
         'active_users': active_users,
     })
-    
-def admin_edit_project_details(request):
-    return render(request, 'core/admin_edit_project_details.html')
+
 
 # =================================== FOR EDITING OF PROJECTS ===================================
 
@@ -388,7 +342,7 @@ def delete_project(request, project_id):
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
-def create_project(request):
+def admin_create_project(request):
     if request.method == 'POST':
         # ... get other fields ...
         name = request.POST.get('name')
@@ -407,7 +361,7 @@ def create_project(request):
             project_manager=project_manager
         )
         return redirect('core:admin_project_page')
-    return render(request, 'core/create_project.html')
+    return render(request, 'core/admin_create_project.html')
 
 # =================================== FOR CREATION OF PROJECTS ===================================
 
@@ -415,7 +369,14 @@ def create_project(request):
 
 
 
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def signup_details(request):
+
+    if SignupDetails.objects.filter(user=request.user).exists():
+        return redirect('core:profilepage', pk=request.user.pk)
+
     if request.method == 'POST':
         profile_avatar = request.FILES.get('profile_avatar')
         first_name = request.POST.get('first_name')
@@ -423,29 +384,43 @@ def signup_details(request):
         last_name = request.POST.get('last_name')
         complete_address = request.POST.get('complete_address')
         contact_number = request.POST.get('contact_number')
+        age = request.POST.get('age')
         gender = request.POST.get('gender')
+        
 
-        # Create SignupDetails instance
-        signup_details = SignupDetails.objects.create(
-            profile_avatar=profile_avatar,
-            first_name=first_name,
-            middle_name=middle_name,
-            last_name=last_name,
-            complete_address=complete_address,
-            contact_number=contact_number,
-            gender=gender
+
+        # Create or update SignupDetails for the logged-in user
+        signup_details, created = SignupDetails.objects.update_or_create(
+            user=request.user,
+            defaults={
+                'profile_avatar': profile_avatar,
+                'first_name': first_name,
+                'middle_name': middle_name,
+                'last_name': last_name,
+                'complete_address': complete_address,
+                'contact_number': contact_number,
+                'age': age,
+                'gender': gender,
+            }
         )
 
         messages.info(request, "Profile details saved successfully!")
-        return redirect('core:home')
+        return redirect('core:profilepage', pk=request.user.pk)
 
     return render(request, 'core/signup_details.html', {
-        'range': range(1, 16)  # Pass numbers 1 to 15 to the template
+        'range': range(1, 16)
     })
 
 
+@login_required 
+def profilepage(request, pk):
+    signup_details = None
+    if request.user.is_authenticated:
+        try:
+            signup_details = request.user.signup_details
+        except SignupDetails.DoesNotExist:
+            signup_details = None
 
-def profilepage(request):
     projects = Project.objects.all()
     employee_awards = EmployeeAward.objects.all()
     personal_information = PersonalInformation.objects.first()
@@ -454,6 +429,7 @@ def profilepage(request):
         'projects': projects,
         'personal_information': personal_information,
         'employee_awards': employee_awards,
+        'signup_details': signup_details,
     })
 
 def landingpage(request):
@@ -481,7 +457,7 @@ def login(request):
                 auth_login(request, user)
                 
                 # Set no-cache headers to prevent back button issues
-                response = redirect('core:home')
+                response = redirect('core:signup_details')  # <-- Redirect here
                 response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
                 response['Pragma'] = 'no-cache'
                 response['Expires'] = '0'
@@ -598,7 +574,7 @@ class CustomSignupView(SignupView):
         # Add any custom logic here if needed
         return super().get(*args, **kwargs)
 
-def home(request):
+def home(request,):
     return render(request, 'core/home.html')
 
 def organization(request):

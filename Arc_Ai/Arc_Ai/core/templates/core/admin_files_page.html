@@ -14,7 +14,7 @@
 <body>
     <div id="sidebar">
     <div id="sidebar_content" class="hidden">
-        <p><a href="{% url 'core:profilepage' %}">Users</a></p>
+        <p><a href="{% url 'core:profilepage' request.user.pk %}">Users</a></p>
         <p><a href="{% url 'core:home' %}">Projects</a></p>
         <p><a href="{% url 'core:organization' %}">Files</a></p>
     </div>
@@ -100,10 +100,12 @@
             <div class="user-name">{{ user_data.user.name }}</div>
             <div class="user-email">({{ user_data.user.email }})</div>
         </div>
+        {% if signup_details %}
         <div class="job-info">
-            <div class="department">Department: {{ user_data.user.department }}</div>
-            <div class="position">Position: {{ user_data.user.position }}</div>
+            <div class="department">Department: {{ signup_details.department }}</div>
+            <div class="position">Position: {{ signup_details.position }}</div>
         </div>
+        {% endif %}
         <div class="file-info">
             <div class="files">Total Files: {{ user_data.file_count }}</div>
             <div class="Folders">Total Folders: {{ user_data.folder_count }}</div>

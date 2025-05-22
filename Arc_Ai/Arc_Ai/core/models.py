@@ -79,13 +79,17 @@ class DriveFolder(models.Model):
         return f"{self.name} ({self.user.username})"
 
 class SignupDetails(models.Model):
-    profile_avatar = models.ImageField(upload_to='avatars/')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
+    profile_avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     complete_address = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=255)
+    age = models.CharField(max_length=3)
     gender = models.CharField(max_length=255)
+    position = models.CharField(max_length=100)
+    department = models.CharField(max_length=100)
     
 # For notification sidebar Popup TEST
 class Notification(models.Model):
@@ -96,39 +100,13 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
-# =======================================================
 
 
-
-
-
-
-
-# PRACTICE TEMPLATES =================================================
-
-class UserProfile(models.Model):
-    email = models.EmailField(unique=True)
-    address = models.CharField(max_length=120, default=None)
-    password = models.CharField(max_length=120)
-
-    def __str__(self):
-        return f"{self.email} ({self.address})"
-
-class EditProfile(models.Model):
-    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    new_email = models.EmailField()
-    new_address = models.CharField(max_length=120, default=None)
-
-    def __str__(self):
-        return f"Edit {self.user.email} to {self.new_email}\n Edit {self.user.address} to {self.new_address}"
-        
-
-# PRACTICE TEMPLATES =================================================
 
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
-    project_desc = models.CharField(max_length=100, blank=True)
+    project_desc = models.CharField(max_length=100, blank=True, default='No description provided')
     project_id = models.CharField(max_length=20, unique=True, blank=True)
     start_date = models.DateField(max_length=20)
     finish_date = models.DateField(max_length=20)

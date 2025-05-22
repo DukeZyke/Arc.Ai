@@ -7,146 +7,136 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Landing Page</title>
   <link rel="stylesheet" href="{% static 'styles/landingpage.css' %}?v=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class ="logo">
-            <img src="{% static 'Images/Logo.png' %}" alt ="Site Icon" class="arclogo"/>
-        </div>
-        <nav>
-            <a href="#about">About Us</a>
-            <a href="{% url 'core:login' %}">Log In</a>
-            <button class="Get-started">Get Started</button>
-        </nav>
-    </header>
-    <div class="hero-divider"></div>
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Welcome to <span class="brand">Arc.ai</span></h1>
-      <p class="subtitle">Designed for Organizations.<br>Built for Scale. Secured by Roles.</p>
-      <p class="description">
-        Arc.ai emphasizes hierarchical access control and role-based permissions to streamline the way documents are stored, shared, and collaborated on within professional environments. It replaces traditional email chains and scattered cloud drives with a unified platform for structured file flow and collaboration.
-      </p>
-      <div class="signUp">
-        <a href="{% url 'core:signup' %}" class="signup-btn">Sign Up </a>
-    </div>
-    </div>
-    <div class="hero-image">
-      <img src="{% static 'Images/Group-image.png' %}" alt="Arc.ai illustration" />
-    </div>
-  </section>
+  <div id="header" class="text_style">
+    <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+    <div id="header_nav" class="text_white">
+      <div id="text">
+        <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">About Us</a>
+        <a href="{% url 'core:login' %}" class="{% if active_page == 'login' %}active{% endif %}">Login</a>
+      </div>
+      <button>
+        <a href="{% url 'core:signup' %}" class="text_white">Get Started</a>
+      </button>
+    </div> 
+  </div>
 
-    <div class="hero-divider"></div>
-  <section class="features">
-    <p class="features-intro">Arc.ai supports your organization in every core aspect</p>
-    <div class="features-grid">
-      <div class="feature-box">
-        <img src="{% static 'Images/Data.png' %}" alt="Folder Icon" class="feature-icon" />
-        <h3>Data and File Repository</h3>
-        <p>
-          A centralized, scalable file system for all departments and teams—structured for clarity, discoverability, and access control.
-        </p>
+  <div id="sec1">
+    <div id="sec1_main">
+      <div id="sec1_text">
+        <h1>Built for Scale. <br> Secure by Roles. <br> Designed for Organizations.</h1>
+        <button>
+          <a href="{% url 'core:signup' %}" class="text_white">Get Started</a>
+        </button>
       </div>
-      <div class="feature-box">
-        <img src="{% static 'Images/Hierarchy.png' %}" alt="Folder Icon" class="feature-icon" />
-        <h3>Hierarchy-Based Access Control</h3>
-        <p>
-          Built-in permission layers based on user roles (e.g., Admin, Manager, Contributor). Set policies at the org, department, or project level.
-        </p>
-      </div>
-      <div class="feature-box">
-        <img src="{% static 'Images/Integrated.png' %}" alt="Folder Icon" class="feature-icon" />
-        <h3>Integrated Collaboration</h3>
-        <p>
-          Enable real-time commenting, document sharing, and notifications, without switching tools.
-        </p>
-      </div>
-      <div class="feature-box">
-        <img src="{% static 'Images/Activity.png' %}" alt="Folder Icon" class="feature-icon" />
-        <h3>Activity Logging & Compliance</h3>
-        <p>
-          Maintain traceability with a complete audit trail of user actions. Compliant by design for industries handling regulated data.
-        </p>
+      <div id="sec1_img">
+        <img src="{% static 'Images/LandingPageImg_1.png' %}" alt="Img1">
+        <img src="{% static 'Images/LandingPageImg_2.png' %}" alt="Img2">
+        <img src="{% static 'Images/LandingPageImg_3.png' %}" alt="Img3">
+        <img src="{% static 'Images/Profile2.png' %}" alt="Img4">
+        <img src="{% static 'Images/Profile5.png' %}" alt="Img5">
+        <img src="{% static 'Images/Profile8.png' %}" alt="Img6">
       </div>
     </div>
-  </section>
+    <img id="arrow_down" src="{% static 'Images/Arrow.png' %}" alt="Arrow Down">
+  </div>
 
-   <div class="hero-divider"></div>
-  <section class="institution-section">
-    <h2 class="institution-title">File Repository Suitable for any type of Institution</h2>
-    <div class="institution-grid">
-        <div class="institution-left">
-          <h3>Enterprises</h3>
-          <h3>Educational Institutes</h3>
-          <h3>Research Organizations</h3>
-          <h3>Government Agencies</h3>
-        </div>
-        <div class="institution-right">
-          <p>Centralized document management across departments, teams, and leadership tiers; ensure executives and managers can securely access critical files while maintaining strict role-based access for other users.</p>
-          <p>Organize academic materials, administrative files, and faculty resources with department-level permissions; streamline internal communications while protecting sensitive student or staff data.</p>
-          <p>Maintain secure access to confidential research, project data, and intellectual property; enforce multi-level access for different research teams and compliance stakeholders.</p>
-          <p>Implement strict document control with multi-tiered access permissions; manage records, inter-departmental memos, and policy documents with full audit trails and retention compliance.</p>
-        </div>
-      </div>
-  </section>
+  <div id="sec2">
+    <div id="sec2_title">
+      <h1>What is ARC.Ai?</h1>
+      <p>Arc.ai emphasizes hierarchical access control and role-based permissions to streamline the way <br> documents are stored, shared, and collaborated on within professional environments. It replaces <br> traditional email chains and scattered cloud drives with a unified platform for structured file flow and <br> collaboration.</p>
+    </div>
+    
 
-  <div class="hero-divider"></div>
-  <section id=  "about" class="about-arcai">
-    <div class="about-container">
-      <!-- Left Side: Text -->
-      <div class="about-text">
-        <h2><em>About the developers of Arc.ai</em></h2>
-        <p>
-          We’re a team of six developers behind Arc.ai, a secure and intelligent platform that simplifies hierarchical file management for organizations. 
-          With expertise across design, architecture, cloud, and cybersecurity, we’ve built a user-friendly system that empowers everyone from employees 
-          to executives through role-based access and intuitive workflows.
-        </p>
-        <p>
-          At Arc.ai, we balance usability with security, delivering scalable, future-ready solutions for modern teams.
-        </p>
-        <div class="submitted"><p>
-            <strong>Submitted to:</strong> Christian Cadiz<br>
-            CIT 214 &nbsp; Software Engineering
-          </p></div>
-        
+    <div id="sec2_container">
+      <div class="sec2_subcont">
+        <img src="{% static 'Images/Cont1.png' %}" alt="Img6">
+        <p>A centralized, scalable file system for all departments and teams—structured for clarity, discoverability, and access control.</p>
       </div>
-  
-      <!-- Right Side: Developers -->
-      <div class="dev-grid">
-        <div class="dev-card">
-          <img src="{% static 'Images/avatar.png' %}" alt="Ginno Arostique">
-          <p><strong>Ginno Arostique</strong><br><span>Frontend</span></p>
-        </div>
-        <div class="dev-card">
-          <img src="{% static 'Images/avatar.png' %}" alt="Zuriel Calix">
-          <p><strong>Zuriel Calix</strong><br><span>Frontend</span></p>
-        </div>
-        <div class="dev-card">
-          <img src="{% static 'Images/avatar.png' %}" alt="Herald Amolong">
-          <p><strong>Herald Amolong</strong><br><span>Frontend</span></p>
-        </div>
-        <div class="dev-card">
-          <img src="{% static 'Images/avatar.png' %}" alt="Joseph Cordero">
-          <p><strong>Joseph Cordero</strong><br><span>Backend</span></p>
-        </div>
-        <div class="dev-card">
-          <img src="{% static 'Images/avatar.png' %}" alt="Christian Pillado">
-          <p><strong>Christian Pillado</strong><br><span>Backend</span></p>
-        </div>
-        <div class="dev-card">
-          <img src="{% static 'Images/avatar.png' %}" alt="Ginno Arostique">
-          <p><strong>Ivan Sagala</strong><br><span>Frontend</span></p>
-        </div>
+      <div class="sec2_subcont">
+        <img src="{% static 'Images/Cont2.png' %}" alt="Img6">
+        <p>Built-in permission layers based on user roles (e.g., Admin, Manager, Contributor). Set policies at the org, department, or project level.</p>
+      </div>
+      <div class="sec2_subcont">
+        <img src="{% static 'Images/Cont3.png' %}" alt="Img6">
+        <p>Maintain traceability with a complete audit trail of user actions. Compliant by design for industries handling regulated data</p>
+      </div>
+      <div class="sec2_subcont">
+        <img src="{% static 'Images/Cont4.png' %}" alt="Img6">
+        <p>Enable real-time commenting, document sharing, and notifications, without switching tools.</p>
       </div>
     </div>
-    <!-- Wavy Blue Footer -->
-<!-- <div class="wave-footer">
-  <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
-    <path fill="#1C2340" d="M0,64L60,58.7C120,53,240,43,360,53.3C480,64,600,96,720,112C840,128,960,128,1080,117.3C1200,107,1320,85,1380,74.7L1440,64L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-  </svg>
-</div> -->
-  </section>
-  
+  </div>
+
+  <div id="sec3">
+    <h1>File Repository Suitable<br>for any type of Institution</h1>
+    <div id="sec3_container">
+      <div class="sec3_topic">
+        <h2>Enterprise</h2>
+        <p>Centralized document management across departments, teams, and leadership tiers; ensure executives and managers can securely access critical files while maintaining strict role-based access for other users.</p>
+      </div>
+      <div class="sec3_topic">
+        <h2>Educational Institutes</h2>
+        <p>Organize academic materials, administrative files, and faculty resources with department-level permissions; streamline internal communications while protecting sensitive student or staff data.</p>
+      </div>
+      <div class="sec3_topic">
+        <h2>Research Organizations</h2>
+        <p>Maintain secure access to confidential research, project data, and intellectual property; enforce multi-level access for different research teams and compliance stakeholders.</p>
+      </div>
+      <div class="sec3_topic">
+        <h2>Government Agencies</h2>
+        <p>Implement strict document control with multi-tiered access permissions; manage records, inter-departmental memos, and policy documents with full audit trails and retention compliance.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec4">
+    <div id="sec4_title">
+      <h1>About the Developers of ARC.Ai</h1>
+      <p>We’re a team of six developers behind Arc.ai, a secure and intelligent platform that simplifies hierarchical file management for organizations. With <br> expertise across design, architecture, cloud, and cybersecurity, we’ve built a user-friendly system that empowers everyone from employees to <br> executives through role-based access and intuitive workflows.
+    </div>
+    
+    </p>
+    <div id="sec4_container">
+      <div class="sec4_subcont">
+        <img src="{% static 'Images/Profile1.png' %}" alt="Img6">
+        <h2>Ginno Arostique</h2>
+        <p>Frontend</p>
+      </div>
+      <div class="sec4_subcont">
+        <img src="{% static 'Images/Profile2.png' %}" alt="Img6">
+        <h2>Zuriel Calix</h2>
+        <p>Frontend</p>
+      </div>
+      <div class="sec4_subcont">
+        <img src="{% static 'Images/Profile3.png' %}" alt="Img6">
+        <h2>Ivan Sagala</h2>
+        <p>Frontend</p>
+      </div>
+      <div class="sec4_subcont">
+        <img src="{% static 'Images/Profile4.png' %}" alt="Img6">
+        <h2>Herald Amolong</h2>
+        <p>Frontend</p>
+      </div>
+      <div class="sec4_subcont">
+        <img src="{% static 'Images/Profile5.png' %}" alt="Img6">
+        <h2>Joseph Cordero</h2>
+        <p>Backend</p>
+      </div>
+      <div class="sec4_subcont">
+        <img src="{% static 'Images/Profile6.png' %}" alt="Img6">
+        <h2>Christial Pillado</h2>
+        <p>Backend</p>
+      </div>
+    </div>
+    <div id="sec4_footer">
+      <hr>
+      <p>At Arc.ai, we balance usability with security, delivering scalable, future-ready solutions for modern teams.</p>
+    </div>
+    
+  </div>
+
+
 </body>
 </html>

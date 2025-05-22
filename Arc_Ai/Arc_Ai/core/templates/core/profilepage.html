@@ -8,229 +8,189 @@
     <title>Profile</title>
     <link rel ="stylesheet" href="{% static 'styles/profilepage.css' %}">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="sidebar">
-        <div id="sidebar_content" class="hidden">
-            <p><a href="{% url 'core:profilepage' %}">Profile</a></p>
-            <p><a href="{% url 'core:home' %}">Home</a></p>
-            <p><a href="{% url 'core:organization' %}">Organization</a></p>
-            <p><a href="{% url 'core:saved' %}">Saved</a></p>
-            <p><a href="{% url 'core:email' %}">Email</a></p>
-        </div>
-        <hr class="divider_sidebar"/>
-    
-        <div class="notification_container">
-          <!-- Notification Pop-Up -->
-          <div id="notification_popup" class="hidden">
-            <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
-            <div id="notification_list">
-                <ul>
-                    <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
-                        <p>Schedule Update <span>Yesterday</span></p>
-                        <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 202</p>
-                        <p class="posted-by">- Imee Duterte</p>
-                        
-                    </li>
-                    <li class="notification_item" data-detail="Another meeting detail here.">
-                        <p>Schedule Update <span>Yesterday</span></p>
-                        <p class="short-description">Another meeting detail here General meeting at 10:30AM on Jan 3, 202 General meet</p>
-                        <p class="posted-by">- John Doe</p>
-                    </li>
-                    <li class="notification_item" data-detail="Another meeting detail here.">
-                        <p>Schedule Update <span>Yesterday</span></p>
-                        <p class="short-description">Another meeting detail here</p>
-                        <p class="posted-by">- Sarah Marcos</p>
-                    </li>
-                    <li class="notification_item" data-detail="Another meeting detail here.">
-                        <p>Schedule Update <span>Yesterday</span></p>
-                        <p class="short-description">Another meeting detail here</p>
-                        <p class="posted-by">- Ginno Arostique</p>
-                    </li>
-                    <li class="notification_item" data-detail="Another meeting detail here.">
-                        <p>Schedule Update <span>Yesterday</span></p>
-                        <p class="short-description">Another meeting detail here</p>
-                        <p class="posted-by">- Ginno Arostique</p>
-                    </li>
-                </ul>
-            </div>
-        </div>
-          <!-- Detailed Notification -->
-          <div id="detailed_notification" class="hidden">
-              <h2 id="notification_title">Schedule Update</h2><p class="notification_date">Yesterday, January 29, 2025</p>
-              <button id="close_detailed_notification" class="close-btn">&times;</button>
-              <p id="notification_detail"></p>
-              <p class="posted-by">- Imee Duterte, Team Head</p>
-              <button class="respond-btn">Respond</button>
-          </div>
-        </div>
-    
-        <div id="sidebar_icns_grp">
-            <div class="nav_item">
-                <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
-                <p id="navigation_paragraph">Navigate</p>
-            </div>
-            <div class="nav_item">
-                <img class="sidebar_icns" src="{% static 'Images/Notification.png' %}" alt="Notification">
-                <p id="notification_paragraph">Notification</p>
-            </div>
-            <div class="nav_item">
-                <img class="sidebar_icns" src="{% static 'Images/Settings.png' %}" alt="Settings">
-                <p>Settings</p>
-            </div>
-        </div>
-    </div>
-    
+    <div id="fixed-main-ratio">
         <div id="header">
-            <div>
-                <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+            <img src="{% static 'Images/Account.png' %}" alt="Account">
+        </div>
+        <div id="sidebar">
+            <div id="logo">
+                <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+                <hr>
             </div>
-            <div id="header_nav" class="text_white">
-              <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
-              <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-              <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-              <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
-              <p><a href="{% url 'core:profilepage' %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
-              <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="logout">Log out</button>
-            </form>
+            <div id="upload">
+                <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
+                <h1>Upload</h1>
+            </div>
+            <div id="sidebar_cont">
+                <div id="navigate">
+                    <h1>Navigate</h1>
+                    <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                    <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+                </div>
+                <div id="settings">
+                    <h1>Settings</h1>
+                    <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
+                    <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
+                </div>
+            </div>
+            <div id="logout">
+                <img src="{% static 'Images/Logout.png' %}" alt="">
+                <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout">Log out</button>
+                </form>
             </div>
         </div>
-        <div id="main-content">
-    <section class="MainProfile">
-        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
-
-        {% if personal_information %}
-        <div class="userInfo">
-            <h1 class="username">{{ personal_information.name }}</h1>
-            <h3 class="email">{{ personal_information.email }}</h3>
-            <h3 class="user-title">{{ personal_information.user_title }}</h3>
-        </div>
-        <div class="setting-icon">
-            <img src="{% static 'Images/file-icon.png' %}" alt="Settings Icon">
-        </div>
-    </section>
-
-    <section class="PersonalInformation">
-        <div class="header-with-line">
-            <h1 class="Title">Personal Information</h1>
-            <hr class="divider"/>
-        </div>
-        <div class="info-grid">
-            <div class="info">
-                <span class="label">Email:</span>
-                <span class="value">{{ personal_information.email }}</span>
-            </div>
-            <div class="info">
-                <span class="label">Address:</span>
-                <span class="value">{{ personal_information.address }}</span>
-            </div>
-            <div class="info">
-                <span class="label">Contact Number:</span>
-                <span class="value">{{ personal_information.contact_number }}</span>
-            </div>
-            <div class="info">
-                <span class="label">Age:</span>
-                <span class="value">{{ personal_information.age }}</span>
-            </div>
-            <div class="info">
-                <span class="label">Birth Date:</span>
-                <span class="value">{{ personal_information.birth_date }}</span>
-            </div>
-            <div class="info">
-                <span class="label">Gender:</span>
-                <span class="value">{{ personal_information.gender }}</span>
-            </div>
-        </div>
-        {% else %}
-            <span class="value">No profile information found.</span>
-        {% endif %}
-    </section>
-    <section class="ProjectHistory">
-        <div class="header-with-line">
-            <h1 class="Title">Project History</h1>
-            <hr class="divider"/>
-        </div>
-
-        <div class="card-section">
-            <div class="card-container">
-
-                {% for project in projects %}
-                <!-- Repeat this card as needed -->
-                <div class="project-container">
-                    <div class="project-card">
-                        <div class="card-header">
-                            <img src="{% static 'Images/icon1.png' %}" alt="icon" />
-                            <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
+        <div id="content">
+                <div id="cont">
+                    <div id="MainProfile">
+                        {% if signup_details %}
+                        <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+                        <div id="userInfo">
+                            <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>
+                            <h2>{{user.email}}</h2>
+                            <h2>{{signup_details.position}}</h2>
                         </div>
-                        <div class="card-body">
-                            <h3>{{project.name}}</h3>
-                            <div class="project-details">
-                                <p>{{project.project_id}}</p>
-                                <div class="dategroup">
-                                    <p>{{project.start_date}}</p>
-                                    <p>{{project.finish_date}}</p>
+                        <div id="setting">
+                            <a href="{% url 'core:edit_user_profile' user.pk %}">
+                                <img src="{% static 'Images/Settings.png' %}" alt="Settings Icon">
+                            </a>
+                        </div>
+                        <div id="vline"></div>
+                        <div id="personalInfo">
+                            <div id="header-with-line">
+                                <h1>Personal Information</h1>
+                                <hr>
+                            </div>
+                            <div class="info-grid">
+        
+                                <div class="info">
+                                    <span class="label">Email:</span>
+                                    <span class="value">{{user.email}}</span>
+                                </div>
+                                <div class="info">
+                                    <span class="label">Address:</span>
+                                    <span class="value">{{signup_details.complete_address}}</span>
+                                </div>
+                                <div class="info">
+                                    <span class="label">Contact Number:</span>
+                                    <span class="value">{{signup_details.contact_number}}</span>
+                                </div>
+                                <div class="info">
+                                    <span class="label">Age:</span>
+                                    <span class="value">{{signup_details.age}}</span>
+                                </div>
+                                <div class="info">
+                                    <span class="label">Birth Date:</span>
+                                    <span class="value">{{signup_details.birth_date}}</span>
+                                </div>
+                                <div class="info">
+                                    <span class="label">Gender:</span>
+                                    <span class="value">{{signup_details.gender}}</span>
                                 </div>
                             </div>
-                            {% if project.project_status == 'Completed' %}
-                            <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
-                            {% elif project.project_status == 'Ongoing' %}
-                            <p class="status" style="color: orange">{{project.project_status}}</p>
-                            {% elif project.project_status == 'Missing' %}
-                            <p class="status" style="color: red">{{project.project_status}}</p>
-                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+        
+                    <div id="ProjectHistory">
+                        <div id="header-with-line">
+                            <h1>Project History</h1>
+                            <hr>
+                        </div>
+                        <div id="cardcont">
+                            {% for project in projects %}
+                            <!-- Repeat this card as needed -->
+                            <div class="projectcont">
+                                <div class="cardheader">
+                                    <img src="{% static 'Images/icon1.png' %}" alt="icon" />
+                                    <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
+                                </div>
+                                <div class="cardbody">
+                                    <h1>{{project.name}}</h1>
+                                    <div class="project-details">
+                                        <p><span class="label">Project ID:</span> <span class="value">{{project.project_id}}</span></p>
+                                        <div class="dategroup">
+                                            <p><span class="label">Start Date:</span> <span class="value">{{project.start_date}}</span></p>
+                                            <p><span class="label">Deadline:</span> <span class="value">{{project.finish_date}}</span></p>
+                                        </div>
+                                    </div>
+                                    {% if project.project_status == 'Completed' %}
+                                    <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
+                                    {% elif project.project_status == 'Ongoing' %}
+                                    <p class="status" style="color: orange">{{project.project_status}}</p>
+                                    {% elif project.project_status == 'Missing' %}
+                                    <p class="status" style="color: red">{{project.project_status}}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-    </section>
-    <section class="EmployeeAwards">
-        <div class="header-with-line">
-            <h1 class="Title">Employee Awards</h1>
-            <hr class="divider"/>
-        </div>
-
-        <div class="awards-container">
-            {% for employee_award in employee_awards %}
-                <div class="award">
-                    <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
-                    <div class="award-text">
-                        <h2 class="award-title">{{ employee_award.award_title }}</h2>
-                        <p class="award-desc">{{ employee_award.award_desc }}</p>
-                        <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
+                    <div id="EmployeeAwards">
+                        <div id="header-with-line">
+                            <h1>Employee Awards</h1>
+                            <hr>
+                        </div>
+                        <div id="awardscont">
+                            {% for employee_award in employee_awards %}
+                                <div class="award">
+                                    <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
+                                    <div class="award-text">
+                                        <h2 class="award-title">{{ employee_award.award_title }}</h2>
+                                        <p class="award-desc">{{ employee_award.award_desc }}</p>
+                                        <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p style="width: 100%;
+                                    max-width: 1000px;
+                                    padding: 40px;
+                                    margin: 100px auto;
+                                    box-sizing: border-box;
+                                    text-align: center;
+                                    font-size: 1.5rem;
+                                    color: #555;">
+                                    No awards yet.
+                                </p>
+                            {% endfor %}
+                        </div>
+                        <hr>
                     </div>
                 </div>
-            {% empty %}
-                <p style="width: 100%;
-                    max-width: 1000px;
-                    padding: 40px;
-                    margin: 100px auto;
-                    box-sizing: border-box;
-                    text-align: center;
-                    font-size: 1.5rem;
-                    color: #555;">
-                    No awards yet.
-                </p>
-            {% endfor %}
+            </div>
         </div>
-        <div>
-            <hr class="divider"/>
-          </div>
-      
-    </section>
-
-    <div class="MoreOptions"> <a href="#" class="Title4">More Options</a>
     </div>
+<script>
+const cardcont = document.getElementById('cardcont');
+let isDown = false;
+let startX;
+let scrollLeft;
 
-</div>
-
-    <script src="{% static 'js/profilepage.js' %}"></script>
-    <script src="{% static 'js/sidebar.js' %}"></script>
-
+cardcont.addEventListener('mousedown', (e) => {
+  isDown = true;
+  cardcont.classList.add('active');
+  startX = e.pageX - cardcont.offsetLeft;
+  scrollLeft = cardcont.scrollLeft;
+});
+cardcont.addEventListener('mouseleave', () => {
+  isDown = false;
+  cardcont.classList.remove('active');
+});
+cardcont.addEventListener('mouseup', () => {
+  isDown = false;
+  cardcont.classList.remove('active');
+});
+cardcont.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - cardcont.offsetLeft;
+  const walk = (x - startX) * 1.5; // adjust scroll speed if needed
+  cardcont.scrollLeft = scrollLeft - walk;
+});
+</script>
 </body>
 </html>
