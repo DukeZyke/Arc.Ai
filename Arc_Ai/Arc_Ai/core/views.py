@@ -440,8 +440,8 @@ def logout_view(request):
     return redirect('core:login')
 
 def login(request):
-    if request.user.is_authenticated:
-        return redirect('core:home')  # Already logged in, go to home
+    # if request.user.is_authenticated:
+    #     return redirect('core:home')  # Already logged in, go to home
         
     if request.method == 'POST':
         email = request.POST.get('email')
