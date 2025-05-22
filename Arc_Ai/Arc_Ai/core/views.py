@@ -118,6 +118,7 @@ def edit_user_profile(request, pk):
     return render(request, 'core/edit_user_profile.html', {
         'signup_details': signup_details,
         'user': user,
+        'range': range(1, 16)  # Add this line to match signup_details view
     })
 
 
