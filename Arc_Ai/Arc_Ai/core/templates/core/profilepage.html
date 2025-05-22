@@ -10,40 +10,32 @@
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
 </head>
 <body>
-    <div id="fixed-main-ratio">
-        <div id="header">
-            <img src="{% static 'Images/Account.png' %}" alt="Account">
+    <div id="header">
+        <img src="{% static 'Images/Account.png' %}" alt="Account">
+    </div>
+    <div id="sidebar">
+        <div id="logo">
+            <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+            <hr>
         </div>
-        <div id="sidebar">
-            <div id="logo">
-                <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
-                <hr>
+        <div id="upload">
+            <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
+            <h1>Upload</h1>
+        </div>
+        <div id="sidebar_cont">
+            <div id="navigate">
+                <h1>Navigate</h1>
+                <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
             </div>
-            <div id="upload">
-                <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
-                <h1>Upload</h1>
-            </div>
-            <div id="sidebar_cont">
-                <div id="navigate">
-                    <h1>Navigate</h1>
-                    <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
-                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
-                    <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
-                </div>
-                <div id="settings">
-                    <h1>Settings</h1>
-                    <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                    <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
-                </div>
-            </div>
-            <div id="logout">
-                <img src="{% static 'Images/Logout.png' %}" alt="">
-                <form method="post" action="{% url 'core:logout' %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="logout">Log out</button>
-                </form>
+            <div id="settings">
+                <h1>Settings</h1>
+                <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
+                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
             </div>
         </div>
+<<<<<<< HEAD
         <div id="content">
                 <div id="cont">
                     <div id="MainProfile">
@@ -94,72 +86,131 @@
                             </div>
                         </div>
                         {% endif %}
+=======
+        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout">
+                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                Log out
+            </button>
+        </form>
+    </div>
+    <div id="content">
+            <div id="cont">
+                <div id="MainProfile">
+                    {% if signup_details %}
+                    <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+                    <div id="userInfo">
+                        <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>
+                        <h2>{{user.email}}</h2>
+                        <h2>{{signup_details.position}}</h2>
+>>>>>>> ceaab28c6a30babf2ce7c74247c61b15c9a2c3fa
                     </div>
-        
-                    <div id="ProjectHistory">
+                    <div id="setting">
+                        <a href="{% url 'core:edit_user_profile' user.pk %}">
+                            <img src="{% static 'Images/Settings.png' %}" alt="Settings Icon">
+                        </a>
+                    </div>
+                    <div id="vline"></div>
+                    <div id="personalInfo">
                         <div id="header-with-line">
-                            <h1>Project History</h1>
+                            <h1>Personal Information</h1>
                             <hr>
                         </div>
-                        <div id="cardcont">
-                            {% for project in projects %}
-                            <!-- Repeat this card as needed -->
-                            <div class="projectcont">
-                                <div class="cardheader">
-                                    <img src="{% static 'Images/icon1.png' %}" alt="icon" />
-                                    <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
-                                </div>
-                                <div class="cardbody">
-                                    <h1>{{project.name}}</h1>
-                                    <div class="project-details">
-                                        <p><span class="label">Project ID:</span> <span class="value">{{project.project_id}}</span></p>
-                                        <div class="dategroup">
-                                            <p><span class="label">Start Date:</span> <span class="value">{{project.start_date}}</span></p>
-                                            <p><span class="label">Deadline:</span> <span class="value">{{project.finish_date}}</span></p>
-                                        </div>
-                                    </div>
-                                    {% if project.project_status == 'Completed' %}
-                                    <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
-                                    {% elif project.project_status == 'Ongoing' %}
-                                    <p class="status" style="color: orange">{{project.project_status}}</p>
-                                    {% elif project.project_status == 'Missing' %}
-                                    <p class="status" style="color: red">{{project.project_status}}</p>
-                                    {% endif %}
-                                </div>
+                        <div class="info-grid">
+    
+                            <div class="info">
+                                <span class="label">Email:</span>
+                                <span class="value">{{user.email}}</span>
                             </div>
-                            {% endfor %}
+                            <div class="info">
+                                <span class="label">Address:</span>
+                                <span class="value">{{signup_details.complete_address}}</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Contact Number:</span>
+                                <span class="value">{{signup_details.contact_number}}</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Age:</span>
+                                <span class="value">{{signup_details.age}}</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Birth Date:</span>
+                                <span class="value">{{signup_details.birth_date}}</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Gender:</span>
+                                <span class="value">{{signup_details.gender}}</span>
+                            </div>
                         </div>
                     </div>
-                    <div id="EmployeeAwards">
-                        <div id="header-with-line">
-                            <h1>Employee Awards</h1>
-                            <hr>
-                        </div>
-                        <div id="awardscont">
-                            {% for employee_award in employee_awards %}
-                                <div class="award">
-                                    <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
-                                    <div class="award-text">
-                                        <h2 class="award-title">{{ employee_award.award_title }}</h2>
-                                        <p class="award-desc">{{ employee_award.award_desc }}</p>
-                                        <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
-                                    </div>
-                                </div>
-                            {% empty %}
-                                <p style="width: 100%;
-                                    max-width: 1000px;
-                                    padding: 40px;
-                                    margin: 100px auto;
-                                    box-sizing: border-box;
-                                    text-align: center;
-                                    font-size: 1.5rem;
-                                    color: #555;">
-                                    No awards yet.
-                                </p>
-                            {% endfor %}
-                        </div>
+                    {% endif %}
+                </div>
+    
+                <div id="ProjectHistory">
+                    <div id="header-with-line">
+                        <h1>Project History</h1>
                         <hr>
                     </div>
+                    <div id="cardcont">
+                        {% for project in projects %}
+                        <!-- Repeat this card as needed -->
+                        <div class="projectcont">
+                            <div class="cardheader">
+                                <img src="{% static 'Images/icon1.png' %}" alt="icon" />
+                                <img src="{% static 'Images/icon2.png' %}" alt="icon" style="filter: brightness(0) invert(1);"  />
+                            </div>
+                            <div class="cardbody">
+                                <h1>{{project.name}}</h1>
+                                <div class="project-details">
+                                    <p><span class="label">Project ID:</span> <span class="value">{{project.project_id}}</span></p>
+                                    <div class="dategroup">
+                                        <p><span class="label">Start Date:</span> <span class="value">{{project.start_date}}</span></p>
+                                        <p><span class="label">Deadline:</span> <span class="value">{{project.finish_date}}</span></p>
+                                    </div>
+                                </div>
+                                {% if project.project_status == 'Completed' %}
+                                <p class="status" style="color: #6AFF3C">{{project.project_status}}</p>
+                                {% elif project.project_status == 'Ongoing' %}
+                                <p class="status" style="color: orange">{{project.project_status}}</p>
+                                {% elif project.project_status == 'Missing' %}
+                                <p class="status" style="color: red">{{project.project_status}}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div id="EmployeeAwards">
+                    <div id="header-with-line">
+                        <h1>Employee Awards</h1>
+                        <hr>
+                    </div>
+                    <div id="awardscont">
+                        {% for employee_award in employee_awards %}
+                            <div class="award">
+                                <img src="{% static employee_award.get_award_icon %}" alt="Award Icon" class="award-icon">
+                                <div class="award-text">
+                                    <h2 class="award-title">{{ employee_award.award_title }}</h2>
+                                    <p class="award-desc">{{ employee_award.award_desc }}</p>
+                                    <p class="award-date">Awarded: {{ employee_award.award_date }}</p>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p style="width: 100%;
+                                max-width: 1000px;
+                                padding: 40px;
+                                margin: 100px auto;
+                                box-sizing: border-box;
+                                text-align: center;
+                                font-size: 1.5rem;
+                                color: #555;">
+                                No awards yet.
+                            </p>
+                        {% endfor %}
+                    </div>
+                    <hr>
                 </div>
             </div>
         </div>

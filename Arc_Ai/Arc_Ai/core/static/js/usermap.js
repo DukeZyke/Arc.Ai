@@ -10,17 +10,31 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error fetching users:', error);
             // Use sample data as fallback
             initializeUserMap([
-                { name: 'Aristique, Ginno D.', position: { x: 100, y: 100 } },
-                { name: 'Aristique, Ginno D.', position: { x: 300, y: 150 } },
-                { name: 'Aristique, Ginno D.', position: { x: 500, y: 100 } },
-                { name: 'Aristique, Ginno D.', position: { x: 700, y: 150 } },
-                { name: 'Aristique, Ginno D.', position: { x: 100, y: 300 } },
-                { name: 'Aristique, Ginno D.', position: { x: 300, y: 350 } },
-                { name: 'Aristique, Ginno D.', position: { x: 500, y: 300 } },
-                { name: 'Aristique, Ginno D.', position: { x: 700, y: 350 } },
-                { name: 'Aristique, Ginno D.', position: { x: 100, y: 500 } },
-                { name: 'Aristique, Ginno D.', position: { x: 300, y: 550 } },
-                { name: 'Aristique, Ginno D.', position: { x: 500, y: 500 } }
+                { name: 'Aristique, Ginno D.', position: { x: 100, y: 100 }, level: 3, files: [
+                    { name: 'Project Proposal.docx', type: 'D', size: '245 KB', date: '2 days ago' },
+                    { name: 'Budget.xlsx', type: 'X', size: '120 KB', date: '3 days ago' }
+                ] },
+                { name: 'Santos, Maria L.', position: { x: 300, y: 150 }, level: 2, files: [
+                    { name: 'Meeting Notes.pdf', type: 'P', size: '1.2 MB', date: '1 day ago' }
+                ] },
+                { name: 'Reyes, Juan C.', position: { x: 500, y: 100 }, level: 1, files: [] },
+                { name: 'Cruz, Ana B.', position: { x: 700, y: 150 }, level: 2, files: [
+                    { name: 'Analysis Report.pptx', type: 'P', size: '3.4 MB', date: 'Today' }
+                ] },
+                { name: 'Lim, Robert M.', position: { x: 100, y: 300 }, level: 1, files: [] },
+                { name: 'Garcia, Elena P.', position: { x: 300, y: 350 }, level: 1, files: [] },
+                { name: 'Tan, David K.', position: { x: 500, y: 300 }, level: 2, files: [
+                    { name: 'Code Review.txt', type: 'T', size: '45 KB', date: 'Yesterday' }
+                ] },
+                { name: 'Mendoza, Patricia Q.', position: { x: 700, y: 350 }, level: 3, files: [
+                    { name: 'Strategic Plan.docx', type: 'D', size: '380 KB', date: '5 days ago' },
+                    { name: 'Team Roster.xlsx', type: 'X', size: '85 KB', date: '1 week ago' }
+                ] },
+                { name: 'Bautista, Ramon F.', position: { x: 100, y: 500 }, level: 1, files: [] },
+                { name: 'Villanueva, Sofia J.', position: { x: 300, y: 550 }, level: 2, files: [
+                    { name: 'Client Feedback.pdf', type: 'P', size: '520 KB', date: '3 days ago' }
+                ] },
+                { name: 'Aquino, Benjamin L.', position: { x: 500, y: 500 }, level: 1, files: [] }
             ]);
         });
     
@@ -39,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
             users.forEach((user, index) => {
         const userBubble = document.createElement('div');
         userBubble.className = 'user_bubble';
+        if (user.level) {
+            userBubble.classList.add(`level-${user.level}`);
+        }
         userBubble.setAttribute('data-user-id', index);
         
         // Position the bubble
@@ -63,11 +80,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Calculate number of files
         const fileCount = recentFiles.length;
         
+        // Get user level text
+        let userLevelText = '';
+        if (user.level === 3) {
+            userLevelText = '<span class="user_level">Administrator</span>';
+        } else if (user.level === 2) {
+            userLevelText = '<span class="user_level">Staff</span>';
+        } else if (user.level === 1) {
+            userLevelText = '<span class="user_level">User</span>';
+        }
+        
         // Construct user bubble HTML
         userBubble.innerHTML = `
             <img src="/static/Images/avatar.png" alt="User" class="user_avatar">
             <div class="user_info">
                 <span class="user_name">${user.name}</span>
+                ${userLevelText}
                 <span class="file_count">${fileCount} files</span>
             </div>
             <div class="toggle_dropdown">
@@ -754,144 +782,4 @@ document.addEventListener('DOMContentLoaded', function() {
             // Send data to server (AJAX)
             fetch('/api/save-user-map/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify(mapData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Map saved successfully:', data);
-                showSaveConfirmation();
-            })
-            .catch(error => {
-                console.error('Error saving map:', error);
-                // Fall back to localStorage if server save fails
-                localStorage.setItem('userMapArrangement', JSON.stringify(mapData));
-                showSaveConfirmation('Saved locally');
-            });
-        }
-        
-        // Show save confirmation message
-        function showSaveConfirmation(message = 'Saved!') {
-            saveStatus.textContent = message;
-            saveStatus.classList.remove('hidden');
-            saveStatus.classList.add('visible');
-            
-            // Hide the message after 3 seconds
-            setTimeout(() => {
-                saveStatus.classList.remove('visible');
-                saveStatus.classList.add('hidden');
-            }, 3000);
-        }
-        
-        // Get CSRF token from cookies
-        function getCsrfToken() {
-            const name = 'csrftoken';
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
-        // Load saved map arrangement on page load
-        function loadSavedMapArrangement() {
-            fetch('/api/load-user-map/')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    applyMapData(data);
-                })
-                .catch(error => {
-                    console.warn('Could not load map from server:', error);
-                    // Try loading from local storage
-                    const localData = localStorage.getItem('userMapArrangement');
-                    if (localData) {
-                        try {
-                            const parsedData = JSON.parse(localData);
-                            applyMapData(parsedData);
-                        } catch (e) {
-                            console.error('Error parsing local map data:', e);
-                        }
-                    }
-                });
-        }
-        
-        // Apply saved map data to current view
-        function applyMapData(mapData) {
-            if (!mapData || !mapData.users || !mapData.connections) {
-                return;
-            }
-            
-            // Update user positions
-            mapData.users.forEach(savedUser => {
-                if (savedUser.id < users.length) {
-                    users[savedUser.id].position = savedUser.position;
-                    
-                    // Update DOM element position
-                    const bubble = document.querySelector(`.user_bubble[data-user-id="${savedUser.id}"]`);
-                    if (bubble) {
-                        bubble.style.left = `${savedUser.position.x}px`;
-                        bubble.style.top = `${savedUser.position.y}px`;
-                    }
-                }
-            });
-            
-            // Clear existing connections
-            connections = [];
-            document.querySelectorAll(`.connection-path, [id^="arrow-"]`).forEach(elem => {
-                elem.remove();
-            });
-            
-            // Recreate connections
-            mapData.connections.forEach(conn => {
-                // Create connection object
-                const connection = {
-                    id: conn.id,
-                    sourceId: conn.sourceId,
-                    targetId: conn.targetId,
-                    direction: conn.direction,
-                    weight: conn.weight || 2,
-                    curve: 0
-                };
-                
-                // Add to connections array
-                connections.push(connection);
-                
-                // Create visual connection
-                createConnectionVisual(connection);
-            });
-        }
-        
-        // Try to load saved arrangement on page load
-        // Wait a bit to ensure the DOM is fully set up
-        setTimeout(loadSavedMapArrangement, 500);
-        
-        // Close dropdowns when clicking outside bubbles
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.user_bubble')) {
-                document.querySelectorAll('.user_bubble.expanded').forEach(bubble => {
-                    bubble.classList.remove('expanded');
-                });
-            }
-        });
-    }
-});
+                headers:
