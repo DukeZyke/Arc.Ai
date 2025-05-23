@@ -32,7 +32,6 @@
             <div id="settings">
                 <h1>Settings</h1>
                 <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
             </div>
         </div>
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">

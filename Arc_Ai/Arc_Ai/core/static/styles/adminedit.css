@@ -1,9 +1,11 @@
+
 /* Main Layout */
 .adminedit-content {
     display: flex;
     justify-content: center;
-    margin-top: 2.5rem;
+    margin-top: 0; /* Change to precisely account for fixed header height (70px) plus a small gap */
     font-family: 'Inter', sans-serif;
+    padding-left: 250px; /* Add padding to account for the sidebar width */
 }
 
 .adminedit-content form {
@@ -22,6 +24,7 @@
 
 /* Card Styles */
 .adminedit-card {
+    margin-top: 150px;
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);

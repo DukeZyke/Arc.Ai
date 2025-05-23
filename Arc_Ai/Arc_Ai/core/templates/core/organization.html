@@ -5,12 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/org.css' %}">
 </head>
 <body>
-
     <div id="header">
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
@@ -37,7 +35,6 @@
                 {% else %}
                     <a href="{% url 'core:login' %}">Login</a>
                 {% endif %}
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
             </div>
         </div>
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
@@ -50,14 +47,9 @@
     </div>
     
     <div id="content">
-        <section class="continue-working">
-            <div class="header-with-line">
-                <h1 class="Title">Continue Working</h1>
-                <hr class="divider"/>
-            </div>
-
-            <a class="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
-
+        <section id="continue-working">
+            <h1 class="Title">Continue Working</h1>
+            <hr>
             {% if top_project %}
             <div class="continue-card">
                 <div>
@@ -109,8 +101,13 @@
                         </div>
                         <div>
                             <!-- <button class="continue-btn">Continue</button> -->
+                             
                         </div>
                     </div>
+                    <div id="createalign">
+                        <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
+                    </div>
+                    
                 </div>
             </div>
             {% else %}
@@ -119,10 +116,8 @@
         </section>
     
         <section class="other-projects">
-            <div class="header-with-line">
-                <h1 class="Title">Project List</h1>
-                <hr class="divider"/>
-            </div>
+            <h1 class="Title">Project List</h1>
+            <hr>
             <div class="card-section">
                 <div class="card-container">
                     <!-- Repeat this card as needed -->
