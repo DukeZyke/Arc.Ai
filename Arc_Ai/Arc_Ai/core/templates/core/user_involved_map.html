@@ -5,78 +5,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/usermap.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-
-
-
-    <div id="header">
-        <div>
-            <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
+<div id="sidebar">
+        <div id="logo">
+            <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+            <hr>
         </div>
-        <div id="header_nav" class="text_white">
-            <p><a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
-            <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
-            <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Saved</a></p>
-            <p><a href="{% url 'core:email' %}" class="{% if active_page == 'email' %}active{% endif %}">Email</a></p>
-            <p><a href="{% url 'core:profilepage' request.user.pk  %}" class="{% if active_page == 'email' %}active{% endif %}">Profile</a></p>
-        </div>
-        <div>
-            <img id="account_icn" src="{% static 'Images/Account.png' %}" alt="Account">
+        <div id="sidebar_jar">
+            <div id="sidebar_cont">
+                <div id="navigate">
+                    <h1>Navigate</h1>
+                    <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                    <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+                </div>
+                <div id="settings">
+                    <h1>Settings</h1>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
+                    {% else %}
+                        <a href="{% url 'core:login' %}">Login</a>
+                    {% endif %}
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
+                    {% endif %}
+                </div>
+            </div>
+            <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout">
+                    <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                    Log out
+                </button>
+            </form>
         </div>
     </div>
-
     <div id="organization_map_container">
         <div id="grid_background"></div>
         <!-- SVG container for arrows -->
-        <svg id="arrows_container"></svg>
         <div id="organization_map">
             <!-- User bubbles will be populated here -->
             <!-- Example user bubble structure -->
-            <div class="user_bubble" draggable="true">
-                <img src="{% static 'Images\avatar.png' %}" alt="User" class="user_avatar">
-                <div class="user_info">
-                    <span class="user_name">Aristique, Ginno D.</span>
-                </div>
-                <div class="Dropdown"></div>
-            </div>
         </div>
         
-        <!-- Zoom controls -->
-        <div id="zoom_controls">
-            <button id="zoom_in" title="Zoom In">+</button>
-            <button id="zoom_out" title="Zoom Out">−</button>
-            <button id="zoom_reset" title="Reset Zoom">Reset</button>
-        </div>
+
         
-        <!-- Add Save button -->
-        <div id="save_controls">
-            <button id="save_map" title="Save Map">Save Map</button>
-            <span id="save_status" class="hidden">Saved!</span>
-        </div>
         
-        <!-- Arrow controls at bottom center -->
-        <div id="arrow_controls">
-            <button id="create_arrow_btn" title="Create Connection">Connect Users</button>
-            <div id="arrow_properties" class="hidden">
-                <div class="property_group">
-                    <label>Direction:</label>
-                    <select id="arrow_direction">
-                        <option value="forward">Forward</option>
-                        <option value="backward">Backward</option>
-                        <option value="both">Both</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <button id="delete_arrow_btn" title="Delete Connection">Delete</button>
-            </div>
         </div>
     </div>
 
-    <script src="{% static 'js/sidebar.js' %}"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <div id="user-map-container"></div>
     <script src="{% static 'js/usermap.js' %}"></script>
+    <script  src="{% static 'js/sidebar.js' %}"></script>
 </body>
 </html>

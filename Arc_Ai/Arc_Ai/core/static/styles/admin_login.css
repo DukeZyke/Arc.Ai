@@ -1,0 +1,8 @@
+#container {
+    justify-content: flex-start;
+    gap: 50px;
+}
+
+.titles {
+    margin: 50px 0;
+}

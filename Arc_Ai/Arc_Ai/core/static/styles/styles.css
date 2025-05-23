@@ -141,16 +141,16 @@ hr {
 }
 
 #logoutform {
-    margin: 35vh auto 0 auto;
+    margin: 0;
     border: none;
     width: auto;
     height: auto;
 }
 
 #logoutform button {
-    display: flex;
+    margin: 0 25px 0 25px;
+    width: 150px;
     align-items: center;
-    gap: 10px;
     background: transparent;
     border: 1px solid #353A56;
     border-radius: 10px;
@@ -158,7 +158,6 @@ hr {
     cursor: pointer;
     font-size: 16px;
     padding: 10px 20px;
-    width: 100%;
 }
 
 #logoutform button:hover {
@@ -179,7 +178,13 @@ hr {
     margin: 0;
 }
 /* ============================= */
-
+#sidebar_jar {
+    display: flex;
+    height: 85vh;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+}
 /* Media queries for different display scales */
 @media screen and (-webkit-min-device-pixel-ratio: 1.25), 
        screen and (min-resolution: 120dpi) {

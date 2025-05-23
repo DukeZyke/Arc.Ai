@@ -8,19 +8,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/login.css' %}?v=1.0">
+    
 </head>
 <body>
+      {% for message in messages %}
+        <h5 style="color: red; margin: auto;">{{message}}</h5>
+      {% endfor %}
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">
                 <h1 class="titles" style="margin-bottom: 12px;">Sign In</h1>
-
-                {% for message in messages %}
-                <h5 style="color: red; margin: auto;">{{message}}</h5>
-                {% endfor %}
-
                 <form id="form" method="post" action="{% url 'core:admin_login' %}">
                     {% csrf_token %}
                     <div id="signin_form">
@@ -49,7 +49,11 @@
                         </button>
                     </div>
                 </form>
-                <a class="titles margin-top-50" href="{% url 'core:admin_signup' %}">Create Admin Account</a></p>
+                <div id="options">
+                   <a class="others" href="{% url 'core:admin_signup' %}">Create Admin Account</a>
+                  <a class="others" href="{% url 'core:login' %}">Login as User?</a>
+                </div>
+               
             </div>
             <div id="logo_container" class="gap">
                 <div id="main_logo">

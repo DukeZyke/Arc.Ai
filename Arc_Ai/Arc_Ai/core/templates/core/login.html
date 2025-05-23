@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="{% static 'styles/login.css' %}?v=1.0">
 </head>
 <body>
+      {% for message in messages %}
+                <h5 style="color: red; margin: auto;">{{message}}</h5>
+                {% endfor %}
       {% if user.is_authenticated %}
         <script>
             window.location.href = "{% url 'core:home' %}";
@@ -21,11 +24,6 @@
         <div id="container">
             <div id="form_container">
                 <h1 class="titles" style="margin-bottom: 12px;">Sign In</h1>
-
-                {% for message in messages %}
-                <h5 style="color: red; margin: auto;">{{message}}</h5>
-                {% endfor %}
-
                 <form id="form" method="post" action="{% url 'core:login' %}">
                     {% csrf_token %}
                     <div id="signin_form">
@@ -54,7 +52,11 @@
                         </button>
                     </div>
                 </form>
-                <a class="titles margin-top-50" href="{% url 'core:signup' %}">Sign Up?</a></p>
+                <div id="options">
+                  <a class="others" href="{% url 'core:signup' %}">Sign Up?</a>
+                  <a class="others" href="{% url 'core:admin_login' %}">Login as Admin?</a>
+                </div>
+                
             </div>
             <div id="logo_container" class="gap">
                 <div id="main_logo">

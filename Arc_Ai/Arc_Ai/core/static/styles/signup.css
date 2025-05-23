@@ -11,6 +11,13 @@ html {
 }
 
 /*================================================== ID's */
+#social_media {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
 
 #login_cntr {
     display: flex;

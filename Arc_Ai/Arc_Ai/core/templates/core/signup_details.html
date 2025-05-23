@@ -13,10 +13,6 @@
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">
-                {% for message in messages %}
-                <h5 style="color: red;">{{message}}</h5>
-                {% endfor %}
-
                 <form id="form" method="post" action="{% url 'core:signup_details' %}">
                     {% csrf_token %}
                     <div id="signin_form">

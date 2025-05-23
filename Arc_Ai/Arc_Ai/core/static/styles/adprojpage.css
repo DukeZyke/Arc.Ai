@@ -1,81 +1,53 @@
 /* Project Management Section */
 #project-management {
-    margin-left: 70px; /* Avoid overlap with the sidebar */
-    padding: 30px;
+    height: 100vh;
+    padding: 100px 50px 0 350px;
     background-color: #f4f6f9;
     font-family: 'Inter', sans-serif;
 }
 
-/* Adjustments for responsiveness */
+/* Responsive adjustments */
 @media (max-width: 768px) {
     #project-management {
-        margin-left: 70px; /* Adjust for collapsed sidebar on smaller screens */
+        padding-left: 70px;
     }
 }
 
+/* Header and search section */
 .project-management-header {
     display: flex;
-    margin-right: 80px;
-    margin-left: 80px;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding-bottom: 15px;
     margin-bottom: 25px;
-    border-bottom: 1px solid #dcdde1; /* Add a horizontal line */
-    padding-bottom: 15px; /* Add spacing below the line */
+    border-bottom: 1px solid #dcdde1;
 }
 
 .project-management-header h1 {
+    padding-left: 10px;
     font-size: 38px;
-    font-style:'Inter', sans-serif;
     font-weight: 200;
     color: black;
 }
 
-/* Enhanced search styling */
+/* Search bar styling */
+
 .search-bar {
+    margin-left: 30px;
     position: relative;
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 400px;
-    justify-content: flex-start; /* Prevent shifting */
-}
-
-.search-bar input {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-/* Style for the search icon */
-.search-bar .search-icon-btn {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px;
-    color: #888;;
-}
-
-.search-bar .search-icon-btn:hover {
-    color: #6c5ce7; /* Change color on hover */
-}
-
-.search-bar .search-icon-btn i {
-    pointer-events: none; /* Prevent the icon from blocking button clicks */
+    max-width: 600px;
 }
 
 #search-projects {
-     width: 100%; /* Ensure the input doesn't resize */
-    padding: 10px 40px 10px 10px; /* Consistent padding */
+    width: 100%;
+    padding: 10px 40px 10px 10px;
     border: 1px solid #dcdde1;
     border-radius: 12px;
     font-size: 14px;
-    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth focus effect */
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 #search-projects:focus {
@@ -84,14 +56,21 @@
     box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
 }
 
-#search-button {
+.search-icon-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
     border: none;
-    border-radius: 6px;
-    padding: 10px;
     cursor: pointer;
-    transition: background 0.3s;
+    font-size: 20px;
+    color: #888;
 }
 
+.search-icon-btn:hover {
+    color: #6c5ce7;
+}
 
 .clear-search-btn {
     position: absolute;
@@ -107,8 +86,133 @@
     visibility: hidden;
 }
 
-.project-management-header h1.searching {
-    position: relative;
+/* Project counters */
+#projcount {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 5px;
+}
+.project-count, .search-results-count {
+    font-size: 18px;
+    color: #34495e;
+}
+
+.status-indicator, .search-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.status-indicator {
+    background-color: #7d70e6;
+}
+
+.search-indicator {
+    background-color: #df8c2d;
+}
+
+/* Project list and cards */
+.project-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0 20px;
+    gap: 20px;
+}
+
+.project-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    gap: 50px;
+    width: 1350px;
+    height: 200px;
+}
+
+.project-icon img {
+    width: 152px;
+    height: 194px;
+    border-radius: 15px;
+    box-shadow: -2px 3px 5.5px 3px rgba(0, 0, 0, 0.25);
+}
+
+.project-info {
+    flex: 2;
+    margin: 0 0 0 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
+}
+
+.project-info h3 {
+    color: #000;
+    font-size: 22px;
+    font-weight: 700;
+    width: 331px;
+    margin: 0 0 20px 0;
+}
+
+.project-info p, .project-meta p {
+    color: grey;
+    font-size: 20px;
+    font-weight: 300;
+    margin: 5px 0;
+}
+
+.project-meta {
+    width: 313px;
+}
+
+/* Status colors */
+.status, .span {
+    font-weight: 700;
+}
+
+.status-ongoing {
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* Project actions */
+.project-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.edit-btn, .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.edit-btn img, .delete-btn img {
+    width: 30px;
+    height: 30px;
+}
+
+/* No results message */
+.no-results {
+    text-align: center;
+    padding: 40px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px 110px 20px 120px;
+    color: #7f8c8d;
+    font-size: 18px;
+}
+
+/* Animation for search loading */
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 .project-management-header h1.searching::after {
@@ -121,147 +225,4 @@
     border-radius: 50%;
     border-top-color: transparent;
     animation: spin 0.8s linear infinite;
-}
-
-.no-results {
-    text-align: center;
-    padding: 40px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 20px 110px 20px 120px;
-    color: #7f8c8d;
-    font-size: 18px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.project-count {
-    font-size: 18px;
-    color: #34495e;
-}
-
-.status-indicator {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    background-color: #7d70e6;
-    border-radius: 50%;
-    margin-left: 10px;
-}
-
-.project-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.project-card {
-    height: 200px;
-    margin-right: 110px;
-    margin-left: 120px;
-    display: flex;
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 30px; /* Adjust padding for larger size */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    align-items: center;
-    justify-content: space-between;
-    gap: 50px;
-}
-
-.project-icon img {
-    width: 152.444px;
-    height: 194px;
-    flex-shrink: 0;
-    border-radius: 15px;
-    background: #FFF;
-    box-shadow: -2px 3px 5.5px 3px rgba(0, 0, 0, 0.25);
-}
-
-.project-info {
-    flex: 2;
-    margin-left: 30px;
-    margin-top: 30px; /* Increase spacing for larger card */
-    margin-bottom: 26px;
-}
-
-.project-info h3 {
-    color: #000;
-    font-family: Inter;
-    font-size: 22px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    width: 331px
-}
-
-.project-info p {
-    color: grey;
-    font-family: 'Inter', sans-serif;
-    font-size: 20px;
-    font-weight: 300;
-    line-height: normal;
-}
-
-.project-meta {
-    color: grey;
-    font-family: 'Inter', sans-serif;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    width: 313px;
-}
-
-.project-meta p {
-    margin: 26px 0; /* Adjust spacing for larger card */
-}
-
-.status-ongoing {
-    color: #27ae60;
-    font-weight: bold;
-    font-style: italic
-}
-.status{
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-}
-.span{
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-}
-
-.project-actions {
-    display: flex;
-    gap: 20px; /* Increase spacing between action buttons */
-}
-
-.edit-btn, .delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.edit-btn img, .delete-btn img {
-    width: 30px; /* Increase size for better proportion */
-    height: 30px;
-}
-
-/* Search Results Count */
-.search-results-count {
-    font-size: 18px;
-    margin-left: 20px;
-    padding: 5px 10px;
-}
-
-.search-indicator {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    background-color: #df8c2d;
-    border-radius: 50%;
-    margin-left: 10px;
 }
