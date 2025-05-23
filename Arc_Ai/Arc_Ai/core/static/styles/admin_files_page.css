@@ -17,6 +17,8 @@
     display: flex;
     margin-right: 80px;
     margin-left: 80px;
+    margin-top: 36px;
+    padding-left: 150px;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
