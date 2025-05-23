@@ -289,6 +289,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add CSS styles for level sections with colors matching level importance
     document.head.insertAdjacentHTML('beforeend', `
         <style>
+            *   {
+            font-family: 'Inter';
+            }
             .level-section {
                 position: relative;
                 width: 100%;
@@ -323,6 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 padding: 5px 10px;
                 border-radius: 5px;
                 z-index: 100;
+                font-family: 'Inter';
             }
             
             .level-indicator {
@@ -341,6 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 font-size: 10px;
                 color: #666;
                 margin-top: 2px;
+                font-family: 'Inter';
             }
             
         </style>

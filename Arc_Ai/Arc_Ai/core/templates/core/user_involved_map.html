@@ -6,11 +6,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/adminstyles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/usermap.css' %}">
 </head>
 <body>
 
+<div id="sidebar">
+    <div id="sidebar_content" class="hidden">
+        <p><a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a></p>
+        <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a></p>
+        <p><a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
+    </div>
+    <hr class="divider_sidebar"/>
+
+    <div class="notification_container">
+    <!-- Notification Pop-Up -->
+    <div id="notification_popup" class="hidden">
+        <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
+        <div id="notification_list">
+            <ul>
+                <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
+                    <div class="title-and-date">
+                        <p>Schedule Update</p>
+                        <span>Yesterday</span>
+                    </div>
+                    <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 2023</p>
+                    <p class="posted-by">- Imee Duterte</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Detailed Notification -->
+    <div id="detailed_notification" class="hidden">
+        <h2 id="notification_title">Schedule Update</h2>
+        <p class="notification_date">Yesterday, January 29, 2025</p>
+        <button id="close_detailed_notification" class="close-btn">&times;</button>
+        <p id="notification_detail"></p>
+        <p class="posted-by">- Imee Duterte, Team Head</p>
+        <button class="respond-btn">Respond</button>
+    </div>
+    </div>
+
+    <div id="sidebar_icns_grp">
+        <div class="nav_item">
+            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
+            <p id="navigation_paragraph">Navigate</p>
+        </div>
+    </div>
+</div>
 
 
 
@@ -32,5 +75,6 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <div id="user-map-container"></div>
     <script src="{% static 'js/usermap.js' %}"></script>
+    <script  src="{% static 'js/sidebar.js' %}"></script>
 </body>
 </html>
