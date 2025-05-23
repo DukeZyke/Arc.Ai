@@ -57,30 +57,17 @@
                             </div>
                         </div>
                     </div>
-                <input type="hidden" id="profile_avatar_id" name="profile_avatar_id" value="1">
-                <div id="select_profile">
-                    <div id="active_profile_pic">
-                        <img id="selected_profile_pic" src="{% static 'Images/Profile1.png' %}">
-                    </div>
-                    <p>Select Profile Picture</p>
-                    <div class="profile_pic_cntr">
-                        {% for i in range %}
-                            <img class="profile_pic_option" src="{% static 'Images/Profile' %}{{ i }}.png" alt="Profile Picture {{ i }}" onclick="selectProfilePicture(this, '{{ i }}')">
-                        {% endfor %}
-                    </div>
-                </div>
                     <div id="footer">
                         <button id="login_button" type="submit">Submit</button>
-                    </div>
-                </form>
+                    </div>     
             </div>
             <div id="logo_container" class="gap">
-
-                    
+        
                 <div id="main_logo">
                     <img id="welcome_logo" src="{% static 'Images/LogoV2.png' %}" alt="Arc.Ai Logo">
                     <h2>Hierarchy-Based Online Repository</h2>
                 </div>
+                </form>
             </div>
         </div>
     </div>
@@ -88,7 +75,17 @@
         function selectProfilePicture(img, avatarId) {
             document.getElementById('profile_avatar_id').value = avatarId;
             document.getElementById('selected_profile_pic').src = img.src;
+            document.querySelectorAll('.profile_pic_option').forEach(function(i) {
+                i.classList.remove('selected');
+            });
+            img.classList.add('selected');
         }
-    </script>
+        </script>
+        <style>
+        .profile_pic_option.selected {
+            border: 2px solid #3498db;
+            border-radius: 50%;
+        }
+        </style>
 </body>
 </html>
