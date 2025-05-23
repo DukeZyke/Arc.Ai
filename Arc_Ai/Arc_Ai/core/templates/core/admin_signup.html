@@ -8,8 +8,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Sign Up</title>
+    
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/signup.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/admin_signup.css' %}?v=1.0">
 </head>
 <body>
     <div id="login_cntr">
@@ -24,11 +26,6 @@
             </div>
             <div id="form_container">
                 <h1 class="titles">Admin Sign Up</h1>
-
-                {% for message in messages %}
-                <h5 style="color: red;">{{message}}</h5>
-                {% endfor %}
-
                 <form id="form" method="post" action="{% url 'core:admin_signup' %}">
                     {% csrf_token %}
                     <div id="signin_form">

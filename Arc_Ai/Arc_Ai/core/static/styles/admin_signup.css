@@ -1,0 +1,14 @@
+input {
+    width: 250px;
+}
+#container {
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+.titles {
+    margin: 50px 0;
+}
+#login_button {
+    width: 75%;
+}

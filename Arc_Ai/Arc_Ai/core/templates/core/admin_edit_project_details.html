@@ -7,68 +7,41 @@
     <title>Admin-Project Page</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'styles/adminstyles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/adminedit.css' %}">
 </head>
 <body>
 
-<div id="sidebar">
-    <div id="sidebar_content" class="hidden">
-        <p><a href="{% url 'core:profilepage' request.user.pk %}">Users</a></p>
-        <p><a href="{% url 'core:home' %}">Projects</a></p>
-        <p><a href="{% url 'core:organization' %}">Files</a></p>
+<div id="header">
+        <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
-    <hr class="divider_sidebar"/>
-
-    <div class="notification_container">
-    <!-- Notification Pop-Up -->
-    <div id="notification_popup" class="hidden">
-        <h2>Notifications</h2><button id="close_notification_popup" class="close-btn">&times;</button>
-        <div id="notification_list">
-            <ul>
-                <li class="notification_item" data-detail="General meeting at 10:30 AM on January 3, 2024, will be held in the main conference room. All employees are expected to attend this important session where key company updates and strategic initiatives for the upcoming year will be discussed.">
-                    <div class="title-and-date">
-                        <p>Schedule Update</p>
-                        <span>Yesterday</span>
-                    </div>
-                    <p class="short-description">General meeting at 10:30AM on Jan 3, 202 General meeting at 10:30AM on Jan 3, 2023</p>
-                    <p class="posted-by">- Imee Duterte</p>
-                </li>
-            </ul>
+    <div id="sidebar">
+        <div id="logo">
+            <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+            <hr>
         </div>
-    </div>
-    <!-- Detailed Notification -->
-    <div id="detailed_notification" class="hidden">
-        <h2 id="notification_title">Schedule Update</h2>
-        <p class="notification_date">Yesterday, January 29, 2025</p>
-        <button id="close_detailed_notification" class="close-btn">&times;</button>
-        <p id="notification_detail"></p>
-        <p class="posted-by">- Imee Duterte, Team Head</p>
-        <button class="respond-btn">Respond</button>
-    </div>
+
+        <div id="sidebar_cont">
+            <div id="navigate">
+                <h1>Navigate</h1>
+                <a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a>
+                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Projects</a>
+                <a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+            </div>
+            <div id="settings">
+                <h1>User View</h1>
+                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+            </div>
+        </div>
+        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout">
+                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                Log out
+            </button>
+        </form>
     </div>
 
-    <div id="sidebar_icns_grp">
-        <div class="nav_item">
-            <img id="nav_icon" class="sidebar_icns" style="margin-bottom: -6px;" src="{% static 'Images/Navigation.png' %}" alt="Navigate">
-            <p id="navigation_paragraph">Navigate</p>
-        </div>
-    </div>
-</div>
-
-    <div id="header">
-        <div>
-            <img id="logo" src="{% static 'Images/Logo.png' %}" alt="ARC.AI Logo">
-        </div>
-    <div id="header_nav" class="text_white">
-        <p><a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a></p>
-        <p><a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a></p>
-        <p><a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a></p>
-    </div>
-        <div>
-            <button class="logout">Log out</button>
-        </div>
-    </div>
 
     <!-- Page Content Start -->
     <div class="adminedit-content">

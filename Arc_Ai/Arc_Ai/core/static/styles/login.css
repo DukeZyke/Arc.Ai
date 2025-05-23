@@ -1,3 +1,19 @@
+#options {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+}
+.others {
+    text-decoration: underline;
+    color: black;
+}
+#social_media {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
 #login_cntr {
     width: 100%;
     height: 100vh;
@@ -104,14 +120,16 @@
 .form-group {
     position: relative;
     margin-bottom: 20px;
+    padding-top: 15px; /* Add padding to the top of the form group */
 }
 
 label {
     position: absolute;
-    top: auto;
+    top: 0; /* Position at the top of the form-group */
     left: 0;
     font-size: 14px;
-    color: #555; 
+    color: #555;
+    background: #fff;
     padding: 0 5px;
 }
 
@@ -120,7 +138,7 @@ input {
     border: none;
     border-bottom: 2px solid #ccc;
     outline: none;
-    padding: 15px 0;
+    padding: 8px 0 5px 0; /* Reduced top padding, added small bottom padding */
     font-size: 16px;
     color: #333;
     background: transparent;
@@ -148,6 +166,7 @@ button:hover {
 #footer {
     text-align: center;
     margin-top: 20px;
+    padding-bottom: 10px;
 }
 
 #footer p {

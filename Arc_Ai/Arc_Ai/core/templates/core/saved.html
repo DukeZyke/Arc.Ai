@@ -17,21 +17,19 @@
             <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
             <hr>
         </div>
-        <div id="upload">
-            <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
-            <h1>Upload</h1>
-        </div>
         <div id="sidebar_cont">
             <div id="navigate">
                 <h1>Navigate</h1>
-                <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
                 <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
                 <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
             </div>
             <div id="settings">
                 <h1>Settings</h1>
                 <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
+                {% endif %}
             </div>
         </div>
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
@@ -109,7 +107,7 @@
                         </form>
                         <hr class="dropdown-divider">
 
-                        <!-- DELETE Button --> <button class="trash" onclick="toggleCheckboxes()">MOVE TO TRASH</button>
+                        <!-- DELETE Button --> <button class="trash" onclick="toggleCheckboxes()">DELETE</button>
                           <hr class="dropdown-divider">
                     </div>
                 </div>
@@ -133,7 +131,7 @@
                                     <div class="file-actions">
                                         <button class="action-button" onclick="showFileOptions(this)">⋮</button>
                                             <div class="file-options-dropdown" style="display: none;">
-                                            <div class="option" onclick="handleSingleFileTrash(this)">Move to Trash</div>
+                                            <div class="option" onclick="handleSingleFileTrash(this)">Delete</div>
                                         </div>
                                     </div>
                                 </li>
@@ -145,12 +143,12 @@
 
                     <!-- Single Delete Button that appears when checkboxes are shown -->
                     <div class="action-buttons-group" id="action-buttons-group" style="display: none;">
-                        <button id="delete-selected-btn" onclick="moveToTrashSelectedFiles()">Move Selected Files to Trash</button>
+                        <button id="delete-selected-btn" onclick="deleteSelectedFiles()">Delete Selected Files</button>
                         <button id="undo-selection-btn" onclick="undoSelection()">Undo</button>
                     </div>
 
                     <!-- Keep the form for the CSRF token and folder ID -->
-                    <form id="delete-files-form" action="{% url 'core:move_files_to_trash' %}" method="post" style="display: none;">
+                    <form id="delete-files-form" action="{% url 'core:delete_files_from_drive' %}" method="post" style="display: none;">
                         {% csrf_token %}
                         <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
                     </form>
@@ -161,30 +159,30 @@
             <div style="display: flex; align-items: center; justify-content: space-between;">
 
 
-            <h3>Trash</h3>
+            <!-- <h3>Trash</h3>
             <div class="horizontal-line"></div>
-            <!-- Dropdown Button -->
+            
             <img src="{% static 'Images/dots copy 2.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownTrash()" style="width: 40px; height: 40px; cursor: pointer;">
                 <div class="dropdown-content3" id="trashDropdown">
-                    <!-- Remove All Trash Button -->
+                    
                     <form action="{% url 'core:empty_trash' %}" method="post">
                         {% csrf_token %}
                         <button class="rat" type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
                     </form>
                     
-                    <!-- Restore Files Button -->
+                    
                     <hr class="dropdown-divider">
                     <form action="{% url 'core:restore_from_trash' %}" method="post">
                         {% csrf_token %}
                         <button class="raf" type="submit" onclick="return confirm('Restore all files from trash?')">Restore All Files</button>
                     </form>
-                </div>
+                </div> -->
 
 
 
 
             </div>
-    <div id="file_items">
+    <!-- <div id="file_items">
     <ul class="file-list">
         {% for file in trash %}
             <div class="horizontal-line"></div>
@@ -203,7 +201,7 @@
         {% empty %}
             <li>Trash is empty</li>
         {% endfor %}
-    </ul>
+    </ul> -->
 </div>
     </div>
     <script src="{% static 'js/sidebar.js' %}"></script>
@@ -215,17 +213,17 @@
         document.getElementById("myDropdown").classList.toggle("show");
     }
 
-    function moveToTrashSelectedFiles() {
+    function deleteSelectedFiles() {
     const checkboxes = document.querySelectorAll('.file-checkbox:checked');
     const fileIds = Array.from(checkboxes).map(checkbox => checkbox.dataset.fileId);
     const form = document.getElementById('delete-files-form');
 
     if (fileIds.length === 0) {
-        alert('No files selected to move to trash.');
+        alert('No files selected to delete.');
         return;
     }
 
-    if (confirm(`Are you sure you want to move ${fileIds.length} selected file(s) to trash?`)) {
+    if (confirm(`Are you sure you want to permanently delete ${fileIds.length} selected file(s)? This action cannot be undone.`)) {
         const formData = new FormData(form);
         fileIds.forEach(fileId => formData.append('file_ids[]', fileId));
 
@@ -239,19 +237,15 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Check if we're in root folder and redirect accordingly
-                if (data.is_root_folder) {
-                    window.location.href = '/saved/';
-                } else {
-                    window.location.href = `/folder/${data.folder_id}/`;
-                }
+                // Refresh the page to show updated content
+                window.location.reload();
             } else {
-                alert(data.error || 'An error occurred while moving files to trash.');
+                alert(data.error || 'An error occurred while deleting files.');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while moving files to trash.');
+            alert('An error occurred while deleting files.');
         });
     }
 }

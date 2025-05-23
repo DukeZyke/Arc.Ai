@@ -13,7 +13,34 @@
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
     <div id="sidebar">
+<<<<<<< HEAD
         <!-- Sidebar code unchanged -->
+=======
+        <div id="logo">
+            <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+            <hr>
+        </div>
+        <div id="sidebar_cont">
+            <div id="navigate">
+                <h1>Navigate</h1>
+                <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+            </div>
+            <div id="settings">
+                <h1>Settings</h1>
+                <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
+            </div>
+        </div>
+        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout">
+                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                Log out
+            </button>
+        </form>
+
+>>>>>>> ed13b82209986378e494081f041078c2c840dfdd
     </div>
     <div id="cont_jar">
         <div id="formdiv">
@@ -69,16 +96,31 @@
                                 <label for="department">Department:</label>
                                 <select id="department" name="department" required>
                                     <option value="" disabled>Select your Department</option>
+<<<<<<< HEAD
                                     <option value="HR" {% if signup_details.department == "HR" %}selected{% endif %}>HR</option>
                                     <option value="IT" {% if signup_details.department == "IT" %}selected{% endif %}>IT</option>
+=======
+                                    <option value="Administrative (Main)" {% if personal_info.department == "Administrative (Main)" %}selected{% endif %}>Administrative (Main)</option>
+                                    <option value="Information Technology" {% if personal_info.department == "Information Technology" %}selected{% endif %}>Information Technology</option>
+                                    <option value="Human Resources" {% if personal_info.department == "Human Resources" %}selected{% endif %}>Human Resources</option>
+                                    <option value="Finance" {% if personal_info.department == "Finance" %}selected{% endif %}>Finance</option>
+                                    <option value="Marketing" {% if personal_info.department == "Marketing" %}selected{% endif %}>Marketing</option>
+                                    <option value="Operations" {% if personal_info.department == "Operations" %}selected{% endif %}>Operations</option>
+>>>>>>> ed13b82209986378e494081f041078c2c840dfdd
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="position">Position:</label>
-                                <select id="position" name="position" required>
+                                <select id="position" name="position" required onchange="updateUserLevel()">
                                     <option value="" disabled>Select your Position</option>
+<<<<<<< HEAD
                                     <option value="Manager" {% if signup_details.position == "Manager" %}selected{% endif %}>Manager</option>
                                     <option value="Employee" {% if signup_details.position == "Employee" %}selected{% endif %}>Employee</option>
+=======
+                                    <option value="Employee" {% if personal_info.position == "Employee" %}selected{% endif %}>1 - Employee</option>
+                                    <option value="Dept. Manager" {% if personal_info.position == "Dept. Manager" %}selected{% endif %}>2 - Dept. Manager</option>
+                                    <option value="Executive Position" {% if personal_info.position == "Executive Position" %}selected{% endif %}>3 - Executive Position</option>
+>>>>>>> ed13b82209986378e494081f041078c2c840dfdd
                                 </select>
                             </div>
                         </div>
@@ -119,6 +161,7 @@
         });
         img.classList.add('selected');
     }
+<<<<<<< HEAD
     </script>
     <style>
     .profile_pic_option.selected {
@@ -126,5 +169,35 @@
         border-radius: 50%;
     }
     </style>
+=======
+
+    function updateUserLevel() {
+        const positionSelect = document.getElementById('position');
+        const userLevelInput = document.getElementById('user_level');
+        
+        switch(positionSelect.value) {
+            case 'Employee':
+                userLevelInput.value = '1';
+                break;
+            case 'Supervisor':
+                userLevelInput.value = '2';
+                break;
+            case 'Dept. Manager':
+                userLevelInput.value = '3';
+                break;
+            case 'Executive Position':
+                userLevelInput.value = '4';
+                break;
+            default:
+                userLevelInput.value = '1';
+        }
+    }
+
+    // Run this on page load to set the initial level based on selected position
+    document.addEventListener('DOMContentLoaded', function() {
+        updateUserLevel();
+    });
+</script>
+>>>>>>> ed13b82209986378e494081f041078c2c840dfdd
 </body>
 </html>

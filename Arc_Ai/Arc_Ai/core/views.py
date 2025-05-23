@@ -7,6 +7,11 @@ from django.http import JsonResponse
 from .models import Notification
 from django.utils.timezone import datetime
 from django.contrib.auth import logout
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.views.decorators.http import require_POST
+import json
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, DriveFolder
@@ -86,7 +91,7 @@ from .models import SignupDetails  # Make sure you have this
 @login_required
 def edit_user_profile(request, pk):
     user = get_object_or_404(User, pk=pk)
-
+    
     try:
         signup_details = SignupDetails.objects.get(user=user)
     except SignupDetails.DoesNotExist:
@@ -112,6 +117,24 @@ def edit_user_profile(request, pk):
             signup_details.profile_avatar = request.FILES['profile_avatar']
 
         signup_details.save()
+
+        # Update user permissions based on position
+        position = request.POST.get('position')
+        
+        if position == "Executive Position":
+            user.is_superuser = True
+            user.is_staff = True
+        elif position == "Dept. Manager":
+            user.is_superuser = False
+            user.is_staff = True  
+        elif position == "Supervisor":
+            user.is_superuser = False
+            user.is_staff = True
+        else:  # Employee
+            user.is_superuser = False
+            user.is_staff = False
+        
+        user.save()
 
         return redirect('core:profilepage', pk=user.pk)  # Adjust to your actual view name
 
@@ -307,24 +330,21 @@ def admin_project_page(request):
     })
     
 def admin_users_page(request):
-    # Check if user is authenticated and has admin privileges
-    if not request.user.is_authenticated or not request.user.is_staff:
-        messages.error(request, "You need administrator privileges to access this page.")
-        return redirect('core:login')
-    
-    # Get all users
+    # Get users and other data...
     users = User.objects.all().order_by('username')
-    signup_details = SignupDetails.objects.all()
     
-    # Count active users
-    active_users = User.objects.filter(is_active=True).count()
+    # Create a dictionary to map users to their signup details
+    user_details = {}
+    for detail in SignupDetails.objects.all():
+        user_details[detail.user_id] = detail
     
-    return render(request, 'core/admin_users_page.html', {
-        'signup_details': signup_details,
-        'users': users, 
+    context = {
+        'users': users,
+        'user_details': user_details,
         'total_users': users.count(),
-        'active_users': active_users,
-    })
+        'active_users': User.objects.filter(is_active=True).count(),
+    }
+    return render(request, 'core/admin_users_page.html', context)
 
 
 # =================================== FOR EDITING OF PROJECTS ===================================
@@ -1224,127 +1244,38 @@ def get_file_icon(mime_type):
     return file_icons.get(mime_type, 'Images/default.png')
 
 
-def get_users_for_map(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Unauthorized'}, status=403)
+@login_required
+def get_all_users_for_usermap(request):
+    users_data = []
     
-    # Get all users
-    users = User.objects.all().order_by('username')
-    
-    # Prepare data structure for users and their files
-    user_data = []
-    
-    # Check if Drive credentials are available for fetching file details
-    creds_data = request.session.get('credentials')
-    if creds_data:
-        creds = Credentials(**creds_data)
-        
+    for user in User.objects.all():
+        # Try to get SignupDetails if available
+        department = position = "Not specified"
         try:
-            # Build the Drive service
-            service = build('drive', 'v3', credentials=creds)
-            
-            # For each user, fetch their files and folders
-            for user in users:
-                # Get files and folders associated with this user
-                user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')[:10]  # Limit to 5 most recent files
-                
-                # Initialize lists for files
-                files = []
-                
-                # Process each file
-                for drive_file in user_drive_files:
-                    try:
-                        print(f"Processing file {drive_file.name} for user {user.username}")
-                        # Get detailed file info from Drive
-                        file_info = service.files().get(
-                            fileId=drive_file.file_id, 
-                            fields="name,mimeType,size,createdTime"
-                        ).execute()
-                        
-                        file_size = int(file_info.get('size', 0)) if 'size' in file_info else 0
-                        file_type = get_file_type_letter(file_info.get('mimeType', ''))
-                        
-                        file_data = {
-                            'name': drive_file.name,
-                            'size': f"{file_size / 1024:.2f} kb",
-                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
-                            'type': file_type,
-                            'fileId': drive_file.file_id
-                        }
-                        
-                        files.append(file_data)
-                        
-                    except Exception as e:
-                        # If we can't get details from Drive, estimate size based on file type
-                        file_extension = drive_file.name.split('.')[-1].lower() if '.' in drive_file.name else ''
-                        
-                        # Provide estimated file size based on extension
-                        estimated_size = '~0 kb'
-                        if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
-                            estimated_size = '~150 kb'
-                        elif file_extension in ['pdf']:
-                            estimated_size = '~300 kb'
-                        elif file_extension in ['docx', 'doc']:
-                            estimated_size = '~100 kb'
-                        elif file_extension in ['xlsx', 'xls']:
-                            estimated_size = '~80 kb'
-                        elif file_extension in ['pptx', 'ppt']:
-                            estimated_size = '~500 kb'
-                        elif file_extension in ['mp3']:
-                            estimated_size = '~3000 kb'
-                        elif file_extension in ['mp4', 'mov']:
-                            estimated_size = '~8000 kb'
-                        
-                        file_data = {
-                            'name': drive_file.name,
-                            'size': estimated_size,  # Estimated size based on file type
-                            'date': drive_file.uploaded_at.strftime('%d %b %Y'),
-                            'type': get_file_type_letter(file_extension),  # Get type from extension
-                            'fileId': drive_file.file_id
-                        }
-                        files.append(file_data)
-                
-                # Get user position or generate default
-                position = {
-                    'x': 100 + ((user.id * 200) % 800),
-                    'y': 100 + ((user.id * 150) // 800) * 150
-                }
-                
-                # Add user data with their files
-                user_data.append({
-                    'id': user.id,
-                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
-                    'position': position,
-                    'files': files
-                })
-                
-        except Exception as e:
-            print(f"Error processing files: {str(e)}")
-            # Return basic user data without files
-            for user in users:
-                user_data.append({
-                    'id': user.id,
-                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
-                    'position': {
-                        'x': 100 + ((user.id * 200) % 800),
-                        'y': 100 + ((user.id * 150) // 800) * 150
-                    },
-                    'files': []
-                })
-    else:
-        # If no Drive credentials, just get basic user info
-        for user in users:
-            user_data.append({
-                'id': user.id,
-                'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
-                'position': {
-                    'x': 100 + ((user.id * 200) % 800),
-                    'y': 100 + ((user.id * 150) // 800) * 150
-                },
-                'files': []
-            })
+            details = SignupDetails.objects.get(user=user)
+            first_name = details.first_name
+            last_name = details.last_name
+            department = details.department
+            position = details.position
+        except SignupDetails.DoesNotExist:
+            # If no SignupDetails, use User model fields
+            first_name = user.first_name or user.username
+            last_name = user.last_name or ""
+        
+        # Add all users to the response with level indicators
+        users_data.append({
+            'id': user.id,
+            'first_name': first_name,
+            'last_name': last_name,
+            'department': department,
+            'position': position,
+            'is_superuser': user.is_superuser,
+            'is_staff': user.is_staff,
+            'x': 100 + ((user.id * 200) % 800),  # Initial positions
+            'y': 100 + ((user.id * 150) // 800) * 150
+        })
     
-    return JsonResponse(user_data, safe=False)
+    return JsonResponse(users_data, safe=False)
 
 # Helper function to determine file type letter
 def get_file_type_letter(mime_type):
@@ -1372,3 +1303,56 @@ def load_user_map(request):
         'users': [],
         'connections': []
     })
+
+@login_required
+@require_POST
+def delete_user(request):
+    # Check if user has admin privileges
+    if not request.user.is_staff and not request.user.is_superuser:
+        return JsonResponse({
+            'success': False,
+            'error': 'You do not have permission to delete users.'
+        })
+    
+    user_id = request.POST.get('user_id')
+    
+    if not user_id:
+        return JsonResponse({
+            'success': False,
+            'error': 'No user ID provided.'
+        })
+    
+    try:
+        user_to_delete = User.objects.get(id=user_id)
+        
+        # Don't allow deleting yourself
+        if user_to_delete == request.user:
+            return JsonResponse({
+                'success': False,
+                'error': 'You cannot delete your own account.'
+            })
+            
+        was_active = user_to_delete.is_active
+        username = user_to_delete.username
+        
+        # Delete user
+        user_to_delete.delete()
+        
+        # Log the deletion
+        print(f"User {username} (ID: {user_id}) deleted by {request.user.username}")
+        
+        return JsonResponse({
+            'success': True,
+            'was_active': was_active,
+            'message': f'User {username} deleted successfully.'
+        })
+    except User.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'User not found.'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        })
