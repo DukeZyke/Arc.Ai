@@ -34,6 +34,7 @@ p {
     height: 800px;
     width: 800px;
     display: flex;
+    margin-left: 40px;
     justify-content: flex-start;
     align-items: center;
     background-color: #FFF;
@@ -43,6 +44,12 @@ p {
     font-family: 'Inter', sans-serif;
     font-size: 28px;
     font-weight: 100;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+#formdiv:hover {
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 #signin_form h1 {
@@ -58,7 +65,7 @@ p {
     border-top-right-radius: 22px;
     border-bottom-right-radius: 22px;
     background: #353A56;
-    box-shadow: -6px 0px 16.3px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: -6px 0px 20px 0px rgba(0, 0, 0, 0.3);
     width: 600px;
     height: 800px;
 }
@@ -88,34 +95,66 @@ p {
 #age-gender_container, #department-position_container {
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: row;
     margin-top: 20px;
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+/* Adjust the form-group inside these containers */
+#age-gender_container .form-group,
+#department-position_container .form-group {
+    margin-left: 50px;
+    margin-right: 20px;
+    flex: 1;
+    align-self: flex-start;
+}
+
+#gender_container, 
+#age-gender_container .form-group:first-child {
+    margin-left: 50px;
+    text-align: left;
 }
 
 /* Consolidated select styling */
 select#gender, select#department, select#position {
     width: 100%;
-    padding: 5px;
+    padding: 10px 12px;
     font-size: 16px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    border: none;
+    border-bottom: 2px solid #353A56;
+    border-radius: 4px 4px 0 0;
+    background-color: rgba(249, 249, 249, 0.8);
     color: #333;
     appearance: none;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 0;
+    text-align: left;
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23353A56' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 select#gender:focus, select#department:focus, select#position:focus {
     border-color: #353A56;
     outline: none;
     background-color: #fff;
+    box-shadow: 0px 4px 10px rgba(53, 58, 86, 0.15);
+}
+
+select#gender:hover, select#department:hover, select#position:hover {
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 select#gender option, select#department option, select#position option {
     font-size: 16px;
-    padding: 5px;
+    padding: 10px;
     background-color: #fff;
     color: #333;
 }
@@ -153,9 +192,14 @@ select#gender option, select#department option, select#position option {
     margin-top: 100px;
     border-radius: 22px;
     background: #353A56;
-    box-shadow: 0px 0px 16.3px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease;
     width: 500px;
     height: 350px;
+}
+
+.profile_pic_cntr:hover {
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .profile_pic_option {
@@ -213,21 +257,32 @@ input:focus {
 #adminedit-submit-btn  {
     display: block;
     width: 200px;
-    padding: 10px;
+    padding: 12px;
     margin: 25px auto 0 auto; 
     background-color: #ffffff;
-    border: 1px solid #353A56;;
+    border: 2px solid #353A56;
     color: #353A56;
-    border-radius: 10px;
+    border-radius: 30px;
     font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    transition: background-color 0.3s, background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 #adminedit-submit-btn:hover {
     background-color: #353A56;
     color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+#adminedit-submit-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .justify-center {
