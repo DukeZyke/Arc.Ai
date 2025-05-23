@@ -20,29 +20,27 @@
             <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
             <hr>
         </div>
-        <div id="upload">
-            <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
-            <h1>Upload</h1>
-        </div>
-        <div id="sidebar_cont">
-            <div id="navigate">
-                <h1>Navigate</h1>
-                <a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a>
-                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Projects</a>
-                <a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+        <div id="sidebar_jar">
+            <div id="sidebar_cont">
+                <div id="navigate">
+                    <h1>Navigate</h1>
+                    <a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a>
+                    <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Projects</a>
+                    <a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+                </div>
+                <div id="settings">
+                    <h1>User View</h1>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                </div>
             </div>
-            <div id="settings">
-                <h1>User View</h1>
-                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
-            </div>
+            <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout">
+                    <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                    Log out
+                </button>
+            </form>
         </div>
-        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="logout">
-                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
-                Log out
-            </button>
-        </form>
     </div>
 
     <div id="project-management">

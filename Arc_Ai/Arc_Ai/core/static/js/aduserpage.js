@@ -144,4 +144,89 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Add event listeners to all delete buttons
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-user-id');
+            deleteUser(userId, this);
+        });
+    });
+    
+    // Function to handle user deletion
+    function deleteUser(userId, buttonElement) {
+        // Show confirmation dialog
+        if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
+            return;
+        }
+
+        // Use getCookie function that's already defined in your code
+        const csrftoken = getCookie('csrftoken');
+        
+        // Create form data for the request
+        const formData = new FormData();
+        formData.append('user_id', userId);
+
+        // Send delete request to the proper endpoint
+        fetch('/delete_user/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Remove the user card with animation
+                const userCard = buttonElement.closest('.user-card');
+                userCard.style.opacity = '0';
+                setTimeout(() => {
+                    userCard.remove();
+                    
+                    // Update user counts
+                    const totalUsersElement = document.getElementById('total-users');
+                    const activeUsersElement = document.getElementById('active-users');
+                    
+                    if (totalUsersElement) {
+                        totalUsersElement.textContent = parseInt(totalUsersElement.textContent) - 1;
+                    }
+                    
+                    if (activeUsersElement && data.was_active) {
+                        activeUsersElement.textContent = parseInt(activeUsersElement.textContent) - 1;
+                    }
+                    
+                    // Show success message
+                    alert('User successfully deleted');
+                }, 300);
+            } else {
+                alert(`Error: ${data.error || 'Failed to delete user'}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(`An error occurred: ${error.message}`);
+        });
+    }
 });
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

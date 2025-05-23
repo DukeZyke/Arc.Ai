@@ -1,5 +1,8 @@
+
+
 /* Organization Map Styles */
 #organization_map_container {
+    padding-left: 150px;
     position: relative;
     width: calc(100% - 70px);
     height: calc(100vh - 60px);

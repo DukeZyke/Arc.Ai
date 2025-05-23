@@ -20,7 +20,7 @@ urlpatterns = [
     path('admin_users_page/', views.admin_users_page, name='admin_users_page'),
     path('home/', views.home, name='home'),
     path('user_involved_map/', views.user_involved_map, name='user_involved_map'),
-    path('api/users-for-map/', views.get_users_for_map, name='get_users_for_map'),
+    path('get_all_users_for_usermap/', views.get_all_users_for_usermap, name='get_all_users_for_usermap'),
     path('api/load-user-map/', views.load_user_map, name='load_user_map'),
     path('organization/', views.organization, name='organization'),
     path('profilepage/<int:pk>/', views.profilepage, name='profilepage'),
@@ -42,6 +42,7 @@ urlpatterns = [
     path('edit_user_profile/<int:pk>/', views.edit_user_profile, name='edit_user_profile'),
     path('restore-from-trash/', views.restore_from_trash, name='restore_from_trash'),
     path('delete_folders/', views.delete_folders, name='delete_folders'),
+    path('delete_user/', views.delete_user, name='delete_user'),
     path('logout/', views.logout_view, name='logout'),   
     
     # FOR EDITING PROJECTS

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
 </head>
 <body>
-
+{% csrf_token %}
 <div id="header">
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
@@ -20,29 +20,27 @@
             <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
             <hr>
         </div>
-        <div id="upload">
-            <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
-            <h1>Upload</h1>
-        </div>
-        <div id="sidebar_cont">
-            <div id="navigate">
-                <h1>Navigate</h1>
-                <a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a>
-                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Projects</a>
-                <a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+        <div id="sidebar_jar">
+            <div id="sidebar_cont">
+                <div id="navigate">
+                    <h1>Navigate</h1>
+                    <a href="{% url 'core:admin_users_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Users</a>
+                    <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Projects</a>
+                    <a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+                </div>
+                <div id="settings">
+                    <h1>User View</h1>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                </div>
             </div>
-            <div id="settings">
-                <h1>User View</h1>
-                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
-            </div>
+            <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout">
+                    <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                    Log out
+                </button>
+            </form>
         </div>
-        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="logout">
-                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
-                Log out
-            </button>
-        </form>
     </div>
 
 <div id="user-management">
@@ -80,20 +78,48 @@
                 </div>
                 <div class="user-details">
                     <div class="department">
-                        <span>Department: {% if user.profile.department %}{{ user.profile.department }}{% else %}Not Set{% endif %}</span>
+                        <span>Department: 
+                            {% with department_found=False %}
+                                {% for detail in signup_details %}
+                                    {% if detail.user == user and not department_found %}
+                                        {{ detail.department|default:"Not Set" }}
+                                        {% with department_found=True %}{% endwith %}
+                                    {% endif %}
+                                {% empty %}
+                                    Not Set
+                                {% endfor %}
+                                {% if not department_found and signup_details %}
+                                    Not Set
+                                {% endif %}
+                            {% endwith %}
+                        </span>
                     </div>
                     <div class="position">
-                        <span>Position: {% if user.profile.position %}{{ user.profile.position }}{% else %}Not Set{% endif %}</span>
+                        <span>Position: 
+                            {% with position_found=False %}
+                                {% for detail in signup_details %}
+                                    {% if detail.user == user and not position_found %}
+                                        {{ detail.position|default:"Not Set" }}
+                                        {% with position_found=True %}{% endwith %}
+                                    {% endif %}
+                                {% empty %}
+                                    Not Set
+                                {% endfor %}
+                                {% if not position_found and signup_details %}
+                                    Not Set
+                                {% endif %}
+                            {% endwith %}
+                        </span>
                     </div>
                 </div>
                 <div class="level-control-container">
                     <span>Level:</span>
                     <div class="level-control">
                         <span class="level-value">{% if user.is_superuser %}3{% elif user.is_staff %}2{% else %}1{% endif %}</span>
-                        <div class="level-buttons">
+                        <!-- <div class="level-buttons">
                             <button class="level-up" data-user-id="{{ user.id }}"><i class="bx bx-caret-up"></i></button>
                             <button class="level-down" data-user-id="{{ user.id }}"><i class="bx bx-caret-down"></i></button>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="user-actions">

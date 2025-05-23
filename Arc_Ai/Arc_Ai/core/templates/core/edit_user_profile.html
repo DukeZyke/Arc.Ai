@@ -18,10 +18,6 @@
             <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
             <hr>
         </div>
-        <div id="upload">
-            <img src="{% static 'Images/PlusIcon.png' %}" alt="ARC.AI Logo">
-            <h1>Upload</h1>
-        </div>
         <div id="sidebar_cont">
             <div id="navigate">
                 <h1>Navigate</h1>
@@ -97,16 +93,21 @@
                                 <label for="department">Department:</label>
                                 <select id="department" name="department" required>
                                     <option value="" disabled>Select your Department</option>
-                                    <option value="HR" {% if personal_info.department == "HR" %}selected{% endif %}>HR</option>
-                                    <option value="IT" {% if personal_info.department == "IT" %}selected{% endif %}>IT</option>
+                                    <option value="Administrative (Main)" {% if personal_info.department == "Administrative (Main)" %}selected{% endif %}>Administrative (Main)</option>
+                                    <option value="Information Technology" {% if personal_info.department == "Information Technology" %}selected{% endif %}>Information Technology</option>
+                                    <option value="Human Resources" {% if personal_info.department == "Human Resources" %}selected{% endif %}>Human Resources</option>
+                                    <option value="Finance" {% if personal_info.department == "Finance" %}selected{% endif %}>Finance</option>
+                                    <option value="Marketing" {% if personal_info.department == "Marketing" %}selected{% endif %}>Marketing</option>
+                                    <option value="Operations" {% if personal_info.department == "Operations" %}selected{% endif %}>Operations</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label for="position">Position:</label>
-                                <select id="position" name="position" required>
+                                <select id="position" name="position" required onchange="updateUserLevel()">
                                     <option value="" disabled>Select your Position</option>
-                                    <option value="Manager" {% if personal_info.position == "Manager" %}selected{% endif %}>Manager</option>
-                                    <option value="Employee" {% if personal_info.position == "Employee" %}selected{% endif %}>Employee</option>
+                                    <option value="Employee" {% if personal_info.position == "Employee" %}selected{% endif %}>1 - Employee</option>
+                                    <option value="Dept. Manager" {% if personal_info.position == "Dept. Manager" %}selected{% endif %}>2 - Dept. Manager</option>
+                                    <option value="Executive Position" {% if personal_info.position == "Executive Position" %}selected{% endif %}>3 - Executive Position</option>
                                 </select>
                             </div>
                         </div>
@@ -145,6 +146,33 @@
         document.querySelectorAll('.profile_pic_option').forEach(i => i.classList.remove('selected'));
         img.classList.add('selected');
     }
+
+    function updateUserLevel() {
+        const positionSelect = document.getElementById('position');
+        const userLevelInput = document.getElementById('user_level');
+        
+        switch(positionSelect.value) {
+            case 'Employee':
+                userLevelInput.value = '1';
+                break;
+            case 'Supervisor':
+                userLevelInput.value = '2';
+                break;
+            case 'Dept. Manager':
+                userLevelInput.value = '3';
+                break;
+            case 'Executive Position':
+                userLevelInput.value = '4';
+                break;
+            default:
+                userLevelInput.value = '1';
+        }
+    }
+
+    // Run this on page load to set the initial level based on selected position
+    document.addEventListener('DOMContentLoaded', function() {
+        updateUserLevel();
+    });
 </script>
 </body>
 </html>

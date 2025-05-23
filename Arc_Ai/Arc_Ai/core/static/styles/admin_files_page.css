@@ -281,9 +281,16 @@
 .file-info {
   position: absolute;
   top: 43px;
-  display: flex;
-  gap: 30px;
   left: 705px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.user-info .file-info {
+  display: flex;
+  align-items: center;
+  gap: 30px;
 }
 
 .files,
@@ -291,11 +298,25 @@
   font-size: 18px;
   font-weight: 500;
   color: black;
-  flex: 1;
-  min-width: 0; /* Allow flex items to shrink below content size */
-  overflow-x: hidden; /* Prevent horizontal overflow */
+  white-space: nowrap; /* Prevent text from wrapping */
+  min-width: 130px; /* Ensure consistent width */
+  display: inline-block; /* Makes the element respect width */
 }
 
+/* If you need to specifically target just the folder count, use this: */
+.Folders {
+  margin-right: 20px; /* Add some margin to ensure spacing */
+}
+
+/* Fix for container positioning if needed */
+.file-info {
+  position: absolute;
+  top: 43px;
+  left: 705px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
 .icon-placeholder {
   position: absolute;
   width: 48px;
