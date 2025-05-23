@@ -37,7 +37,7 @@
                 {% else %}
                     <a href="{% url 'core:login' %}">Login</a>
                 {% endif %}
-                <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">Notification</a>
+                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
             </div>
         </div>
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
@@ -55,9 +55,6 @@
                 <h1 class="Title">Continue Working</h1>
                 <hr class="divider"/>
             </div>
-
-            <a class="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
-
             {% if top_project %}
             <div class="continue-card">
                 <div>
@@ -108,6 +105,7 @@
                             <p>{{ top_project.finish_date|default:"-" }}</p>
                         </div>
                         <div>
+                            <a class="continue-btn" href="{% url 'core:create_project_details' %}">Create Project</a>
                             <!-- <button class="continue-btn">Continue</button> -->
                         </div>
                     </div>

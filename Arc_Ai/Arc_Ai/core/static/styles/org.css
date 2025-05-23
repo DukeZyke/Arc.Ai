@@ -152,10 +152,15 @@
     cursor: pointer;
     font-size: 16px;
     margin-top: 35px;
+    text-decoration: none; /* Remove underline from links */
+    display: inline-block; /* Make anchor behave like a block */
+    text-align: center; /* Center the text */
 }
 
 .continue-btn:hover {
     background-color: #2a2f45; /* Darker shade on hover */
+    color: white; /* Keep text white on hover */
+    text-decoration: none; /* Ensure no underline appears on hover */
 }
 
 .project-details h3 {
@@ -766,5 +771,126 @@
 
 .project-description-container::-webkit-scrollbar {
   display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
+}
+
+/* Responsive scaling for different display settings */
+html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Media queries for different display scales */
+@media screen and (-webkit-min-device-pixel-ratio: 1.25), 
+       screen and (min-resolution: 120dpi) {
+    html {
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .contentorg {
+        transform: scale(0.8);
+        transform-origin: left top;
+        width: 100%; /* Changed from 125% to prevent overflow */
+        margin-left: 240px;
+        padding-left: 0;
+        padding-right: 0;
+        overflow-x: hidden; /* Prevent horizontal overflow */
+    }
+    
+    .continue-card {
+        width: 80%; /* Reduced width to prevent overflow */
+        margin-left: 60px;
+        margin-right: 0;
+    }
+    
+    .project-status-container {
+        margin-left: 250px; /* Adjusted positioning */
+    }
+    
+    /* Fix positioning of card container */
+    .card-container {
+        width: 90%;
+        overflow-x: auto;
+    }
+    
+    /* Adjust schedule container to prevent overflow */
+    .schedule-container {
+        width: 90%;
+        margin: 40px 0;
+        overflow-x: hidden;
+    }
+    
+    .schedule-grid {
+        max-width: 95%;
+    }
+    
+    /* Fix popup positioning */
+    .popup-wrapper {
+        width: 400px;
+        margin-left: 40px;
+    }
+    
+    /* Fix title and divider */
+    .Title {
+        font-size: 42px;
+    }
+    
+    .divider {
+        margin-right: 40px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .continue-card {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .project-status-container {
+        margin-left: 0;
+    }
+    
+    .Title {
+        font-size: 36px;
+        margin-left: 20px;
+    }
+    
+    .divider {
+        margin-right: 50px;
+    }
+    
+    .contentorg {
+        margin-left: 20px;
+    }
+    
+    .schedule-grid {
+        grid-template-columns: 60px 1fr;
+    }
+    
+    .time-labels {
+        left: 65px;
+        gap: 10px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .card-section {
+        margin: 20px;
+    }
+    
+    .schedule-container {
+        margin: 20px;
+    }
+    
+    .popup-wrapper {
+        width: 90%;
+        height: auto;
+        margin-left: 0;
+    }
 }
 
