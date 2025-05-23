@@ -479,7 +479,7 @@ def logout_view(request):
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('core:home')  # Already logged in, go to home
+        return redirect('core:user_involved_map')  # Already logged in, go to home
         
     if request.method == 'POST':
         email = request.POST.get('email')

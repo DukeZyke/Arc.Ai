@@ -13,8 +13,8 @@
     <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
     <div id="header_nav" class="text_white">
       <div id="text">
-        <a href="#sec4" class="{% if active_page == 'home' %}active{% endif %}">About Us</a>
-        <a href="{% url 'core:login' %}" class="{% if active_page == 'login' %}active{% endif %}">Login</a>
+        <a href="#sec4" class="{% if active_page == 'user_involved_map' %}active{% endif %}">About Us</a>
+        <a href="{% url 'core:login' %}">Login</a>
       </div>
       <button>
         <a href="{% url 'core:signup' %}" class="text_white">Get Started</a>

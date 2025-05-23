@@ -6,9 +6,9 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.user_involved_map, name='user_involved_map'),
+    path('', views.landingpage, name='landingpage'),
+    path('user_involved_map', views.user_involved_map, name='user_involved_map'),
     path('signup_details/', views.signup_details, name='signup_details'),
-    path('landingpage/', views.landingpage, name='landingpage'),
     path('login/', views.login, name='login'),
     path('signup/', views.signup, name='signup'),
     path('saved/', views.saved, name='saved'),
