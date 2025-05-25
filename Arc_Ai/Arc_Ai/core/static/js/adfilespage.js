@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const username = card.querySelector('.username')?.textContent.toLowerCase() || '';
                 
                 const matches = userName.includes(searchTerm) || 
-                              userEmail.includes(searchTerm) || 
-                              department.includes(searchTerm) || 
-                              position.includes(searchTerm) ||
-                              username.includes(searchTerm);
+                            userEmail.includes(searchTerm) || 
+                            department.includes(searchTerm) || 
+                            position.includes(searchTerm) ||
+                            username.includes(searchTerm);
                 
                 if (matches) {
                     card.style.display = 'block';
@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (container) {
                         const button = container.querySelector('.icon-button.dropdown-toggle');
                         if (button) {
-                            const icon = button.querySelector('i');
-                            if (icon) {
-                                icon.className = 'bx bx-caret-down';
+                            const img = button.querySelector('img');
+                            if (img) {
+                                img.classList.remove('rotate');
                             }
                         }
                         box.classList.add('hidden');
@@ -125,20 +125,20 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         
-        // Find the icon element
-        const icon = button.querySelector('i');
+        // Find the image element
+        const img = button.querySelector('img');
         
         // Toggle the hidden class and add expanded state
         contentBox.classList.toggle('hidden');
         container.classList.toggle('expanded');
         console.log("Content box visibility:", !contentBox.classList.contains('hidden'));
         
-        // Rotate the icon based on dropdown state
-        if (icon) {
+        // Toggle rotation class based on dropdown state
+        if (img) {
             if (contentBox.classList.contains('hidden')) {
-                icon.className = 'bx bx-caret-down';
+                img.classList.remove('rotate');
             } else {
-                icon.className = 'bx bx-caret-up';
+                img.classList.add('rotate');
             }
         }
         
