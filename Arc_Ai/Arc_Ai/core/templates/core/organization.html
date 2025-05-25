@@ -63,7 +63,7 @@
                         </div>
                         <div class="FileInfo">
                             <p><strong>{{top_project.name}}</strong></p>
-                            <p>Project ID: HR-2024-ONB-{{top_project.project_id}}</p>
+                            <p>Project ID: {{top_project.project_id_str}}</p>
                             <p class="space">Start Date: {{top_project.project_start_Date}}</p>
                             <p>Finished Date: {{ top_project.finish_date|default:"-" }}</p>
                             <p class="status1">{{ top_project.project_status }}</p>
@@ -101,16 +101,15 @@
                             <p>{{ top_project.finish_date|default:"-" }}</p>
                         </div>
                     </div>
-                    <div id="createalign">
-                        <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
-                    </div>
-                    
                 </div>
             </div>
             {% else %}
             <p>No projects available.</p>
             {% endif %}
         </section>
+        <div id="createalign">
+                    <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
+                </div>      
     
         <section class="other-projects">
             <h1 class="Title">Project List</h1>
@@ -120,7 +119,7 @@
                     <!-- Repeat this card as needed -->
                     {% for project in projects %}
                     <!-- Repeat this card as needed -->
-                    <div class="project-container">
+                    <div class="project-container" data-project-id="{{ project.id }}">
                         <div class="project-card">  
                             <div class="card-header">
                             <img src="{% static 'Images/icon1.png' %}" alt="icon" />
@@ -130,7 +129,7 @@
                             <h3>{{project.name}}</h3>
                             <div class="project-detailscard">
 
-                                <p>{{project.project_id}}</p>
+                                <p>{{project.project_id_str}}</p>
                                 <div class="dategroup">
                                 <p>{{project.start_date}}</p>
                                 <p>{{project.finish_date}}</p>
@@ -223,6 +222,46 @@
             </div>
         </section>
     </div> 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.project-container').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    fetch(`/get_project_details/${projectId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const p = data.project;
+                                // Update the Continue Working section
+                                document.querySelector('.FileInfo strong').textContent = p.name;
+                                document.querySelector('.FileInfo p:nth-child(2)').textContent = 'Project ID: ' + p.project_id_str;
+                                document.querySelector('.FileInfo p:nth-child(3)').textContent = 'Start Date: ' + p.start_date;
+                                document.querySelector('.FileInfo p:nth-child(4)').textContent = 'Finished Date: ' + p.finish_date;
+                                document.querySelector('.status1').textContent = p.project_status;
+
+                                document.querySelector('.project-description-container p').textContent = p.project_desc;
+                                document.querySelector('.project-details p').textContent = p.project_manager;
+
+                                // Team members
+                                let teamText = '';
+                                if (p.members.length === 0) {
+                                    teamText = 'No members assigned.';
+                                } else if (p.members.length <= 3) {
+                                    teamText = p.members.join(', ');
+                                } else {
+                                    teamText = p.members.slice(0, 3).join(', ') + ' and ' + (p.members.length - 3) + ' others';
+                                }
+                                document.querySelector('.project-details h3 + p + h3 + p').textContent = teamText;
+
+                                // Start Date and Deadline
+                                document.querySelectorAll('.details-row p')[0].textContent = p.start_date;
+                                document.querySelectorAll('.details-row p')[1].textContent = p.finish_date;
+                            }
+                        });
+                });
+            });
+        });
+        </script>
     <script src="{% static 'js/org.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
 </body>

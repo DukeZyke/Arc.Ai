@@ -147,7 +147,6 @@ def edit_user_profile(request, pk):
         'range': range(1, 16)
     })
 
-
 def admin_files_page(request):
     # Check admin privileges
     if not request.user.is_authenticated or not request.user.is_staff:
@@ -662,7 +661,7 @@ def home(request,):
     return render(request, 'core/home.html')
 
 def organization(request):
-    projects = Project.objects.all().order_by('-project_id')  # or your preferred ordering
+    projects = Project.objects.all().order_by('-id')  # or your preferred ordering
     personal_information = PersonalInformation.objects.first()
     employee_awards = EmployeeAward.objects.all()
     top_project = projects.first() if projects else None
@@ -673,6 +672,27 @@ def organization(request):
         'personal_information': personal_information,
         'employee_awards': employee_awards,
     })
+
+from django.http import JsonResponse
+from .models import Project, ProjectMember
+
+def get_project_details(request, project_id):
+    try:
+        project = Project.objects.get(pk=project_id)
+        members = list(project.members.values_list('member_name', flat=True))
+        data = {
+            'name': project.name,
+            'project_id_str': project.project_id_str,
+            'project_desc': project.project_desc,
+            'project_manager': project.project_manager,
+            'start_date': project.start_date.strftime('%Y-%m-%d'),
+            'finish_date': project.finish_date.strftime('%Y-%m-%d'),
+            'project_status': project.project_status,
+            'members': members,
+        }
+        return JsonResponse({'success': True, 'project': data})
+    except Project.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Project not found'})
 
 def landingpage(request):
     return render(request, 'core/landingpage.html')

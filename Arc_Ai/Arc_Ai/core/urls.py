@@ -23,6 +23,7 @@ urlpatterns = [
     path('get_all_users_for_usermap/', views.get_all_users_for_usermap, name='get_all_users_for_usermap'),
     path('api/load-user-map/', views.load_user_map, name='load_user_map'),
     path('organization/', views.organization, name='organization'),
+    path('get_project_details/<int:project_id>/', views.get_project_details, name='get_project_details'),
     path('profilepage/<int:pk>/', views.profilepage, name='profilepage'),
     path('edit_user_profile/<int:pk>/', views.edit_user_profile, name='edit_user_profile'),
     path('admin_login/', views.admin_login, name='admin_login'),

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
+    <title>Edit Profile</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/edit_user.css' %}?v=1.0">
 </head>
@@ -40,13 +41,16 @@
     <div id="cont_jar">
         <div id="formdiv">
             <form method="post" action="{% url 'core:edit_user_profile' user.pk %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'core:edit_user_profile' user.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="user_pk" value="{{ user.pk }}">
+                <input type="hidden" name="profile_avatar_id" id="profile_avatar_id" value="{{ signup_details.profile_avatar_id|default:1 }}">
                 <input type="hidden" name="profile_avatar_id" id="profile_avatar_id" value="{{ signup_details.profile_avatar_id|default:1 }}">
                 <div id="content">
                     <div id="signin_form">
                         {% if signup_details %}
                         <h1 class="titles justify-center">Edit User Information</h1>
+                        <!-- Form fields unchanged -->
                         <!-- Form fields unchanged -->
                         <div class="form-group">
                             <label for="email">Email:</label>
@@ -84,6 +88,9 @@
                                     <option value="male" {% if signup_details.gender == "male" %}selected{% endif %}>Male</option>
                                     <option value="female" {% if signup_details.gender == "female" %}selected{% endif %}>Female</option>
                                     <option value="other" {% if signup_details.gender == "other" %}selected{% endif %}>Other</option>
+                                    <option value="male" {% if signup_details.gender == "male" %}selected{% endif %}>Male</option>
+                                    <option value="female" {% if signup_details.gender == "female" %}selected{% endif %}>Female</option>
+                                    <option value="other" {% if signup_details.gender == "other" %}selected{% endif %}>Other</option>
                                 </select>
                             </div>
                         </div>
@@ -98,6 +105,7 @@
                             </div>
                         </div>
                         <button id="adminedit-submit-btn" type="submit">Save</button>
+                        <button id="adminedit-submit-btn" type="submit">Save</button>
                         {% endif %}
                     </div>
                 </div>
@@ -106,10 +114,15 @@
             <div id="select_profile">
                 <div id="active_profile_pic">
                     <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png">
+                    <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png">
                 </div>
                 <p>Select Profile Picture</p>
                 <div class="profile_pic_cntr">
                     {% for i in range %}
+                        <img class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}" 
+                             src="{% static 'Images/Profile' %}{{ i }}.png" 
+                             alt="Profile Picture {{ i }}" 
+                             onclick="selectProfilePicture(this, '{{ i }}')">
                         <img class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}" 
                              src="{% static 'Images/Profile' %}{{ i }}.png" 
                              alt="Profile Picture {{ i }}" 
@@ -121,9 +134,14 @@
         </div>
     </div>
     <script>
+    <script>
     function selectProfilePicture(img, avatarId) {
         document.getElementById('profile_avatar_id').value = avatarId;
+        document.getElementById('profile_avatar_id').value = avatarId;
         document.getElementById('selected_profile_pic').src = img.src;
+        document.querySelectorAll('.profile_pic_option').forEach(function(i) {
+            i.classList.remove('selected');
+        });
         document.querySelectorAll('.profile_pic_option').forEach(function(i) {
             i.classList.remove('selected');
         });

@@ -121,15 +121,19 @@ class Notification(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=100)
     project_desc = models.CharField(max_length=100, blank=True, default='No description provided')
-    project_id = models.CharField(max_length=20, unique=True, blank=True)
+    # Remove project_id field!
     start_date = models.DateField(max_length=20)
     finish_date = models.DateField(max_length=20)
     project_status = models.CharField(max_length=50)
     project_manager = models.CharField(max_length=100)
+
+    @property
+    def project_id_str(self):
+        return f"HR-2024-ONB-{self.id:02d}"
     
 
     def __str__(self):
-        return f"{self.name} {self.project_id}"
+        return f"{self.name} {self.project_id_str}"
     
 class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')
