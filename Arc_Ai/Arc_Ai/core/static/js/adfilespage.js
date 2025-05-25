@@ -36,19 +36,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Search functionality
     const searchInput = document.getElementById('search-users');
+    const userCards = document.querySelectorAll('.card-container');
+    
     if (searchInput) {
-        searchInput.addEventListener('input', function () {
+        searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
-            document.querySelectorAll('.card-container').forEach(function (userCard) {
-                const userName = userCard.querySelector('.user-name').textContent.toLowerCase();
-                const userEmail = userCard.querySelector('.user-email').textContent.toLowerCase();
-
-                if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
-                    userCard.style.display = '';
+            let visibleCount = 0;
+            
+            userCards.forEach(card => {
+                const userName = card.querySelector('.user-name')?.textContent.toLowerCase() || '';
+                const userEmail = card.querySelector('.user-email')?.textContent.toLowerCase() || '';
+                const department = card.querySelector('.department')?.textContent.toLowerCase() || '';
+                const position = card.querySelector('.position')?.textContent.toLowerCase() || '';
+                const username = card.querySelector('.username')?.textContent.toLowerCase() || '';
+                
+                const matches = userName.includes(searchTerm) || 
+                              userEmail.includes(searchTerm) || 
+                              department.includes(searchTerm) || 
+                              position.includes(searchTerm) ||
+                              username.includes(searchTerm);
+                
+                if (matches) {
+                    card.style.display = 'block';
+                    visibleCount++;
                 } else {
-                    userCard.style.display = 'none';
+                    card.style.display = 'none';
                 }
             });
+            
+            // Update the search results count if you have a counter
+            const resultsCounter = document.getElementById('search-results-count');
+            if (resultsCounter) {
+                resultsCounter.textContent = `${visibleCount} users found`;
+            }
         });
     }
     

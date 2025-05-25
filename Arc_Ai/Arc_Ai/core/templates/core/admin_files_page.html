@@ -71,19 +71,21 @@
         <div class="user-details">
             <div class="user-name">{{ user_data.user.name }}</div>
             <div class="user-email">({{ user_data.user.email }})</div>
+            <div class="username">@{{ user_data.user.username }}</div>
         </div>
-        {% if signup_details %}
         <div class="job-info">
-            <div class="department">Department: {{ signup_details.department }}</div>
-            <div class="position">Position: {{ signup_details.position }}</div>
+            <div class="department">Department: {{ user_data.user.department }}</div>
+            <div class="position">Position: {{ user_data.user.position }}</div>
+            <div class="user-level">Level: {{ user_data.user.user_level }}</div>
+            <div class="contact">Contact: {{ user_data.user.contact_number }}</div>
         </div>
-        {% endif %}
         <div class="file-info">
             <div class="files">Total Files: {{ user_data.file_count }}</div>
             <div class="Folders">Total Folders: {{ user_data.folder_count }}</div>
+            <div class="storage-used">Storage: {{ user_data.user.total_size }}</div>
         </div>
         <div class="icon-placeholder">
-            <button class="icon-button dropdown-toggle">
+            <button class="icon-button dropdown-toggle" data-user-id="{{ user_data.user.id }}">
                 <i class="bx bx-caret-down"></i>
             </button>
         </div>
@@ -98,14 +100,17 @@
                             <img src="{% static 'Images/default.png' %}" alt="File Icon" />
                             <div class="name">{{ file.name }}</div>
                             <div class="date">{{ file.date }}</div>
-                            <div class="size">{{ file.size_display }}</div>
+                            <!-- <div class="size">{{ file.size_display }}</div> -->
                             <button class="delete-btn" data-file-id="{{ file.id }}" title="Delete file">
-                                <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                            <button class="view-btn" data-file-id="{{ file.id }}" title="View file" onclick="window.open('https://drive.google.com/file/d/{{ file.id }}/view', '_blank')">
+                                <i class="bx bx-show"></i>
                             </button>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="file-item no-files">No files found</div>
+                        <div class="file-item no-files">No files uploaded yet</div>
                     {% endif %}
                 </div>
                 
@@ -114,17 +119,20 @@
                     {% if user_data.folders %}
                         {% for folder in user_data.folders %}
                         <div class="folder-item">
-                            <div class="arrow">📁</div>
+                            <div class="folder-icon">📁</div>
                             <div class="name">{{ folder.name }}</div>
                             <div class="date">{{ folder.date }}</div>
-                            <div class="size">{{ folder.size_display }}</div>
+                            <div class="parent">Parent: {{ folder.parent_id }}</div>
                             <button class="delete-btn" data-folder-id="{{ folder.id }}" title="Delete folder">
-                                <img src="{% static 'Images/delete-icon.png' %}" alt="Delete">
+                                <i class="bx bx-trash"></i>
+                            </button>
+                            <button class="view-btn" data-folder-id="{{ folder.id }}" title="View folder" onclick="window.open('https://drive.google.com/drive/folders/{{ folder.id }}', '_blank')">
+                                <i class="bx bx-show"></i>
                             </button>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="folder-item no-folders">No folders found</div>
+                        <div class="folder-item no-folders">No folders created yet</div>
                     {% endif %}
                 </div>
             </div>
@@ -133,7 +141,8 @@
     {% empty %}
     <div class="card-container">
         <div class="user-details">
-            <div class="user-name">No users found</div>
+            <div class="user-name">No users with completed signup details found</div>
+            <div class="user-email">Users must complete their profile setup to appear here</div>
         </div>
     </div>
     {% endfor %}

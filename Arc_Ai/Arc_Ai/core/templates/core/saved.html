@@ -124,9 +124,16 @@
                                     </div>
                                     <div class="file-details">
                                         <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
-                                        <span class="file-owner">{{ file.uploader_username }}</span>
+                                        <span class="file-owner">{{ file.uploader_full_name }}</span>
+                                        <span class="file-department">Dept: {{ file.uploader_department }}</span>
+                                        <span class="file-level">Level {{ file.uploader_level }}</span>
                                         <span class="file-date">{{ file.date }}</span>
                                         <span class="file-size">{{ file.size }}</span>
+                                        {% if current_user_level == 4 %}
+                                            <span class="executive-access" title="You can see this because you're an Executive">👁️ All Access</span>
+                                        {% elif file.uploader_department == request.user.signup_details.department %}
+                                            <span class="same-dept" title="Same department file">🏢 Your Dept</span>
+                                        {% endif %}
                                     </div>
                                     <div class="file-actions">
                                         <button class="action-button" onclick="showFileOptions(this)">⋮</button>
@@ -157,51 +164,7 @@
         
 
             <div style="display: flex; align-items: center; justify-content: space-between;">
-
-
-            <!-- <h3>Trash</h3>
-            <div class="horizontal-line"></div>
-            
-            <img src="{% static 'Images/dots copy 2.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownTrash()" style="width: 40px; height: 40px; cursor: pointer;">
-                <div class="dropdown-content3" id="trashDropdown">
-                    
-                    <form action="{% url 'core:empty_trash' %}" method="post">
-                        {% csrf_token %}
-                        <button class="rat" type="submit" onclick="return confirm('Are you sure you want to permanently delete all items in trash?')">Remove All Trash</button>
-                    </form>
-                    
-                    
-                    <hr class="dropdown-divider">
-                    <form action="{% url 'core:restore_from_trash' %}" method="post">
-                        {% csrf_token %}
-                        <button class="raf" type="submit" onclick="return confirm('Restore all files from trash?')">Restore All Files</button>
-                    </form>
-                </div> -->
-
-
-
-
             </div>
-    <!-- <div id="file_items">
-    <ul class="file-list">
-        {% for file in trash %}
-            <div class="horizontal-line"></div>
-            <li class="file-item">
-                <div class="file-icon">
-                    <img src="{% static file.icon %}" alt="File Icon">
-                </div>
-                <div class="file-details">
-                    <a href="https://drive.google.com/file/d/{{ file.file_id }}/view" target="_blank" class="file-name">{{ file.name }}</a>
-                     <span class="file-owner">{{ file.uploader_username }}</span>
-                    <span class="file-date">{{ file.date }}</span>
-                    <span class="file-size">{{ file.size }}</span>
-                </div>
-            </li>
-            <div class="horizontal-line"></div>
-        {% empty %}
-            <li>Trash is empty</li>
-        {% endfor %}
-    </ul> -->
 </div>
     </div>
     <script src="{% static 'js/sidebar.js' %}"></script>

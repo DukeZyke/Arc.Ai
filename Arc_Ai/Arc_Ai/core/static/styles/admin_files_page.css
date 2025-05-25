@@ -250,7 +250,7 @@
 }
 
 .user-name {
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 700;
   color: black;
 }
@@ -270,8 +270,10 @@
 }
 
 .department,
-.position {
-  font-size: 18px;
+.position, 
+.user-level, 
+.contact {
+  font-size: 12px;
   font-weight: 400;
   color: black;
 }

@@ -16,16 +16,17 @@ document.addEventListener('DOMContentLoaded', function() {
         exampleBubble.remove();
     }
     
-    // Create level sections
+    // Create level sections - updated to match signup_details levels
     const levelSections = {
-        3: createLevelSection('Level 3 - Administrators', 'level-3-section'),
-        2: createLevelSection('Level 2 - Staff', 'level-2-section'),
-        1: createLevelSection('Level 1 - Users', 'level-1-section')
+        4: createLevelSection('Level 4 - Executive Position', 'level-4-section'),
+        3: createLevelSection('Level 3 - Dept. Manager', 'level-3-section'),
+        2: createLevelSection('Level 2 - Supervisor', 'level-2-section'),
+        1: createLevelSection('Level 1 - Employee', 'level-1-section')
     };
     
-    // Add sections to the map container in reverse order (3, 2, 1)
-    // This puts Level 3 at the top visually
-    [3, 2, 1].forEach(level => {
+    // Add sections to the map container in reverse order (4, 3, 2, 1)
+    // This puts Level 4 at the top visually
+    [4, 3, 2, 1].forEach(level => {
         mapContainer.appendChild(levelSections[level]);
     });
     
@@ -77,21 +78,18 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error loading saved positions:', e);
         }
         
-        // Group users by level
+        // Group users by level - updated for 4 levels
         const usersByLevel = {
             1: [],
             2: [],
-            3: []
+            3: [],
+            4: []
         };
         
         userData.forEach(user => {
-            // Determine user level using the same logic as admin_users_page.html
-            let level = 1;
-            if (user.is_superuser) {
-                level = 3;
-            } else if (user.is_staff) {
-                level = 2;
-            }
+            // Use the user_level from signup_details instead of calculating from permissions
+            let level = user.user_level || 1; // Use the stored user_level, default to 1 if not set
+            
             user.level = level;
             usersByLevel[level].push(user);
         });
@@ -170,10 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     const cellWidth = levelWidth / (columns + 1);
                     
-                    // Calculate section top based on the new visual order (3,2,1)
-                    // Level 3 is at index 0, Level 2 at index 1, Level 1 at index 2
-                    const sectionIndex = 3 - parseInt(level); // Reverse the order
-                    const sectionTop = sectionIndex * (height / 3);
+                    // Calculate section top based on the new visual order (4,3,2,1)
+                    // Level 4 is at index 0, Level 3 at index 1, Level 2 at index 2, Level 1 at index 3
+                    const sectionIndex = 4 - parseInt(level); // Reverse the order for 4 levels
+                    const sectionTop = sectionIndex * (height / 4); // Divide by 4 levels
                     
                     xPos = cellWidth * (col + 1);
                     yPos = sectionTop + 70 + (row * 120); // 70px from top of section, 120px spacing between rows
@@ -182,10 +180,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Ensure within bounds
                 xPos = Math.max(50, Math.min(width - 50, xPos));
                 
-                // Calculate section boundaries based on the new visual order (3,2,1)
-                const sectionIndex = 3 - parseInt(level); // Reverse the order
-                const sectionTop = sectionIndex * (height / 3);
-                const sectionBottom = sectionTop + (height / 3);
+                // Calculate section boundaries based on the new visual order (4,3,2,1)
+                const sectionIndex = 4 - parseInt(level); // Reverse the order for 4 levels
+                const sectionTop = sectionIndex * (height / 4); // Divide by 4 levels
+                const sectionBottom = sectionTop + (height / 4);
                 
                 yPos = Math.max(sectionTop + 50, Math.min(sectionBottom - 50, yPos));
                 
@@ -228,10 +226,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     const newLeft = startLeft + dx;
                     const newTop = startTop + dy;
                     
-                    // Calculate section boundaries based on the new visual order (3,2,1)
-                    const sectionIndex = 3 - parseInt(userLevel); // Reverse the order
-                    const sectionTop = sectionIndex * (height / 3);
-                    const sectionBottom = sectionTop + (height / 3);
+                    // Calculate section boundaries based on the new visual order (4,3,2,1)
+                    const sectionIndex = 4 - parseInt(userLevel); // Reverse the order for 4 levels
+                    const sectionTop = sectionIndex * (height / 4); // Divide by 4 levels
+                    const sectionBottom = sectionTop + (height / 4);
                     
                     const constrainedLeft = Math.max(0, Math.min(width - 100, newLeft));
                     const constrainedTop = Math.max(sectionTop, Math.min(sectionBottom - 100, newTop));
@@ -292,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .level-section {
                 position: relative;
                 width: 100%;
-                height: ${height / 3}px;
+                height: ${height / 4}px; /* Changed from /3 to /4 for 4 levels */
                 border-bottom: 2px dashed #ccc;
             }
             
@@ -300,16 +298,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 border-bottom: none;
             }
             
+            .level-4-section {
+                background-color: rgba(255, 200, 200, 0.3); /* Executive - Red tint */
+            }
+            
             .level-3-section {
-                background-color: rgba(255, 220, 220, 0.2);
+                background-color: rgba(255, 220, 220, 0.2); /* Dept. Manager - Light red */
             }
             
             .level-2-section {
-                background-color: rgba(235, 235, 255, 0.2);
+                background-color: rgba(235, 235, 255, 0.2); /* Supervisor - Light blue */
             }
             
             .level-1-section {
-                background-color: rgba(220, 255, 220, 0.2);
+                background-color: rgba(220, 255, 220, 0.2); /* Employee - Light green */
             }
             
             .section-title {

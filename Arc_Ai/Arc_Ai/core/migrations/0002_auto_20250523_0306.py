@@ -2,7 +2,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 from django.conf import settings
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -17,7 +16,7 @@ class Migration(migrations.Migration):
             name='SignupDetails',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('profile_avatar', models.ImageField(blank=True, null=True, upload_to='avatars/')),
+                ('profile_avatar_id', models.IntegerField(default=1)),  # Save avatar as id (1-15)
                 ('first_name', models.CharField(max_length=255)),
                 ('middle_name', models.CharField(max_length=255)),
                 ('last_name', models.CharField(max_length=255)),

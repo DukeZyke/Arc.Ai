@@ -51,11 +51,13 @@
             <div id="cont">
                 <div id="MainProfile">
                     {% if signup_details %}
-                    <img src="{% static 'Images/avatar.png' %}" alt="User avatar" class="Avatar"/>
+                    <div class="avatar">
+                        <img src="{% static 'Images/Profile1.png' %}" alt="{{ signup_details.first_name }} {{ signup_details.last_name }}">
+                    </div>
                     <div id="userInfo">
                         <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>
-                        <h2>{{user.email}}</h2>
-                        <h2>{{signup_details.position}}</h2>
+                        <!-- <h2>{{user.email}}</h2>
+                        <h2>{{signup_details.position}}</h2> -->
                     </div>
                     <div id="setting">
                         <a href="{% url 'core:edit_user_profile' user.pk %}">
@@ -69,10 +71,31 @@
                             <hr>
                         </div>
                         <div class="info-grid">
-    
                             <div class="info">
                                 <span class="label">Email:</span>
                                 <span class="value">{{user.email}}</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Department:</span>
+                                <span class="value">{{signup_details.department}}</span>
+                            </div>
+                            <div class="info">
+                                <span class="label">Position:</span>
+                                <span class="value">{{signup_details.position}}</span>
+                            </div>
+                            <div class="info user-level">
+                                <span class="label">User Level:</span>
+                                <span class="value">Level {{ signup_details.user_level }}
+                                    {% if signup_details.user_level == 4 %}
+                                        (Executive)
+                                    {% elif signup_details.user_level == 3 %}
+                                        (Dept. Manager)
+                                    {% elif signup_details.user_level == 2 %}
+                                        (Supervisor)
+                                    {% else %}
+                                        (Employee)
+                                    {% endif %}
+                                </span>
                             </div>
                             <div class="info">
                                 <span class="label">Address:</span>
@@ -87,12 +110,36 @@
                                 <span class="value">{{signup_details.age}}</span>
                             </div>
                             <div class="info">
-                                <span class="label">Birth Date:</span>
-                                <span class="value">{{signup_details.birth_date}}</span>
-                            </div>
-                            <div class="info">
                                 <span class="label">Gender:</span>
-                                <span class="value">{{signup_details.gender}}</span>
+                                <span class="value">{{signup_details.gender|title}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Fallback for users without signup details -->
+                    <div class="avatar">
+                        <img src="{% static 'Images/Profile1.png' %}" alt="Default Avatar">
+                    </div>
+                    <div id="userInfo">
+                        <h1 class="username">{{ user.username }}</h1>
+                        <h2>{{ user.email }}</h2>
+                        <h2>Profile Incomplete</h2>
+                    </div>
+                    <div id="setting">
+                        <a href="{% url 'core:signup_details' %}">
+                            <img src="{% static 'Images/Settings.png' %}" alt="Complete Profile">
+                        </a>
+                    </div>
+                    <div id="vline"></div>
+                    <div id="personalInfo">
+                        <div id="header-with-line">
+                            <h1>Personal Information</h1>
+                            <hr>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info" style="grid-column: 1 / -1; text-align: center; color: #666;">
+                                <p>Please complete your profile setup to view personal information.</p>
+                                <a href="{% url 'core:signup_details' %}" style="color: #353A56; text-decoration: underline;">Complete Profile</a>
                             </div>
                         </div>
                     </div>

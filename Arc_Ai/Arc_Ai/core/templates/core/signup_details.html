@@ -52,6 +52,31 @@
                                 </select>
                             </div>
                         </div>
+                        <div id="department-position-container">
+                            <div class="form-group">
+                                <label for="department">Department:</label>
+                                <select id="department" name="department" required>
+                                    <option value="" disabled selected>Select your Department</option>
+                                    <option value="Administrative (Main)">Administrative</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Human Resources">Human Resources</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Operations">Operations</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="position">Position:</label>
+                                <select id="position" name="position" required onchange="updateUserLevel()">
+                                    <option value="" disabled selected>Select your Position</option>
+                                    <option value="Employee">1 - Employee</option>
+                                    <option value="Supervisor">2 - Supervisor</option>
+                                    <option value="Dept. Manager">3 - Dept. Manager</option>
+                                    <option value="Executive Position">4 - Executive Position</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" name="user_level" id="user_level" value="1">
                     </div>
                     
                     <div id="footer">
@@ -72,6 +97,77 @@
             document.getElementById('profile_avatar_id').value = avatarId;
             document.getElementById('selected_profile_pic').src = img.src;
         }
+
+        function updateUserLevel() {
+            const positionSelect = document.getElementById('position');
+            const userLevelInput = document.getElementById('user_level');
+            const departmentSelect = document.getElementById('department');
+            
+            switch(positionSelect.value) {
+                case 'Employee':
+                    userLevelInput.value = '1';
+                    enableAllDepartments();
+                    break;
+                case 'Supervisor':
+                    userLevelInput.value = '2';
+                    enableAllDepartments();
+                    break;
+                case 'Dept. Manager':
+                    userLevelInput.value = '3';
+                    enableAllDepartments();
+                    break;
+                case 'Executive Position':
+                    userLevelInput.value = '4';
+                    restrictToAdministrative();
+                    break;
+                default:
+                    userLevelInput.value = '1';
+                    enableAllDepartments();
+            }
+            
+            // Debug: Log the values to check
+            console.log('Position:', positionSelect.value, 'User Level:', userLevelInput.value);
+        }
+
+        function restrictToAdministrative() {
+            const departmentSelect = document.getElementById('department');
+            
+            // Reset and disable all options except Administrative
+            Array.from(departmentSelect.options).forEach(option => {
+                if (option.value === 'Administrative (Main)') {
+                    option.disabled = false;
+                    option.style.display = 'block';
+                } else if (option.value !== '') { // Don't hide the default "Select your Department" option
+                    option.disabled = true;
+                    option.style.display = 'none';
+                }
+            });
+            
+            // Automatically select Administrative if Executive Position is chosen
+            departmentSelect.value = 'Administrative (Main)';
+        }
+
+        function enableAllDepartments() {
+            const departmentSelect = document.getElementById('department');
+            
+            // Enable and show all department options
+            Array.from(departmentSelect.options).forEach(option => {
+                option.disabled = false;
+                option.style.display = 'block';
+            });
+            
+            // Reset to default selection if currently on Administrative and changing from Executive
+            if (departmentSelect.value === 'Administrative (Main)') {
+                departmentSelect.value = '';
+            }
+        }
+
+        // Add event listener to position select to trigger the restriction
+        document.addEventListener('DOMContentLoaded', function() {
+            const positionSelect = document.getElementById('position');
+            positionSelect.addEventListener('change', updateUserLevel);
+            updateUserLevel();
+        });
     </script>
 </body>
 </html>

@@ -106,6 +106,7 @@ p {
     border-radius: 9px;
     width: 100%;
     height: auto;
+    margin-top: -10px; /* Move button up by 10px */
 }
 
 #welcome_logo {
@@ -155,6 +156,21 @@ p {
     flex-direction: row;
     margin-top: 20px;
 }
+
+#department-position-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 20px;
+    gap: 15px;
+}
+
+#department-position-container .form-group {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
 select#gender {
     width: 100%; /* Full width */
     padding: 5px; /* Add padding for better spacing */
@@ -168,19 +184,29 @@ select#gender {
     margin-left: 10px;
 }
 
-/* Style the dropdown on focus */
-select#gender:focus {
-    border-color: #353A56; /* Highlight border on focus */
-    outline: none; /* Remove default outline */
-    background-color: #fff; /* Optional: Change background on focus */
+select#department, select#position {
+    width: 100%;
+    padding: 5px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    appearance: none;
+    cursor: pointer;
 }
 
-/* Style the dropdown options */
-select#gender option {
-    font-size: 16px; /* Adjust font size */
-    padding: 5px; /* Add padding for better spacing */
-    background-color: #fff; /* Background color for options */
-    color: #333; /* Text color */
+select#department:focus, select#position:focus {
+    border-color: #353A56;
+    outline: none;
+    background-color: #fff;
+}
+
+select#department option, select#position option {
+    font-size: 16px;
+    padding: 5px;
+    background-color: #fff;
+    color: #333;
 }
 /*================================================== Classes */
 .profile_pic_cntr {

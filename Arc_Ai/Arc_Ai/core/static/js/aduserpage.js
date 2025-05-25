@@ -49,9 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Search within user name and email
                     const userName = card.querySelector('.user-info h3').textContent.toLowerCase();
                     const userEmail = card.querySelector('.user-email').textContent.toLowerCase();
+                    const department = card.querySelector('.department span').textContent.toLowerCase();
+                    const position = card.querySelector('.position span').textContent.toLowerCase();
                     
-                    // Check if the user name or email contains the search term
-                    if (userName.includes(searchTerm) || userEmail.includes(searchTerm)) {
+                    // Check if the user name, email, department, or position contains the search term
+                    if (userName.includes(searchTerm) || userEmail.includes(searchTerm) || department.includes(searchTerm) || position.includes(searchTerm)) {
                         card.style.display = 'flex';
                         matchCount++;
                     } else {
@@ -213,6 +215,36 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`An error occurred: ${error.message}`);
         });
     }
+    
+    // Real-time search functionality
+    const userCards = document.querySelectorAll('.user-card');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+        
+        userCards.forEach(card => {
+            const userName = card.querySelector('.user-info h3').textContent.toLowerCase();
+            const userEmail = card.querySelector('.user-email').textContent.toLowerCase();
+            const department = card.querySelector('.department span').textContent.toLowerCase();
+            const position = card.querySelector('.position span').textContent.toLowerCase();
+            
+            const matches = userName.includes(searchTerm) || 
+                          userEmail.includes(searchTerm) || 
+                          department.includes(searchTerm) || 
+                          position.includes(searchTerm);
+            
+            if (matches) {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Update the search results count
+        document.getElementById('active-users').textContent = visibleCount;
+    });
 });
 
 // Function to get CSRF token from cookies

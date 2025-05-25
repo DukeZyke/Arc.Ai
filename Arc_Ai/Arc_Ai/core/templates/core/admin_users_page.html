@@ -66,71 +66,64 @@
     </div>
 
     <div class="user-list">
-        {% if users %}
-            {% for user in users %}
+        {% if users_with_details %}
+            {% for user_data in users_with_details %}
             <div class="user-card">
                 <div class="user-avatar">
-                    <img src="{% static 'Images/avatar.png' %}" alt="{{ user.username }}">
+                    <img src="{% static 'Images/Profile' %}{{ user_data.signup_details.profile_avatar_id|default:1 }}.png" alt="{{ user_data.full_name }}">
                 </div>
                 <div class="user-info">
-                    <h3>{{ user.username }}</h3>
-                    <span class="user-email">({{ user.email }})</span>
+                    <h3>{{ user_data.full_name }}</h3>
+                    <span class="user-email">({{ user_data.user.email }})</span>
+                    <span class="username">@{{ user_data.user.username }}</span>
                 </div>
                 <div class="user-details">
                     <div class="department">
-                        <span>Department: 
-                            {% with department_found=False %}
-                                {% for detail in signup_details %}
-                                    {% if detail.user == user and not department_found %}
-                                        {{ detail.department|default:"Not Set" }}
-                                        {% with department_found=True %}{% endwith %}
-                                    {% endif %}
-                                {% empty %}
-                                    Not Set
-                                {% endfor %}
-                                {% if not department_found and signup_details %}
-                                    Not Set
-                                {% endif %}
-                            {% endwith %}
-                        </span>
+                        <span>Department: {{ user_data.department }}</span>
                     </div>
                     <div class="position">
-                        <span>Position: 
-                            {% with position_found=False %}
-                                {% for detail in signup_details %}
-                                    {% if detail.user == user and not position_found %}
-                                        {{ detail.position|default:"Not Set" }}
-                                        {% with position_found=True %}{% endwith %}
-                                    {% endif %}
-                                {% empty %}
-                                    Not Set
-                                {% endfor %}
-                                {% if not position_found and signup_details %}
-                                    Not Set
-                                {% endif %}
-                            {% endwith %}
-                        </span>
+                        <span>Position: {{ user_data.position }}</span>
+                    </div>
+                    <div class="contact">
+                        <span>Contact: {{ user_data.signup_details.contact_number }}</span>
+                    </div>
+                    <div class="age-gender">
+                        <span>Age: {{ user_data.signup_details.age }} | Gender: {{ user_data.signup_details.gender|title }}</span>
                     </div>
                 </div>
                 <div class="level-control-container">
                     <span>Level:</span>
                     <div class="level-control">
-                        <span class="level-value">{% if user.is_superuser %}3{% elif user.is_staff %}2{% else %}1{% endif %}</span>
-                        <!-- <div class="level-buttons">
-                            <button class="level-up" data-user-id="{{ user.id }}"><i class="bx bx-caret-up"></i></button>
-                            <button class="level-down" data-user-id="{{ user.id }}"><i class="bx bx-caret-down"></i></button>
-                        </div> -->
+                        <span class="level-value">{{ user_data.user_level }}</span>
+                        <span class="level-label">
+                            {% if user_data.user_level == 4 %}
+                                (Executive)
+                            {% elif user_data.user_level == 3 %}
+                                (Dept. Manager)
+                            {% elif user_data.user_level == 2 %}
+                                (Supervisor)
+                            {% else %}
+                                (Employee)
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
                 <div class="user-actions">
-                    <button class="edit-btn" data-user-id="{{ user.id }}"><i class="bx bx-edit"></i></button>
-                    <button class="delete-btn" data-user-id="{{ user.id }}"><i class="bx bx-trash"></i></button>
+                    <button class="edit-btn" data-user-id="{{ user_data.user.id }}" title="Edit User">
+                        <i class="bx bx-edit"></i>
+                    </button>
+                    <button class="delete-btn" data-user-id="{{ user_data.user.id }}" title="Delete User">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                    <button class="view-btn" data-user-id="{{ user_data.user.id }}" title="View Profile">
+                        <i class="bx bx-user"></i>
+                    </button>
                 </div>
             </div>
             {% endfor %}
         {% else %}
             <div class="no-users-message">
-                <p>No users found in the database.</p>
+                <p>No users have completed their signup details yet.</p>
             </div>
         {% endif %}
     </div>

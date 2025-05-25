@@ -25,11 +25,29 @@
     width: 100vw;
 }
 
+/* Remove or update this conflicting rule */
 #MainProfile img {
     width: 250px;
     height: auto;
     margin: 0 20px 0 20px;
 }
+
+/* Update the avatar container styling */
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 20px;
+}
+
+.avatar img {
+    width: 250px !important;  /* Override the conflicting rule */
+    height: 250px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #353A56;
+}
+
 #userInfo {
     display: flex;
     flex-direction: column;
@@ -39,8 +57,9 @@
 #userInfo h1 {
     font-size: 60px;
     font-weight: bold;
-    margin: 0;
+    margin-top: -60px;
     color: #000000;
+    justify-content: center;
 }
 #userInfo h2 {
     font-size: 18px;
@@ -315,4 +334,63 @@ html {
         height: auto;
         margin-left: 0;
     }
+}
+
+/* Update the info grid styling for better layout */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info .label {
+    font-weight: 600;
+    color: #353A56;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info .value {
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Remove the problematic :has-text selector as it's not widely supported */
+.user-level .value {
+    color: #353A56;
+    font-weight: 600;
+}
+
+.incomplete-profile {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.incomplete-profile a {
+    display: inline-block;
+    background-color: #353A56;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.incomplete-profile a:hover {
+    background-color: #2a2d47;
 }

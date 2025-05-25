@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
 import json
+from django.db import models
+
 
 # MODELS
 from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, DriveFolder
@@ -113,8 +115,9 @@ def edit_user_profile(request, pk):
         signup_details.position = request.POST.get('position')
         signup_details.department = request.POST.get('department')
 
-        if 'profile_avatar' in request.FILES:
-            signup_details.profile_avatar = request.FILES['profile_avatar']
+        # Save selected avatar
+        avatar_id = request.POST.get('profile_avatar_id', 1)
+        signup_details.profile_avatar_id = int(avatar_id)
 
         signup_details.save()
 
@@ -136,12 +139,12 @@ def edit_user_profile(request, pk):
         
         user.save()
 
-        return redirect('core:profilepage', pk=user.pk)  # Adjust to your actual view name
+        return redirect('core:profilepage', pk=user.pk)
 
     return render(request, 'core/edit_user_profile.html', {
         'signup_details': signup_details,
         'user': user,
-        'range': range(1, 16)  # Add this line to match signup_details view
+        'range': range(1, 16)
     })
 
 
@@ -151,8 +154,8 @@ def admin_files_page(request):
         messages.error(request, "You need administrator privileges to access this page.")
         return redirect('core:login')
     
-    # Get all users
-    users = User.objects.all().order_by('username')
+    # Get all users who have completed signup details
+    signup_details = SignupDetails.objects.select_related('user').all().order_by('first_name', 'last_name')
     
     # Prepare data structure for users and their files
     user_files_data = []
@@ -169,8 +172,10 @@ def admin_files_page(request):
             # Build the Drive service
             service = build('drive', 'v3', credentials=creds)
             
-            # For each user, fetch their files and folders from the database
-            for user in users:
+            # For each user with signup details, fetch their files and folders
+            for detail in signup_details:
+                user = detail.user
+                
                 # Get files and folders associated with this user from the database
                 user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')
                 user_drive_folders = DriveFolder.objects.filter(user=user).order_by('-created_at')
@@ -217,7 +222,6 @@ def admin_files_page(request):
                 
                 # Process each folder
                 for drive_folder in user_drive_folders:
-                    # For folders, we don't need to fetch additional details from Drive API
                     folder_data = {
                         'id': drive_folder.folder_id,
                         'name': drive_folder.name,
@@ -227,36 +231,22 @@ def admin_files_page(request):
                     }
                     folders.append(folder_data)
                     total_folders += 1
-                        
-                # Get user profile information if available
-                avatar = 'Images/Profile3.png'
-                department = 'N/A'
-                position = 'N/A'
                 
-                try:
-                    # Find the SignupDetails for this user if it exists
-                    # Note: You might need to add a user field to your SignupDetails model
-                    user_profile = SignupDetails.objects.filter(
-                        first_name__iexact=user.first_name, 
-                        last_name__iexact=user.last_name
-                    ).first()
-                    
-                    if user_profile and user_profile.profile_avatar:
-                        avatar = user_profile.profile_avatar.url
-                except Exception as e:
-                    print(f"Error fetching user profile: {str(e)}")
-                
-                # Add user data with their files and folders
+                # Add user data with their files and folders using signup_details
                 user_files_data.append({
                     'user': {
-                        'id': user.username,
-                        'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                        'id': user.id,
+                        'name': f"{detail.first_name} {detail.last_name}",
                         'email': user.email,
-                        'avatar': avatar,
-                        'department': department,
-                        'position': position,
+                        'username': user.username,
+                        'avatar': f'Images/Profile{detail.profile_avatar_id}.png',
+                        'department': detail.department or "Not Set",
+                        'position': detail.position or "Not Set",
+                        'user_level': detail.user_level,
+                        'contact_number': detail.contact_number,
                         'total_size': f"{user_total_size / (1024 * 1024):.2f} MB"
                     },
+                    'signup_details': detail,  # Pass the signup details object
                     'files': files,
                     'folders': folders,
                     'file_count': len(files),
@@ -268,7 +258,8 @@ def admin_files_page(request):
             messages.error(request, f"Error retrieving files: {str(e)}")
     else:
         # If no Drive credentials, just get basic info from database
-        for user in users:
+        for detail in signup_details:
+            user = detail.user
             user_drive_files = DriveFile.objects.filter(user=user).order_by('-uploaded_at')
             user_drive_folders = DriveFolder.objects.filter(user=user).order_by('-created_at')
             
@@ -293,14 +284,18 @@ def admin_files_page(request):
             
             user_files_data.append({
                 'user': {
-                    'id': user.username,
-                    'name': f"{user.first_name} {user.last_name}" if user.first_name else user.username,
+                    'id': user.id,
+                    'name': f"{detail.first_name} {detail.last_name}",
                     'email': user.email,
-                    'avatar': 'Images/Profile3.png',
-                    'department': 'N/A',
-                    'position': 'N/A',
+                    'username': user.username,
+                    'avatar': f'Images/Profile{detail.profile_avatar_id}.png',
+                    'department': detail.department or "Not Set",
+                    'position': detail.position or "Not Set",
+                    'user_level': detail.user_level,
+                    'contact_number': detail.contact_number,
                     'total_size': '0 MB'
                 },
+                'signup_details': detail,
                 'files': files,
                 'folders': folders,
                 'file_count': len(files),
@@ -313,7 +308,6 @@ def admin_files_page(request):
         'total_folders': total_folders,
         'total_size': f"{total_size / (1024 * 1024):.2f} MB",
         'active_page': 'files',  # For highlighting the current page in navigation
-        'signup_details': signup_details
     })
 
 def admin_project_page(request):
@@ -330,19 +324,31 @@ def admin_project_page(request):
     })
     
 def admin_users_page(request):
-    # Get users and other data...
-    users = User.objects.all().order_by('username')
+    # Check if user is authenticated and has admin privileges
+    if not request.user.is_authenticated or not request.user.is_staff:
+        messages.error(request, "You need administrator privileges to access this page.")
+        return redirect('core:login')
     
-    # Create a dictionary to map users to their signup details
-    user_details = {}
-    for detail in SignupDetails.objects.all():
-        user_details[detail.user_id] = detail
+    # Get all signup details (users who have completed registration)
+    signup_details = SignupDetails.objects.select_related('user').all().order_by('first_name', 'last_name')
+    
+    # Create a list of users with their complete information
+    users_with_details = []
+    for detail in signup_details:
+        users_with_details.append({
+            'user': detail.user,
+            'signup_details': detail,
+            'full_name': f"{detail.first_name} {detail.last_name}",
+            'department': detail.department or "Not Set",
+            'position': detail.position or "Not Set",
+            'user_level': detail.user_level,
+        })
     
     context = {
-        'users': users,
-        'user_details': user_details,
-        'total_users': users.count(),
-        'active_users': User.objects.filter(is_active=True).count(),
+        'users_with_details': users_with_details,
+        'total_users': len(users_with_details),
+        'active_users': len([u for u in users_with_details if u['user'].is_active]),
+        'active_page': 'home',  # For navigation highlighting
     }
     return render(request, 'core/admin_users_page.html', context)
 
@@ -418,7 +424,32 @@ def signup_details(request):
         contact_number = request.POST.get('contact_number')
         age = request.POST.get('age')
         gender = request.POST.get('gender')
-        # profile_avatar_id = request.POST.get('profile_avatar_id')
+        department = request.POST.get('department')
+        position = request.POST.get('position')
+        user_level = request.POST.get('user_level')
+        
+        # Server-side validation: Executive Position can only be Administrative department
+        if position == "Executive Position" and department != "Administrative (Main)":
+            messages.error(request, "Executive Position can only be assigned to Administrative department.")
+            return render(request, 'core/signup_details.html', {
+                'range': range(1, 16)
+            })
+        
+        # Double-check user_level based on position (server-side validation)
+        if position == "Employee":
+            user_level = 1
+        elif position == "Supervisor":
+            user_level = 2
+        elif position == "Dept. Manager":
+            user_level = 3
+        elif position == "Executive Position":
+            user_level = 4
+            department = "Administrative"  # Force Administrative for Executive
+        else:
+            user_level = 1  # Default to Employee level
+        
+        # Debug: Print the values to check
+        print(f"Position: {position}, Department: {department}, User Level: {user_level}")
         
         # Create or update SignupDetails for the logged-in user
         signup_details, created = SignupDetails.objects.update_or_create(
@@ -431,13 +462,27 @@ def signup_details(request):
                 'contact_number': contact_number,
                 'age': age,
                 'gender': gender,
+                'department': department,
+                'position': position,
+                'user_level': user_level,
             }
         )
 
-        # Handle profile avatar separately if needed
-        if 'profile_avatar' in request.FILES:
-            signup_details.profile_avatar = request.FILES['profile_avatar']
-            signup_details.save()
+        # Update user permissions based on position
+        if position == "Executive Position":
+            request.user.is_superuser = True
+            request.user.is_staff = True
+        elif position == "Dept. Manager":
+            request.user.is_superuser = False
+            request.user.is_staff = True  
+        elif position == "Supervisor":
+            request.user.is_superuser = False
+            request.user.is_staff = True
+        else:  # Employee
+            request.user.is_superuser = False
+            request.user.is_staff = False
+        
+        request.user.save()
 
         messages.info(request, "Profile details saved successfully!")
         return redirect('core:profilepage', pk=request.user.pk)
@@ -478,8 +523,10 @@ def logout_view(request):
     return redirect('core:login')
 
 def login(request):
-    if request.user.is_authenticated:
-        return redirect('core:user_involved_map')  # Already logged in, go to home
+    # Force logout if accessing login page directly
+    if request.user.is_authenticated and request.method == 'GET':
+        logout(request)
+        request.session.flush()
         
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -645,51 +692,87 @@ def saved(request):
     try:
         service = build('drive', 'v3', credentials=creds)
 
-        # Fetch folders from the root folder
+        # Get accessible files based on user level
+        accessible_files, accessible_folders = get_accessible_files_for_user(request.user)
+        
+        # Get file IDs that user can access
+        accessible_file_ids = set(accessible_files.values_list('file_id', flat=True))
+        accessible_folder_ids = set(accessible_folders.values_list('folder_id', flat=True))
+
+        # Fetch folders from Google Drive
         folder_results = service.files().list(
             q=f"'{folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
             pageSize=100,
             fields="files(id, name, parents)"
         ).execute()
 
-        folders = folder_results.get('files', [])
+        all_folders = folder_results.get('files', [])
+        # Filter folders based on access rights
+        folders = [folder for folder in all_folders if folder['id'] in accessible_folder_ids]
 
-        # Fetch files from the root folder
+        # Fetch files from Google Drive
         file_results = service.files().list(
             q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
             pageSize=100,
             fields="files(id, name, mimeType, size, createdTime, owners)"
         ).execute()
 
-        drive_files = file_results.get('files', [])
+        all_drive_files = file_results.get('files', [])
+        # Filter files based on access rights
+        drive_files = [file for file in all_drive_files if file['id'] in accessible_file_ids]
         
-        # Fetch trashed files
+        # Get uploader information from database with signup details
+        file_id_to_uploader_info = {}
+        file_id_to_level = {}
+        for file_obj in accessible_files:
+            try:
+                signup_details = file_obj.user.signup_details
+                uploader_name = f"{signup_details.first_name} {signup_details.last_name}"
+            except SignupDetails.DoesNotExist:
+                uploader_name = file_obj.user.username  # Fallback to username
+            
+            file_id_to_uploader_info[file_obj.file_id] = {
+                'username': file_obj.user.username,
+                'full_name': uploader_name,
+                'department': getattr(file_obj.user.signup_details, 'department', 'Not specified') if hasattr(file_obj.user, 'signup_details') else 'Not specified'
+            }
+            file_id_to_level[file_obj.file_id] = file_obj.uploader_user_level
+
+        # Add metadata for each file
+        for file in drive_files:
+            file['file_id'] = file['id']
+            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
+            
+            uploader_info = file_id_to_uploader_info.get(file['id'], {})
+            file['uploader_username'] = uploader_info.get('username', "Unknown User")
+            file['uploader_full_name'] = uploader_info.get('full_name', "Unknown User")
+            file['uploader_department'] = uploader_info.get('department', "Not specified")
+            file['uploader_level'] = file_id_to_level.get(file['id'], 1)
+            
+            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
+            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['icon'] = get_file_icon(file.get('mimeType', ''))
+
+        # Fetch trashed files (apply same filtering)
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
             fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
         ).execute()
         
-        trash_files = trashed_results.get('files', [])
+        all_trash_files = trashed_results.get('files', [])
+        trash_files = [file for file in all_trash_files if file['id'] in accessible_file_ids]
 
-        # Get all drive files from database for mapping to their uploaders
-        db_files = DriveFile.objects.select_related('user').all()
-        file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
-
-        # Add metadata for each file
-        for file in drive_files:
-            file['file_id'] = file['id']
-            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
-            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User") 
-            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
-            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
-            file['icon'] = get_file_icon(file.get('mimeType', ''))
-
-        # Add metadata for each trashed file
         for file in trash_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
-            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User")
+            
+            uploader_info = file_id_to_uploader_info.get(file['id'], {})
+            file['uploader_username'] = uploader_info.get('username', "Unknown User")
+            file['uploader_full_name'] = uploader_info.get('full_name', "Unknown User")
+            file['uploader_department'] = uploader_info.get('department', "Not specified")
+            file['uploader_level'] = file_id_to_level.get(file['id'], 1)
+            
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
@@ -706,8 +789,10 @@ def saved(request):
         'files': drive_files,
         'trash': trash_files,
         'ROOT_FOLDER_ID': ROOT_FOLDER_ID,
-        'user_filter': user_name,  # Pass the user filter to the template
+        'user_filter': user_name,
+        'current_user_level': getattr(request.user.signup_details, 'user_level', 1) if hasattr(request.user, 'signup_details') else 1,
     })
+
 def email(request):
     online_users = User.objects.all() 
     emails = Email.objects.all()
@@ -764,13 +849,9 @@ def google_drive_callback(request):
 
 def upload_file_to_drive(request):
     if request.method == 'POST':
-        # Check if user is authenticated first
         if not request.user.is_authenticated:
             messages.error(request, "You must be logged in to upload files.")
             return redirect('core:login')
-        
-        # Debug line - check if user is recognized
-        print(f"Authenticated user: {request.user.username}, ID: {request.user.id}")
             
         try:
             uploaded_files = request.FILES.getlist('file')
@@ -783,6 +864,15 @@ def upload_file_to_drive(request):
             
             creds = Credentials(**creds_data)
             service = build('drive', 'v3', credentials=creds)
+            
+            # Get current user's level and department
+            try:
+                signup_details = request.user.signup_details
+                user_level = signup_details.user_level
+                user_department = signup_details.department
+            except SignupDetails.DoesNotExist:
+                user_level = 1  # Default to lowest level
+                user_department = "Not specified"
             
             for uploaded_file in uploaded_files:
                 # Google Drive upload code
@@ -803,35 +893,15 @@ def upload_file_to_drive(request):
                     fields='id'
                 ).execute()
                 
-                print(f"File created in Drive with ID: {file.get('id')}")
-                
-                # FIXED CODE - More robust user handling
-                try:
-                    # Get a fresh user instance to ensure it's valid
-                    user = User.objects.get(id=request.user.id)
-                    print(f"Retrieved user: {user.username}, ID: {user.id}")
-                    
-                    # Create DriveFile with explicit save() to see any errors
-                    drive_file = DriveFile(
-                        user=user,
-                        name=uploaded_file.name,
-                        file_id=file.get('id')
-                    )
-                    drive_file.save()
-                    print(f"DriveFile created successfully with ID: {drive_file.id}")
-                    
-                except Exception as user_error:
-                    print(f"Error creating DriveFile record: {str(user_error)}")
-                    # Try with user ID 1 as fallback if your user fails
-                    admin_user = User.objects.get(id=1)
-                    DriveFile.objects.create(
-                        user=admin_user,  # Fallback to admin user
-                        name=uploaded_file.name,
-                        file_id=file.get('id')
-                    )
-                    print(f"Created DriveFile with admin user fallback")
+                # Create DriveFile with user level information
+                DriveFile.objects.create(
+                    user=request.user,
+                    name=uploaded_file.name,
+                    file_id=file.get('id'),
+                    uploader_user_level=user_level,
+                    uploader_department=user_department
+                )
             
-            # Check if upload was to root folder
             if folder_id == ROOT_FOLDER_ID:
                 return redirect('core:saved')
             else:
@@ -870,8 +940,8 @@ def delete_files_from_drive(request):
 
 def create_folder_in_drive(request):
     if request.method == 'POST':
-        folder_name = request.POST.get('folder_name')  # Get the folder name from the form
-        parent_folder_id = request.POST.get('parent_folder_id', ROOT_FOLDER_ID)  # Get parent folder ID, default to ROOT
+        folder_name = request.POST.get('folder_name')
+        parent_folder_id = request.POST.get('parent_folder_id', ROOT_FOLDER_ID)
 
         creds_data = request.session.get('credentials')
         if not creds_data:
@@ -883,47 +953,48 @@ def create_folder_in_drive(request):
         try:
             service = build('drive', 'v3', credentials=creds)
 
-            # Define folder metadata
             folder_metadata = {
                 'name': folder_name,
                 'mimeType': 'application/vnd.google-apps.folder',
-                'parents': [parent_folder_id]  # Use parent_folder_id instead of hardcoded ROOT_FOLDER_ID
+                'parents': [parent_folder_id]
             }
 
-            # Create the folder in Google Drive
             folder = service.files().create(
                 body=folder_metadata,
                 fields='id, name'
             ).execute()
 
-            # Save the folder information to the database with the current user
+            # Get current user's level and department
+            try:
+                signup_details = request.user.signup_details
+                user_level = signup_details.user_level
+                user_department = signup_details.department
+            except SignupDetails.DoesNotExist:
+                user_level = 1
+                user_department = "Not specified"
+
+            # Save folder with user level information
             DriveFolder.objects.create(
                 user=request.user,
                 name=folder['name'],
                 folder_id=folder['id'],
-                parent_folder_id=parent_folder_id
+                parent_folder_id=parent_folder_id,
+                creator_user_level=user_level,
+                creator_department=user_department
             )
 
-            print(f"Folder created: {folder['name']} (ID: {folder['id']})")
             messages.success(request, f"Folder '{folder['name']}' created successfully.")
             
-            # Determine where to redirect based on parent folder
-            if parent_folder_id == ROOT_FOLDER_ID:
-                return redirect('core:saved')  # Redirect to main saved page
-            else:
-                return redirect('core:view_folder_contents', folder_id=parent_folder_id)  # Return to parent folder
-
-        except Exception as e:
-            print("Error creating folder in Google Drive:", str(e))
-            messages.error(request, f"Error creating folder: {str(e)}")
-            
-            # Determine where to redirect based on parent folder
             if parent_folder_id == ROOT_FOLDER_ID:
                 return redirect('core:saved')
             else:
                 return redirect('core:view_folder_contents', folder_id=parent_folder_id)
 
-    messages.error(request, "Invalid request method.")
+        except Exception as e:
+            print("Error creating folder in Google Drive:", str(e))
+            messages.error(request, f"Error creating folder: {str(e)}")
+            return redirect('core:saved')
+
     return redirect('core:saved')
 
 def delete_folders(request):
@@ -1030,6 +1101,102 @@ def view_folder_contents(request, folder_id):
         'ROOT_FOLDER_ID': ROOT_FOLDER_ID,  # Pass ROOT_FOLDER_ID to the template
         'trash': trash_files,  # Add this line to pass trash files
     })
+
+def get_accessible_files_for_user(user):
+    """
+    Get files that a user can access based on their level and department
+    Higher levels can see lower level files, but only within their department (except executives)
+    """
+    try:
+        user_signup_details = user.signup_details
+        user_level = user_signup_details.user_level
+        user_department = user_signup_details.department
+    except SignupDetails.DoesNotExist:
+        user_level = 1
+        user_department = "Not specified"
+    
+    # Executive Position (Level 4) can see all files from all departments
+    if user_level == 4:
+        accessible_files = DriveFile.objects.all()
+        accessible_folders = DriveFolder.objects.all()
+    # Dept. Manager (Level 3) can see level 1, 2, and 3 files from their department only
+    elif user_level == 3:
+        accessible_files = DriveFile.objects.filter(
+            uploader_user_level__lte=3,
+            uploader_department=user_department
+        )
+        accessible_folders = DriveFolder.objects.filter(
+            creator_user_level__lte=3,
+            creator_department=user_department
+        )
+    # Supervisor (Level 2) can see level 1 and 2 files from their department only
+    elif user_level == 2:
+        accessible_files = DriveFile.objects.filter(
+            uploader_user_level__lte=2,
+            uploader_department=user_department
+        )
+        accessible_folders = DriveFolder.objects.filter(
+            creator_user_level__lte=2,
+            creator_department=user_department
+        )
+    # Employee (Level 1) can only see their own files
+    else:
+        accessible_files = DriveFile.objects.filter(user=user)
+        accessible_folders = DriveFolder.objects.filter(user=user)
+    
+    return accessible_files, accessible_folders
+
+def get_accessible_files_for_user_with_department_filter(user, include_department_filter=True):
+    """
+    Enhanced version with department filtering enabled by default
+    """
+    try:
+        user_signup_details = user.signup_details
+        user_level = user_signup_details.user_level
+        user_department = user_signup_details.department
+    except SignupDetails.DoesNotExist:
+        user_level = 1
+        user_department = "Not specified"
+    
+    # Executive Position (Level 4) - can see all files from all departments
+    if user_level == 4:
+        accessible_files = DriveFile.objects.all()
+        accessible_folders = DriveFolder.objects.all()
+    # Dept. Manager (Level 3) - can see their department files + lower levels in their department
+    elif user_level == 3:
+        if include_department_filter:
+            accessible_files = DriveFile.objects.filter(
+                uploader_user_level__lte=3,
+                uploader_department=user_department
+            )
+            accessible_folders = DriveFolder.objects.filter(
+                creator_user_level__lte=3,
+                creator_department=user_department
+            )
+        else:
+            # Fallback without department filter
+            accessible_files = DriveFile.objects.filter(uploader_user_level__lte=3)
+            accessible_folders = DriveFolder.objects.filter(creator_user_level__lte=3)
+    # Supervisor (Level 2) - can see level 1 and 2 files in their department
+    elif user_level == 2:
+        if include_department_filter:
+            accessible_files = DriveFile.objects.filter(
+                uploader_user_level__lte=2,
+                uploader_department=user_department
+            )
+            accessible_folders = DriveFolder.objects.filter(
+                creator_user_level__lte=2,
+                creator_department=user_department
+            )
+        else:
+            accessible_files = DriveFile.objects.filter(uploader_user_level__lte=2)
+            accessible_folders = DriveFolder.objects.filter(creator_user_level__lte=2)
+    # Employee (Level 1) - can only see their own files
+    else:
+        accessible_files = DriveFile.objects.filter(user=user)
+        accessible_folders = DriveFolder.objects.filter(user=user)
+    
+    return accessible_files, accessible_folders
 
 
 def move_files_to_trash(request):
@@ -1248,27 +1415,20 @@ def get_file_icon(mime_type):
 def get_all_users_for_usermap(request):
     users_data = []
     
-    for user in User.objects.all():
-        # Try to get SignupDetails if available
-        department = position = "Not specified"
-        try:
-            details = SignupDetails.objects.get(user=user)
-            first_name = details.first_name
-            last_name = details.last_name
-            department = details.department
-            position = details.position
-        except SignupDetails.DoesNotExist:
-            # If no SignupDetails, use User model fields
-            first_name = user.first_name or user.username
-            last_name = user.last_name or ""
+    # Only get users who have completed signup details
+    signup_details = SignupDetails.objects.select_related('user').all()
+    
+    for detail in signup_details:
+        user = detail.user
         
-        # Add all users to the response with level indicators
+        # Add users to the response with their signup details
         users_data.append({
             'id': user.id,
-            'first_name': first_name,
-            'last_name': last_name,
-            'department': department,
-            'position': position,
+            'first_name': detail.first_name,
+            'last_name': detail.last_name,
+            'department': detail.department or "Not specified",
+            'position': detail.position or "Not specified",
+            'user_level': detail.user_level,
             'is_superuser': user.is_superuser,
             'is_staff': user.is_staff,
             'x': 100 + ((user.id * 200) % 800),  # Initial positions
@@ -1333,6 +1493,13 @@ def delete_user(request):
             })
             
         was_active = user_to_delete.is_active
+        username = user_to_delete.username
+        
+        # Delete user
+        user_to_delete.delete()
+        
+        # Log the deletion
+       
         username = user_to_delete.username
         
         # Delete user

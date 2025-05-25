@@ -68,36 +68,45 @@ class DriveFile(models.Model):
     name = models.CharField(max_length=255)
     file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploader_user_level = models.IntegerField(default=1)  # Add this field
+    uploader_department = models.CharField(max_length=100, blank=True)  # Optional: for department-based filtering
+
+    def __str__(self):
+        return f"{self.name} (Level {self.uploader_user_level})"
 
 class DriveFolder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drive_folders')
     name = models.CharField(max_length=255)
     folder_id = models.CharField(max_length=255, db_index=True)
-    parent_folder_id = models.CharField(max_length=255, blank=True, null=True)  # For folder hierarchy
+    parent_folder_id = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    creator_user_level = models.IntegerField(default=1)  # Add this field
+    creator_department = models.CharField(max_length=100, blank=True)  # Optional
     
     def __str__(self):
-        return f"{self.name} ({self.user.username})"
+        return f"{self.name} (Level {self.creator_user_level}) ({self.user.username})"
     
 
 class SignupDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
-    # profile_avatar_id = models.IntegerField(default=1)  # Save avatar as id (1-15)
-    first_name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    complete_address = models.CharField(max_length=255)
-    contact_number = models.CharField(max_length=255)
-    age = models.CharField(max_length=3)
-    gender = models.CharField(max_length=255)
-    position = models.CharField(max_length=100, default="No position yet")
-    department = models.CharField(max_length=100, default="No position yet")
+    first_name = models.CharField(max_length=50)
+    middle_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50)
+    complete_address = models.TextField()
+    contact_number = models.CharField(max_length=20)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=10)
+    department = models.CharField(max_length=100, blank=True)
+    position = models.CharField(max_length=100, blank=True)
+    user_level = models.IntegerField(default=1)  # Add this field
+    profile_avatar_id = models.IntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    # @property
-    # def avatar_url(self):
-    #     return f'/static/Images/Profile{self.profile_avatar_id}.png'
-
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
     
+
 # For notification sidebar Popup TEST
 class Notification(models.Model):
     title = models.CharField(max_length=255)
