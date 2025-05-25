@@ -712,10 +712,10 @@ def saved(request):
     try:
         service = build('drive', 'v3', credentials=creds)
 
-        # Get accessible files based on user level
+        # Get accessible files and folders based on user level and department
         accessible_files, accessible_folders = get_accessible_files_for_user(request.user)
         
-        # Get file IDs that user can access
+        # Get file IDs and folder IDs that user can access
         accessible_file_ids = set(accessible_files.values_list('file_id', flat=True))
         accessible_folder_ids = set(accessible_folders.values_list('folder_id', flat=True))
 
@@ -728,13 +728,39 @@ def saved(request):
 
         all_folders = folder_results.get('files', [])
         # Filter folders based on access rights
-        folders = [folder for folder in all_folders if folder['id'] in accessible_folder_ids]
+        filtered_folders = [folder for folder in all_folders if folder['id'] in accessible_folder_ids]
+
+        # Get creator information from database with signup details for folders
+        folder_id_to_creator_info = {}
+        for folder_obj in accessible_folders:
+            try:
+                signup_details = folder_obj.user.signup_details
+                creator_name = f"{signup_details.first_name} {signup_details.last_name}"
+                creator_department = signup_details.department
+            except SignupDetails.DoesNotExist:
+                creator_name = folder_obj.user.username  # Fallback to username
+                creator_department = "Not specified"
+            
+            folder_id_to_creator_info[folder_obj.folder_id] = {
+                'username': folder_obj.user.username,
+                'full_name': creator_name,
+                'department': creator_department,
+                'user_level': getattr(folder_obj.user.signup_details, 'user_level', 1) if hasattr(folder_obj.user, 'signup_details') else 1,
+            }
+
+        # Add creator metadata to folders
+        for folder in filtered_folders:
+            creator_info = folder_id_to_creator_info.get(folder['id'], {})
+            folder['creator_username'] = creator_info.get('username', "Unknown User")
+            folder['creator_full_name'] = creator_info.get('full_name', "Unknown User")
+            folder['creator_department'] = creator_info.get('department', "Not specified")
+            folder['creator_level'] = creator_info.get('user_level', 1)
 
         # Fetch files from Google Drive
         file_results = service.files().list(
             q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
             pageSize=100,
-            fields="files(id, name, mimeType, size, createdTime, owners)"
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
 
         all_drive_files = file_results.get('files', [])
@@ -770,19 +796,21 @@ def saved(request):
             file['uploader_level'] = file_id_to_level.get(file['id'], 1)
             
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
-            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
+            file['webViewLink'] = file.get('webViewLink', '')
 
         # Fetch trashed files (apply same filtering)
         trashed_results = service.files().list(
             q="trashed = true",
             pageSize=20,
-            fields="files(id, name, mimeType, webViewLink, size, createdTime, owners)"
+            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
-        
+
         all_trash_files = trashed_results.get('files', [])
         trash_files = [file for file in all_trash_files if file['id'] in accessible_file_ids]
 
+        # Add metadata for each trashed file
         for file in trash_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
@@ -794,18 +822,19 @@ def saved(request):
             file['uploader_level'] = file_id_to_level.get(file['id'], 1)
             
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
-            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
+            file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
+            file['webViewLink'] = file.get('webViewLink', '')
 
     except Exception as e:
         print("Error fetching files or folders from Google Drive:", str(e))
         messages.error(request, "Failed to fetch files or folders from Google Drive.")
-        folders = []
+        filtered_folders = []
         drive_files = []
         trash_files = []
 
     return render(request, 'core/saved.html', {
-        'folders': folders,
+        'folders': filtered_folders,  # Now includes creator information
         'files': drive_files,
         'trash': trash_files,
         'ROOT_FOLDER_ID': ROOT_FOLDER_ID,
@@ -1052,74 +1081,115 @@ def view_folder_contents(request, folder_id):
         messages.error(request, "You must authorize Google Drive to view folder contents.")
         return redirect('core:google_drive_auth')
 
+    # Check if user has access to this specific folder
+    accessible_files, accessible_folders = get_accessible_files_for_user(request.user)
+    accessible_folder_ids = set(accessible_folders.values_list('folder_id', flat=True))
+    
+    # If the folder_id is not in accessible folders and it's not the root folder, deny access
+    if folder_id != ROOT_FOLDER_ID and folder_id not in accessible_folder_ids:
+        messages.error(request, "You don't have permission to access this folder.")
+        return redirect('core:saved')
+
     creds = Credentials(**creds_data)
 
     try:
         service = build('drive', 'v3', credentials=creds)
 
+        # Get file IDs and folder IDs that user can access
+        accessible_file_ids = set(accessible_files.values_list('file_id', flat=True))
+
         # Fetch folders from the root folder
         folder_results = service.files().list(
-            q=f"'{ROOT_FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder'",
+            q=f"'{ROOT_FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
             pageSize=100,
             fields="files(id, name, parents)"
         ).execute()
 
-        folders = folder_results.get('files', [])
+        all_folders = folder_results.get('files', [])
+        # Filter folders based on access rights
+        filtered_folders = [folder for folder in all_folders if folder['id'] in accessible_folder_ids]
 
-        # Fetch files inside the clicked folder
+        # Get creator information from database with signup details for folders
+        folder_id_to_creator_info = {}
+        for folder_obj in accessible_folders:
+            try:
+                signup_details = folder_obj.user.signup_details
+                creator_name = f"{signup_details.first_name} {signup_details.last_name}"
+                creator_department = signup_details.department
+            except SignupDetails.DoesNotExist:
+                creator_name = folder_obj.user.username  # Fallback to username
+                creator_department = "Not specified"
+            
+            folder_id_to_creator_info[folder_obj.folder_id] = {
+                'username': folder_obj.user.username,
+                'full_name': creator_name,
+                'department': creator_department,
+                'user_level': getattr(folder_obj.user.signup_details, 'user_level', 1) if hasattr(folder_obj.user, 'signup_details') else 1,
+            }
+
+        # Add creator metadata to folders
+        for folder in filtered_folders:
+            creator_info = folder_id_to_creator_info.get(folder['id'], {})
+            folder['creator_username'] = creator_info.get('username', "Unknown User")
+            folder['creator_full_name'] = creator_info.get('full_name', "Unknown User")
+            folder['creator_department'] = creator_info.get('department', "Not specified")
+            folder['creator_level'] = creator_info.get('user_level', 1)
+
+        # Rest of your existing file processing code...
         file_results = service.files().list(
-            q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder'",
+            q=f"'{folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
             pageSize=100,
             fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
         ).execute()
 
-        drive_files = file_results.get('files', [])
-        
-        # Fetch trashed files
-        trashed_results = service.files().list(
-            q="trashed = true",
-            pageSize=20,
-            fields="files(id, name, mimeType, size, createdTime, owners, webViewLink)"
-        ).execute()
+        all_drive_files = file_results.get('files', [])
+        drive_files = [file for file in all_drive_files if file['id'] in accessible_file_ids]
 
-        trash_files = trashed_results.get('files', [])
+        # Get uploader information from database with signup details
+        file_id_to_uploader_info = {}
+        file_id_to_level = {}
+        for file_obj in accessible_files:
+            try:
+                signup_details = file_obj.user.signup_details
+                uploader_name = f"{signup_details.first_name} {signup_details.last_name}"
+            except SignupDetails.DoesNotExist:
+                uploader_name = file_obj.user.username  # Fallback to username
+            
+            file_id_to_uploader_info[file_obj.file_id] = {
+                'username': file_obj.user.username,
+                'full_name': uploader_name,
+                'department': getattr(file_obj.user.signup_details, 'department', 'Not specified') if hasattr(file_obj.user, 'signup_details') else 'Not specified'
+            }
+            file_id_to_level[file_obj.file_id] = file_obj.uploader_user_level
 
-        # Get all drive files from database for mapping to their uploaders
-        db_files = DriveFile.objects.select_related('user').all()
-        file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
-        
         # Add metadata for files including uploader
         for file in drive_files:
             file['file_id'] = file['id']
             file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
-            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User")
+            
+            uploader_info = file_id_to_uploader_info.get(file['id'], {})
+            file['uploader_username'] = uploader_info.get('username', "Unknown User")
+            file['uploader_full_name'] = uploader_info.get('full_name', "Unknown User")
+            file['uploader_department'] = uploader_info.get('department', "Not specified")
+            file['uploader_level'] = file_id_to_level.get(file['id'], 1)
+            
             file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
             file['size'] = f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown'
             file['icon'] = get_file_icon(file.get('mimeType', ''))
             file['webViewLink'] = file.get('webViewLink', '')
 
-            # Add metadata for each trashed file
-        for file in trash_files:
-            file['file_id'] = file['id']
-            file['owner'] = file.get('owners', [{}])[0].get('displayName', 'Unknown')
-            file['uploader_username'] = file_id_to_uploader.get(file['id'], "Unknown User")
-            file['date'] = datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S')
-            file['size'] = f"{int(file['size']) / 1024:.2f} KB" if 'size' in file else 'Unknown'
-            file['icon'] = get_file_icon(file.get('mimeType', ''))
-
     except Exception as e:
         print("Error fetching folder contents from Google Drive:", str(e))
         messages.error(request, "Failed to fetch folder contents from Google Drive.")
-        folders = []
+        filtered_folders = []
         drive_files = []
-        trash_files = []  # Add this line
 
     return render(request, 'core/saved.html', {
-        'folders': folders,  # Pass folders to the template
-        'files': drive_files,  # Pass files inside the clicked folder
-        'folder_id': folder_id,  # Pass the current folder ID to the template
-        'ROOT_FOLDER_ID': ROOT_FOLDER_ID,  # Pass ROOT_FOLDER_ID to the template
-        'trash': trash_files,  # Add this line to pass trash files
+        'folders': filtered_folders,  # Now includes creator information
+        'files': drive_files,
+        'folder_id': folder_id,
+        'ROOT_FOLDER_ID': ROOT_FOLDER_ID,
+        'current_user_level': getattr(request.user.signup_details, 'user_level', 1) if hasattr(request.user, 'signup_details') else 1,
     })
 
 def get_accessible_files_for_user(user):
