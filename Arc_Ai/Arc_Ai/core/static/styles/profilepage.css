@@ -209,3 +209,110 @@
     max-width: 1437px;
     height: 150px;
 }
+
+/* Responsive scaling for different display settings */
+html {
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Media queries for different display scales */
+@media screen and (-webkit-min-device-pixel-ratio: 1.25), 
+       screen and (min-resolution: 120dpi) {
+    html {
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    body {
+        overflow-x: hidden;
+    }
+    
+    #cont {
+        transform: scale(0.8);
+        transform-origin: left top;
+        width: calc(125% - 240px); /* Account for sidebar */
+        margin-left: 0;
+        overflow-x: hidden;
+    }
+    
+    #MainProfile {
+        width: 100%;
+        padding-left: 20px;
+    }
+    
+    #MainProfile img {
+        width: 200px;
+    }
+    
+    #userInfo h1 {
+        font-size: 50px;
+    }
+    
+    #setting img {
+        right: 60px;
+    }
+    
+    #personalInfo {
+        width: 400px;
+    }
+    
+    #cardcont {
+        width: 90%;
+        padding-left: 10px;
+    }
+    
+    #EmployeeAwards {
+        width: 90%;
+    }
+    
+    .award {
+        margin-left: 20px;
+    }
+}
+
+/* General responsive adjustments for smaller screens */
+@media screen and (max-width: 992px) {
+    #MainProfile {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    #userInfo {
+        align-items: center;
+    }
+    
+    #personalInfo {
+        width: 90%;
+    }
+    
+    #setting img {
+        position: static;
+        margin: 10px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #ProjectHistory {
+        padding-left: 10px;
+    }
+    
+    #EmployeeAwards {
+        padding-left: 10px;
+    }
+    
+    #MainProfile img {
+        width: 150px;
+    }
+    
+    #userInfo h1 {
+        font-size: 40px;
+    }
+    
+    .award {
+        flex-direction: column;
+        height: auto;
+        margin-left: 0;
+    }
+}

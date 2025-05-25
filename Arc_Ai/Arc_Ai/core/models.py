@@ -69,12 +69,16 @@ class DriveFile(models.Model):
     file_id = models.CharField(max_length=255, db_index=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.name} ({self.user.username})"
+
 class DriveFolder(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='drive_folders')
     name = models.CharField(max_length=255)
     folder_id = models.CharField(max_length=255, db_index=True)
     parent_folder_id = models.CharField(max_length=255, blank=True, null=True)  # For folder hierarchy
     created_at = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='folders', null=True, blank=True)  # <-- Add this line
     
     def __str__(self):
         return f"{self.name} ({self.user.username})"
@@ -82,7 +86,7 @@ class DriveFolder(models.Model):
 
 class SignupDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signup_details')
-    # profile_avatar_id = models.IntegerField(default=1)  # Save avatar as id (1-15)
+    profile_avatar_id = models.IntegerField(default=1)  # Save avatar as id (1-15)
     first_name = models.CharField(max_length=255)
     middle_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -93,9 +97,9 @@ class SignupDetails(models.Model):
     position = models.CharField(max_length=100, default="No position yet")
     department = models.CharField(max_length=100, default="No position yet")
 
-    # @property
-    # def avatar_url(self):
-    #     return f'/static/Images/Profile{self.profile_avatar_id}.png'
+    @property
+    def avatar_url(self):
+        return f'/static/Images/Profile{self.profile_avatar_id}.png'
 
     
 # For notification sidebar Popup TEST
@@ -112,15 +116,19 @@ class Notification(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=100)
     project_desc = models.CharField(max_length=100, blank=True, default='No description provided')
-    project_id = models.CharField(max_length=20, unique=True, blank=True)
+    # Remove project_id field!
     start_date = models.DateField(max_length=20)
     finish_date = models.DateField(max_length=20)
     project_status = models.CharField(max_length=50)
     project_manager = models.CharField(max_length=100)
+
+    @property
+    def project_id_str(self):
+        return f"HR-2024-ONB-{self.id:02d}"
     
 
     def __str__(self):
-        return f"{self.name} {self.project_id}"
+        return f"{self.name} {self.project_id_str}"
     
 class ProjectMember(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members')

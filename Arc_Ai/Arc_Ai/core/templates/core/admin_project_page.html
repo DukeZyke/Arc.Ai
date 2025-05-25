@@ -74,7 +74,7 @@
                 </div>
                 <div class="project-info">
                     <h3>{{ project.name }}</h3>
-                    <p><span class="span">Project ID:</span> HR-2024-ONB-{{ project.project_id }}</p>
+                    <p><span class="span">Project ID:</span> {{project.project_id_str}}</p>
                     <p><span class="span">Start Date:</span> {{ project.start_date }}</p>
                     <p><span class="span">Finish Date:</span> {{ project.finish_date }}</p>
                 </div>
@@ -95,7 +95,7 @@
                             {% endfor %}
                         {% endwith %}
                     </p>
-                    {% if project.project_status == 'Complete' %}
+                    {% if project.project_status == 'Completed' %}
                         <p class="status" >Status: <span class="status-ongoing" style="color: #6AFF3C">{{ project.project_status }}</span></p>
                     {% elif project.project_status == 'Ongoing' %}
                         <p class="status" >Status: <span class="status-ongoing" style="color: orange">{{ project.project_status }}</span></p>

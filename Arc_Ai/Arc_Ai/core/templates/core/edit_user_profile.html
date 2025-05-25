@@ -36,13 +36,13 @@
                 Log out
             </button>
         </form>
-
     </div>
     <div id="cont_jar">
         <div id="formdiv">
             <form method="post" action="{% url 'core:edit_user_profile' user.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="user_pk" value="{{ user.pk }}">
+                <input type="hidden" name="profile_avatar_id" id="profile_avatar_id" value="{{ signup_details.profile_avatar_id|default:1 }}">
                 <div id="content">
                     <div id="signin_form">
                         {% if signup_details %}
@@ -114,28 +114,23 @@
                         {% endif %}
                     </div>
                 </div>
-                <!-- Avatar Picker Section -->
-                <input type="hidden" id="profile_avatar_id" name="profile_avatar_id" value="{{ signup_details.profile_avatar_id }}">
-                <div id="select_profile">
-                    <div id="active_profile_pic">
-                        <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id }}.png" style="width:80px;">
-                    </div>
-                        
-                    <p>Select Profile Picture</p>
-                    <div class="profile_pic_cntr">
-                        {% for i in range %}
-                            <img
-                                class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}"
-                                src="{% static 'Images/Profile' %}{{ i }}.png"
-                                alt="Profile Picture {{ i }}"
-                                style="width:6px;cursor:pointer;"
-                                onclick="selectProfilePicture(this, '{{ i }}')">
-                        {% endfor %}
-                    </div>
-                </div>
         </div>
         <div id="logo_container" class="gap">
-            <!-- Any additional content -->
+            <div id="select_profile">
+                <div id="active_profile_pic">
+                    <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png">
+                </div>
+                <p>Select Profile Picture</p>
+                <div class="profile_pic_cntr">
+                    {% for i in range %}
+                        <img class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}" 
+                             src="{% static 'Images/Profile' %}{{ i }}.png" 
+                             alt="Profile Picture {{ i }}" 
+                             onclick="selectProfilePicture(this, '{{ i }}')">
+                    {% endfor %}
+                </div>
+            </div>
+            </form>
         </div>
     </div>
     <script>
@@ -174,6 +169,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         updateUserLevel();
     });
-</script>
+    </script>
 </body>
 </html>
