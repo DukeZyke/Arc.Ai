@@ -1,10 +1,10 @@
 #cont {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 50px;
-  overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 50px;
+    overflow-x: hidden;
 }
 #vline {
     width: 1px;
@@ -57,10 +57,10 @@
 #userInfo h1 {
     font-size: 60px;
     font-weight: bold;
-    margin-top: -60px;
     color: #000000;
-    justify-content: center;
+    max-width: 500px;
 }
+
 #userInfo h2 {
     font-size: 18px;
     font-weight: normal;
