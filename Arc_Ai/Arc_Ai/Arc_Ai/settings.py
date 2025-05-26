@@ -89,16 +89,27 @@ WSGI_APPLICATION = 'Arc_Ai.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# ...existing code...
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Use psycopg2 for PostgreSQL
+#         'NAME': 'test',
+#         'USER': 'postgres',  # Default PostgreSQL user
+#         'PASSWORD': 'herald123',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+# ...existing code...
+
+# ...existing code...
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'arc.ai_database',
-        'USER': 'test_user',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# ...existing code...
 
 
 # Password validation

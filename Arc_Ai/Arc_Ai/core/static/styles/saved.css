@@ -15,16 +15,16 @@
 
 .folder-item {
     min-width: 300px;
-    height: 100px;
+    height: 120px; /* Increased height to accommodate metadata */
     background-color: #f1f3f5;
     border-radius: 10px;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    padding: 10px;
 }
 
 .folder-content {
@@ -35,32 +35,97 @@
     width: 100%;
 }
 
+.folder-main-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    flex: 1;
+}
+
 .folder-item:hover {
     background-color: #e9ecef;
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.folder-item a {
+.folder-name {
     text-decoration: none;
     color: white;
     font-family: 'Inter', sans-serif;
     font-size: 1.1em;
+    font-weight: 600;
     text-align: center;
     word-break: break-word;
     background: #353A56;
-    padding:10px;
-    border-radius: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: block;
 }
 
-.folder-item a:hover{
+.folder-name:hover {
     color: black;
+    background-color: #f8f9fa;
+}
+
+.folder-metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+.folder-creator {
+    font-weight: 500;
+    color: #333;
+}
+
+.folder-department {
+    font-size: 11px;
+    color: #666;
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    width: fit-content;
+}
+
+.folder-level {
+    font-size: 11px;
+    background-color: #e6f3ff;
+    color: #0066cc;
+    padding: 2px 6px;
+    border-radius: 3px;
+    width: fit-content;
+}
+
+.executive-folder-access {
+    font-size: 10px;
+    color: #ff6b35;
+    background-color: #fff3cd;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #ffeaa7;
+    width: fit-content;
+}
+
+.same-dept-folder {
+    font-size: 10px;
+    color: #155724;
+    background-color: #d4edda;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #c3e6cb;
+    width: fit-content;
 }
 
 .folder-checkbox {
-    position: relative;
+    position: absolute;
+    top: 10px;
+    left: 10px;
     z-index: 2;
-    scale: 1;
+    scale: 1.2;
 }
 
 #delete-selected-folders-btn {
@@ -150,13 +215,13 @@
 .file-list {
     list-style: none;
     padding: 0;
-    margin: 20px 0;
+    margin: 0;
 }
 
 .file-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 10px 0;
     margin: 5px 0;
     border-radius: 4px;
     transition: background-color 0.2s;
@@ -323,11 +388,10 @@
 
 /* Divider */
 .horizontal-line {
+    width: 100%;
     height: 1px;
-    background-color: #e0e0e0;
-    flex-grow: 1;
-    margin-left: 5px;
-    margin-right: 5px;
+    background-color: #ddd;
+    margin: 0;
 }
 
 /* Trash Section Styles */
@@ -488,4 +552,138 @@
 
 .dropdown-content3.show {
     display: block;
+}
+
+/* Search Bar Styling */
+.file-management-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.file-management-header h1 {
+    margin: 0;
+    color: #353A56;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+}
+
+.search-bar input::placeholder {
+    color: #999;
+}
+
+.search-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-icon-btn:hover {
+    color: #353A56;
+}
+
+.search-icon-btn i {
+    font-size: 18px;
+}
+
+.files-count {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.files-count strong {
+    color: #353A56;
+    font-weight: 600;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+}
+
+.department-filter-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.department-filter-section label {
+    color: #666;
+    font-weight: 500;
+}
+
+.department-filter-section select {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    color: #333;
+}
+
+.department-filter-section select:focus {
+    outline: none;
+    border-color: #353A56;
+}
+
+/* Update existing file styling for better search visibility */
+.file-item.hidden {
+    display: none !important;
+}
+
+.folder-item.hidden {
+    display: none !important;
+}
+
+/* Search results counter */
+.search-results {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.file-container {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.file-container.hidden {
+    display: none !important;
 }

@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
-    <title>Edit Profile</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/edit_user.css' %}?v=1.0">
 </head>
@@ -30,7 +29,7 @@
                 <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
             </div>
         </div>
-        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+        <form id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="logout">
                 <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
@@ -38,44 +37,49 @@
             </button>
         </form>
     </div>
+    
     <div id="cont_jar">
         <div id="formdiv">
-            <form method="post" action="{% url 'core:edit_user_profile' user.pk %}" enctype="multipart/form-data">
             <form method="post" action="{% url 'core:edit_user_profile' user.pk %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="user_pk" value="{{ user.pk }}">
                 <input type="hidden" name="profile_avatar_id" id="profile_avatar_id" value="{{ signup_details.profile_avatar_id|default:1 }}">
-                <input type="hidden" name="profile_avatar_id" id="profile_avatar_id" value="{{ signup_details.profile_avatar_id|default:1 }}">
+                
                 <div id="content">
                     <div id="signin_form">
                         {% if signup_details %}
                         <h1 class="titles justify-center">Edit User Information</h1>
-                        <!-- Form fields unchanged -->
-                        <!-- Form fields unchanged -->
+                        
                         <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" value="{{ user.email }}" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="first_name">First Name:</label>
                             <input type="text" id="first_name" name="first_name" value="{{ signup_details.first_name }}" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="middle_name">Middle Name:</label>
                             <input type="text" id="middle_name" name="middle_name" value="{{ signup_details.middle_name }}" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="last_name">Last Name:</label>
                             <input type="text" id="last_name" name="last_name" value="{{ signup_details.last_name }}" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="complete_address">Complete Address:</label>
                             <input type="text" id="complete_address" name="complete_address" value="{{ signup_details.complete_address }}" required>
                         </div>
+                        
                         <div class="form-group">
                             <label for="contact_number">Contact No.:</label>
                             <input type="text" id="contact_number" name="contact_number" value="{{ signup_details.contact_number }}" required>
                         </div>
+                        
                         <div id="age-gender_container">
                             <div class="form-group">
                                 <label for="age">Age:</label>
@@ -88,12 +92,10 @@
                                     <option value="male" {% if signup_details.gender == "male" %}selected{% endif %}>Male</option>
                                     <option value="female" {% if signup_details.gender == "female" %}selected{% endif %}>Female</option>
                                     <option value="other" {% if signup_details.gender == "other" %}selected{% endif %}>Other</option>
-                                    <option value="male" {% if signup_details.gender == "male" %}selected{% endif %}>Male</option>
-                                    <option value="female" {% if signup_details.gender == "female" %}selected{% endif %}>Female</option>
-                                    <option value="other" {% if signup_details.gender == "other" %}selected{% endif %}>Other</option>
                                 </select>
                             </div>
                         </div>
+                        
                         <div id="department-position_container">
                             <div class="form-group">
                                 <label for="department">Department:</label>
@@ -105,48 +107,46 @@
                             </div>
                         </div>
                         <button id="adminedit-submit-btn" type="submit">Save</button>
-                        <button id="adminedit-submit-btn" type="submit">Save</button>
                         {% endif %}
                     </div>
                 </div>
+            </form>
         </div>
+        
         <div id="logo_container" class="gap">
             <div id="select_profile">
                 <div id="active_profile_pic">
-                    <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png">
-                    <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png">
+                    <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png" alt="Selected Profile Picture">
                 </div>
                 <p>Select Profile Picture</p>
                 <div class="profile_pic_cntr">
                     {% for i in range %}
                         <img class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}" 
-                             src="{% static 'Images/Profile' %}{{ i }}.png" 
-                             alt="Profile Picture {{ i }}" 
-                             onclick="selectProfilePicture(this, '{{ i }}')">
-                        <img class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}" 
-                             src="{% static 'Images/Profile' %}{{ i }}.png" 
-                             alt="Profile Picture {{ i }}" 
-                             onclick="selectProfilePicture(this, '{{ i }}')">
+                                src="{% static 'Images/Profile' %}{{ i }}.png" 
+                                alt="Profile Picture {{ i }}" 
+                                onclick="selectProfilePicture(this, '{{ i }}')">
                     {% endfor %}
                 </div>
             </div>
-            </form>
         </div>
     </div>
+
     <script>
-    <script>
-    function selectProfilePicture(img, avatarId) {
-        document.getElementById('profile_avatar_id').value = avatarId;
-        document.getElementById('profile_avatar_id').value = avatarId;
-        document.getElementById('selected_profile_pic').src = img.src;
-        document.querySelectorAll('.profile_pic_option').forEach(function(i) {
-            i.classList.remove('selected');
-        });
-        document.querySelectorAll('.profile_pic_option').forEach(function(i) {
-            i.classList.remove('selected');
-        });
-        img.classList.add('selected');
-    }
+        function selectProfilePicture(img, avatarId) {
+            // Update the hidden input value
+            document.getElementById('profile_avatar_id').value = avatarId;
+            
+            // Update the selected profile picture display
+            document.getElementById('selected_profile_pic').src = img.src;
+            
+            // Remove selected class from all options
+            document.querySelectorAll('.profile_pic_option').forEach(function(option) {
+                option.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked image
+            img.classList.add('selected');
+        }
     </script>
 </body>
 </html>

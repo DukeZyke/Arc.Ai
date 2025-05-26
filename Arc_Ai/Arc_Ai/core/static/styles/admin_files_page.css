@@ -325,7 +325,7 @@
   position: absolute;
   width: 48px;
   height: 48px;
-  top: 47px;
+  top: 70px;
   left: 1040px;
   
 }
@@ -339,13 +339,14 @@
     justify-content: center;
 }
 
-.icon-button i {
-    font-size: 20px; /* Adjust icon size */
-    color: #333; /* Adjust icon color */
+.icon-button img {
+    width: 30px; /* Adjust image size */
+    height: 24px; /* Adjust image size */
+    transition: transform 0.3s ease;
 }
 
-.icon-button:hover i {
-    color: #555; /* Change color on hover */
+.icon-button:hover img {
+    opacity: 0.7; /* Change opacity on hover */
 }
 
 /* Dropdown container */
@@ -364,13 +365,7 @@
     display: block;
 }
 
-/* Rotate the icon */
-.icon-button i {
-     font-size: 24px;
-    transition: transform 0.3s ease;
-}
-
-.icon-button i.rotate {
+.icon-button img.rotate {
     transform: rotate(180deg);
 }
 
