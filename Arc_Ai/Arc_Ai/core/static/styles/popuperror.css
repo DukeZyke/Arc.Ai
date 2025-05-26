@@ -1,0 +1,59 @@
+#auth-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 750px;
+}
+
+.auth-message {
+    color: #353A56;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 10px;
+}
+
+/* Remove the old notification banner styling */
+.notification-banner {
+    display: none;
+}
+.notification-text {
+    display: none;
+}
+
+/* Message Popup Styling */
+.message-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -100px);
+    background-color: #ff4d4f;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.5s ease;
+    min-width: 200px;
+    max-width: 80%;
+    text-align: center;
+}
+
+.message-popup.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.message-content {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Hide old message elements */
+#auth-container .auth-message {
+    display: none;
+}

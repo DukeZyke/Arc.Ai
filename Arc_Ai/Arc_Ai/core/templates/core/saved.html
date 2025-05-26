@@ -7,9 +7,17 @@
     <title>Saved</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/saved.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/popuperror.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
+    {% if messages %}
+            <div id="message-popup" class="message-popup">
+            {% for message in messages %}
+            <div class="message-content">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div id="header">
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>

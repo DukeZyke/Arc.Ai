@@ -9,9 +9,17 @@
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/aduserpage.css' %}">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/popuperror.css' %}?v=1.0">
 </head>
 <body>
 {% csrf_token %}
+    {% if messages %}
+    <div id="message-popup" class="message-popup">
+        {% for message in messages %}
+        <div class="message-content">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 <div id="header">
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
