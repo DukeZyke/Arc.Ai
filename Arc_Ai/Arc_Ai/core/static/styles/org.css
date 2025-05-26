@@ -28,7 +28,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin: 50px 20px 0 0;
+  margin: -60px 950px 0px 0;
 }
 #create_project:hover {
     background: #353A56;
@@ -76,13 +76,12 @@
     overflow: hidden; /* Ensure content doesn't overflow */
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: flex-start; 
     margin-left: 200px; 
 }
 
 .project-logo {
-    margin-left: -70%;
+   margin-left:initial; /* Reset margin to default */
     position:relative; /* Position it absolutely relative to the container */
     z-index: 2; /* Ensure it appears above the container background */
 }
@@ -94,9 +93,7 @@
     padding: 5px; /* Optional: Add padding around the image */
 }
 
-.FileInfo{
-    margin-left: 10px;
-}
+
 
 .under-image {
     position: absolute; /* Position it absolutely relative to the parent container */
@@ -344,34 +341,7 @@
     margin-right: 100px;
 }
 
-.project-status-container {
-    position: relative; /* Set relative positioning for stacking */
-    width: 291px; /* Adjust width as needed */
-    height: 394px; /* Adjust height as needed */
-    background: #ffffff; /* Background color for the container */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for card effect */
-    z-index: 1; /* Base z-index */
-    overflow: hidden; /* Ensure content doesn't overflow */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; 
-    margin-left: 200px; 
-}
 
-.project-logo {
-    margin-left: -70%;
-    position:relative; /* Position it absolutely relative to the container */
-    z-index: 2; /* Ensure it appears above the container background */
-}
-
-.project-logo img {
-    margin-top: 20px; /* Adjust to control vertical spacing */
-    width: 50px; /* Adjust size of the image */
-    height: 50px; /* Adjust size of the image */
-    padding: 5px; /* Optional: Add padding around the image */
-}
 
 .FileInfo{
     margin-left: 10px;

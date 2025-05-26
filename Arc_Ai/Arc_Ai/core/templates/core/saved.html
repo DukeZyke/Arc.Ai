@@ -17,28 +17,34 @@
             <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
             <hr>
         </div>
-        <div id="sidebar_cont">
-            <div id="navigate">
-                <h1>Navigate</h1>
-                <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
-                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
-                <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+        <div id="sidebar_jar">
+            <div id="sidebar_cont">
+                <div id="navigate">
+                    <h1>Navigate</h1>
+                    <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                    <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+                </div>
+                <div id="settings">
+                    <h1>Settings</h1>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
+                    {% else %}
+                        <a href="{% url 'core:login' %}">Login</a>
+                    {% endif %}
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
+                    {% endif %}
+                </div>
             </div>
-            <div id="settings">
-                <h1>Settings</h1>
-                <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                {% if request.user.is_staff or request.user.is_superuser %}
-                    <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
-                {% endif %}
-            </div>
+            <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout">
+                    <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+                    Log out
+                </button>
+            </form>
         </div>
-        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="logout">
-                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
-                Log out
-            </button>
-        </form>
     </div>
     
     <div id="content">
@@ -55,14 +61,14 @@
                 <form action="{% url 'core:create_folder_in_drive' %}" method="post">
                     {% csrf_token %}
                     <input class="Fn" type="text" name="folder_name" placeholder="Folder Name" required>
-                     <hr class="dropdown-divider">
+                    <hr class="dropdown-separator">
                     <button class="create" type="submit">Create</button>
                 </form>
-                <hr class="dropdown-divider">
+                <hr class="dropdown-separator">
 
                 <!-- DELETE Button -->
                 <button class="delete"  onclick="toggleFolderCheckboxes()">DELETE</button>
-                 <hr class="dropdown-divider">
+                <hr class="dropdown-separator">
             </div>
         </div>
 
@@ -101,14 +107,15 @@
                         <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
-                            <input  style=" margin: 10px auto auto 5px; padding: 8px 16px; width:auto;"type="file" name="file" multiple required>
-                            <hr class="dropdown-divider">
+                            <input style="margin: 10px auto auto 5px; padding: 8px 16px; width:auto;" type="file" name="file" multiple required>
+                            <hr class="dropdown-separator">
                             <button class="upload" type="submit">Upload</button>
                         </form>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-separator">
 
-                        <!-- DELETE Button --> <button class="trash" onclick="toggleCheckboxes()">DELETE</button>
-                          <hr class="dropdown-divider">
+                        <!-- DELETE Button --> 
+                        <button class="trash" onclick="toggleCheckboxes()">DELETE</button>
+                        <hr class="dropdown-separator">
                     </div>
                 </div>
 

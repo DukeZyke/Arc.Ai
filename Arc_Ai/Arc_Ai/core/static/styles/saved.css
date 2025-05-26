@@ -102,25 +102,31 @@
 }
 
 .dropdown-content {
-    display:none;
+    display: none;
     position: absolute;
     margin-top: 150px;
     right: 100px;
     background-color: #f1f1f1;
     min-width: 160px;
+    max-width: 300px; /* Add max-width */
+    width: auto; /* Allow content to determine width */
+    height: auto;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
-    width:10px;
-    height: auto;
     border-radius: 10px;
+    overflow: hidden; /* Handle overflow */
 }
 
 .dropdown-content a {
     color: black;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
+    display: flex; /* Change to flex */
+    align-items: center;
     font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .show {
@@ -130,7 +136,14 @@
 .dropdown-divider {
     margin: 5px 20px;
     border: 0;
-    border-top: 1px solid grey;
+}
+
+/* Custom dropdown separator to avoid conflicts */
+.dropdown-separator {
+    margin: 5px 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+    width: 100%; /* Match width to content box */
 }
 
 /* File List Styles */

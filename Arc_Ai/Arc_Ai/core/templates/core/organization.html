@@ -107,13 +107,14 @@
             <p>No projects available.</p>
             {% endif %}
         </section>
-        <div id="createalign">
-                    <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
-                </div>      
+             
     
         <section class="other-projects">
             <h1 class="Title">Project List</h1>
             <hr>
+            <div id="createalign">
+                    <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
+                </div> 
             <div class="card-section">
                 <div class="card-container">
                     <!-- Repeat this card as needed -->
