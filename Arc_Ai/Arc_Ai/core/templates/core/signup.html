@@ -12,7 +12,16 @@
     <link rel="stylesheet" href="{% static 'styles/signup.css' %}?v=1.0">
 </head>
 <body>
+
+    
     <div id="login_cntr">
+            {% if messages %}
+    <div id="message-popup" class="message-popup">
+        {% for message in messages %}
+        <div class="message-content">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
         <div id="container">
             <div id="logo_container" class="gap">
                 <div id="main_logo">
@@ -24,10 +33,6 @@
             </div>
             <div id="form_container">
                 <h1 class="titles">Sign Up</h1>
-
-                {% for message in messages %}
-                <h5 style="color: red;">{{message}}</h5>
-                {% endfor %}
 
                 <form id="form" method="post" action="{% url 'core:signup' %}">
                     {% csrf_token %}
@@ -68,5 +73,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Message popup auto-dismiss
+        document.addEventListener('DOMContentLoaded', function() {
+            const popup = document.getElementById('message-popup');
+            if (popup) {
+                // Show popup
+                setTimeout(() => popup.classList.add('show'), 300);
+                
+                // Hide popup after 5 seconds
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                    setTimeout(() => popup.style.display = 'none', 500);
+                }, 5000);
+            }
+        });
+    </script>
 </body>
 </html>

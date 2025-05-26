@@ -12,15 +12,23 @@
     <link rel="stylesheet" href="{% static 'styles/login.css' %}?v=1.0">
 </head>
 <body>
-      {% for message in messages %}
-                <h5 style="color: red; margin: auto;">{{message}}</h5>
-                {% endfor %}
+    {% if messages %}
+    <div id="message-popup" class="message-popup">
+        {% for message in messages %}
+        <div class="message-content">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div id="login_cntr">
       {% if user.is_authenticated %}
         <script>
             window.location.href = "{% url 'core:home' %}";
         </script>
       {% endif %}
-    <div id="login_cntr">
+      
+      <div id="auth-container">
+        
         <div id="container">
             <div id="form_container">
                 <h1 class="titles" style="margin-bottom: 12px;">Sign In</h1>
@@ -119,7 +127,20 @@
       preventBackToLogin();
   });
 
-
+  // Message popup auto-dismiss
+  document.addEventListener('DOMContentLoaded', function() {
+    const popup = document.getElementById('message-popup');
+    if (popup) {
+      // Show popup
+      setTimeout(() => popup.classList.add('show'), 300);
+      
+      // Hide popup after 5 seconds
+      setTimeout(() => {
+        popup.classList.remove('show');
+        setTimeout(() => popup.style.display = 'none', 500);
+      }, 5000);
+    }
+  });
 </script>
 
 </body>
