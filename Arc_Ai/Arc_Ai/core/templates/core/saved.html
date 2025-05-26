@@ -7,6 +7,7 @@
     <title>Saved</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/saved.css' %}?v=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="header">
@@ -27,7 +28,7 @@
             <div id="settings">
                 <h1>Settings</h1>
                 <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                {% if request.user.is_staff or request.user.is_superuser %}
+                {% if request.user.is_superuser %}
                     <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
                 {% endif %}
             </div>
@@ -42,6 +43,36 @@
     </div>
     
     <div id="content">
+        <!-- Add the search bar section here -->
+        <h1>File Manager</h1>
+        <div class="file-management-header">
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search Files..." id="search-files">
+                <button id="search-button" class="search-icon-btn">
+                    <i class="bx bx-search"></i>
+                </button>
+            </div>
+            <div class="files-count">
+                <span>Total Files: <strong>{{ files|length }}</strong></span>
+                <span class="status-indicator"></span>
+            </div>
+            {% if current_user_level == 4 %}
+            <div class="department-filter-section">
+                <label for="department-filter">Filter by Department:</label>
+                <select id="department-filter" onchange="filterByDepartment()">
+                    <option value="">All Departments</option>
+                    <option value="Administrative (Main)">Administrative</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Operations">Operations</option>
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <h1>Folders</h1>
 
@@ -69,10 +100,21 @@
             <div id="folder_items">
                 {% for folder in folders %}
                     <div class="folder-item">
-                            <div class="folder-content">
-                                <input type="checkbox" class="folder-checkbox" style="display: none;" data-folder-id="{{ folder.id }}">
-                                    <a href="{% url 'core:view_folder_contents' folder.id %}">{{ folder.name }}</a>
-                             </div>
+                        <div class="folder-content">
+                            <input type="checkbox" class="folder-checkbox" style="display: none;" data-folder-id="{{ folder.id }}">
+                            <div class="folder-main-content">
+                                <a href="{% url 'core:view_folder_contents' folder.id %}" class="folder-name">{{ folder.name }}</a>
+                                <div class="folder-metadata">
+                                    <span class="folder-creator">Created by: {{ folder.creator_full_name }}</span>
+                                    <span class="folder-department">Dept: {{ folder.creator_department }}</span>
+                                    <span class="folder-level">Level {{ folder.creator_level }}</span>
+                                    {% if current_user_level == 4 %}
+                                    {% elif folder.creator_department == request.user.signup_details.department %}
+                                        <span class="same-dept-folder" title="Same department folder">🏢 Your Dept</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% empty %}
                     <p>No folders found.</p>
@@ -114,11 +156,12 @@
 
                 <div id="file_items">
                     <ul class="file-list">
-                            <div class="horizontal-line"></div>
-                            {% for file in files %}
-                                <li class="file-item">
+                        <div class="horizontal-line"></div>
+                        {% for file in files %}
+                            <li class="file-container"> <!-- Wrap both file-item and horizontal-line -->
+                                <div class="file-item">
                                     <div class="file-icon">
-                                        <input type="checkbox" class ="file-checkbox"
+                                        <input type="checkbox" class="file-checkbox"
                                         style="display: none;" data-file-id="{{ file.file_id }}">
                                         <img src="{% static file.icon %}" alt="File Icon">
                                     </div>
@@ -137,16 +180,17 @@
                                     </div>
                                     <div class="file-actions">
                                         <button class="action-button" onclick="showFileOptions(this)">⋮</button>
-                                            <div class="file-options-dropdown" style="display: none;">
+                                        <div class="file-options-dropdown" style="display: none;">
                                             <div class="option" onclick="handleSingleFileTrash(this)">Delete</div>
                                         </div>
                                     </div>
-                                </li>
+                                </div>
                                 <div class="horizontal-line"></div>
-                            {% empty %}
-                                <li>No files uploaded yet.</li>
-                            {% endfor %}
-                        </ul>
+                            </li>
+                        {% empty %}
+                            <li>No files uploaded yet.</li>
+                        {% endfor %}
+                    </ul>
 
                     <!-- Single Delete Button that appears when checkboxes are shown -->
                     <div class="action-buttons-group" id="action-buttons-group" style="display: none;">
@@ -342,6 +386,143 @@ function undoSelection() {
     // Hide the action buttons group
     document.getElementById('action-buttons-group').style.display = 'none';
 }
+
+    // Update the search function to include folder creator and department
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-files');
+        const fileContainers = document.querySelectorAll('.file-container');
+        const folderItems = document.querySelectorAll('.folder-item');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                let visibleFiles = 0;
+                let visibleFolders = 0;
+                
+                // Search through file containers (unchanged)
+                fileContainers.forEach(container => {
+                    const fileItem = container.querySelector('.file-item');
+                    if (fileItem && fileItem.querySelector('.file-name')) {
+                        const fileName = fileItem.querySelector('.file-name').textContent.toLowerCase();
+                        const fileOwner = fileItem.querySelector('.file-owner')?.textContent.toLowerCase() || '';
+                        const fileDept = fileItem.querySelector('.file-department')?.textContent.toLowerCase() || '';
+                        const fileLevel = fileItem.querySelector('.file-level')?.textContent.toLowerCase() || '';
+                        
+                        const matches = fileName.includes(searchTerm) || 
+                                      fileOwner.includes(searchTerm) || 
+                                      fileDept.includes(searchTerm) ||
+                                      fileLevel.includes(searchTerm);
+                        
+                        if (matches) {
+                            container.style.display = 'list-item';
+                            container.classList.remove('hidden');
+                            visibleFiles++;
+                        } else {
+                            container.style.display = 'none';
+                            container.classList.add('hidden');
+                        }
+                    }
+                });
+                
+                // Search through folders with creator information
+                folderItems.forEach(item => {
+                    const folderName = item.querySelector('.folder-name')?.textContent.toLowerCase() || '';
+                    const folderCreator = item.querySelector('.folder-creator')?.textContent.toLowerCase() || '';
+                    const folderDept = item.querySelector('.folder-department')?.textContent.toLowerCase() || '';
+                    const folderLevel = item.querySelector('.folder-level')?.textContent.toLowerCase() || '';
+                    
+                    const matches = folderName.includes(searchTerm) ||
+                                  folderCreator.includes(searchTerm) ||
+                                  folderDept.includes(searchTerm) ||
+                                  folderLevel.includes(searchTerm);
+                    
+                    if (matches) {
+                        item.style.display = 'block';
+                        item.classList.remove('hidden');
+                        visibleFolders++;
+                    } else {
+                        item.style.display = 'none';
+                        item.classList.add('hidden');
+                    }
+                });
+                
+                // Update the files count
+                const filesCountElement = document.querySelector('.files-count strong');
+                if (filesCountElement) {
+                    filesCountElement.textContent = visibleFiles;
+                }
+                
+                // Add search results indicator
+                updateSearchResults(searchTerm, visibleFiles, visibleFolders);
+            });
+        }
+    });
+    
+    function updateSearchResults(searchTerm, visibleFiles, visibleFolders) {
+        // Remove existing search results indicator
+        const existingResults = document.querySelector('.search-results');
+        if (existingResults) {
+            existingResults.remove();
+        }
+        
+        // Add new search results indicator if there's a search term
+        if (searchTerm.trim() !== '') {
+            const searchResults = document.createElement('div');
+            searchResults.className = 'search-results';
+            searchResults.textContent = `Found ${visibleFiles} files and ${visibleFolders} folders matching "${searchTerm}"`;
+            
+            const searchBar = document.querySelector('.search-bar');
+            if (searchBar && searchBar.parentNode) {
+                searchBar.parentNode.insertBefore(searchResults, searchBar.nextSibling);
+            }
+        }
+    }
+    
+    // Department filter for executives
+    function filterByDepartment() {
+        const selectedDept = document.getElementById('department-filter').value;
+        const fileItems = document.querySelectorAll('.file-item');
+        let visibleCount = 0;
+        
+        fileItems.forEach(item => {
+            const parentLi = item.closest('li') || item;
+            const nextHorizontalLine = parentLi.nextElementSibling;
+            const deptSpan = item.querySelector('.file-department');
+            
+            if (!selectedDept || (deptSpan && deptSpan.textContent.includes(selectedDept))) {
+                parentLi.style.display = 'list-item';
+                parentLi.classList.remove('hidden');
+                if (nextHorizontalLine && nextHorizontalLine.classList.contains('horizontal-line')) {
+                    nextHorizontalLine.style.display = 'block';
+                }
+                visibleCount++;
+            } else {
+                parentLi.style.display = 'none';
+                parentLi.classList.add('hidden');
+                if (nextHorizontalLine && nextHorizontalLine.classList.contains('horizontal-line')) {
+                    nextHorizontalLine.style.display = 'none';
+                }
+            }
+        });
+        
+        // Update the files count
+        const filesCountElement = document.querySelector('.files-count strong');
+        if (filesCountElement) {
+            filesCountElement.textContent = visibleCount;
+        }
+        
+        // Clear search input when using department filter
+        const searchInput = document.getElementById('search-files');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        // Remove search results indicator
+        const existingResults = document.querySelector('.search-results');
+        if (existingResults) {
+            existingResults.remove();
+        }
+    }
 </script>
     
 </html>

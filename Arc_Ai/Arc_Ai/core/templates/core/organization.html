@@ -32,7 +32,7 @@
                     {% else %}
                         <a href="{% url 'core:login' %}">Login</a>
                     {% endif %}
-                    {% if request.user.is_staff or request.user.is_superuser %}
+                    {% if request.user.is_superuser %}
                         <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'home' %}active{% endif %}">Project Management</a>
                     {% endif %}
                 </div>
