@@ -141,17 +141,24 @@
              
     
         <section class="other-projects">
-            <h1 class="Title">Project List</h1>
-            <hr>
-            <div id="createalign">
-                <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
-            </div> 
-            <div id="createalign">
-                <a id="edit_project" href="{% if top_project %}{% url 'core:user_edit_project_details' top_project.id %}{% else %}#{% endif %}" 
-                   {% if not top_project %}onclick="alert('No project selected. Please click on a project card first.'); return false;"{% endif %}>
-                   Edit Project
-                </a>
-            </div> 
+            <div id="titleProj_list">
+                <div>
+                    <h1 class="Title">Project List</h1>
+                    <hr>
+                </div>
+                
+                <div id="buttonProj_select">
+                    <div class="createalign">
+                        <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
+                    </div>
+                    <div class="createalign">
+                        <a id="edit_project" href="{% if top_project %}{% url 'core:user_edit_project_details' top_project.id %}{% else %}#{% endif %}"
+                           {% if not top_project %}onclick="alert('No project selected. Please click on a project card first.'); return false;"{% endif %}>
+                           Edit Project
+                        </a>
+                    </div>
+                </div>
+            </div>
             <div class="card-section">
                 <div class="card-container">
                     <!-- Repeat this card as needed -->
@@ -362,7 +369,6 @@
                                 }
                                 
                                 if (continueCard) {
-                                    continueCard.style.display = 'block';
                                 } else {
                                     // If no continue card exists, we might need to create it or reload the page
                                     console.log('No continue card found, consider page reload');
