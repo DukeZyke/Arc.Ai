@@ -81,10 +81,16 @@
     margin-left: 200px; 
 }
 
+.project-logo-and-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* This will push them to opposite ends */
+    margin-bottom: 15px;
+
+}
+
 .project-logo {
-    margin-left: -70%;
-    position:relative; /* Position it absolutely relative to the container */
-    z-index: 2; /* Ensure it appears above the container background */
+    flex-shrink: 0;
 }
 
 .project-logo img {
@@ -360,10 +366,16 @@
     margin-left: 200px; 
 }
 
+.project-logo-and-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* This will push them to opposite ends */
+    margin-bottom: 15px;
+    width: 200px; /* Set a specific width to control the spacing */
+}
+
 .project-logo {
-    margin-left: -70%;
-    position:relative; /* Position it absolutely relative to the container */
-    z-index: 2; /* Ensure it appears above the container background */
+    flex-shrink: 0;
 }
 
 .project-logo img {
@@ -898,5 +910,74 @@ html {
         height: auto;
         margin-left: 0;
     }
+}
+
+/* Add to your org.css file */
+.project-actions {
+    margin: 1rem 0;
+    display: flex;
+    gap: 10px;
+}
+
+.drive-folder-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.drive-folder-btn:hover {
+    background: #3367d6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.drive-folder-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.folder-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1); /* Makes the icon white */
+}
+
+/* Alternative styling if you want it to match your theme */
+.drive-folder-btn.theme-style {
+    background: #363c54;
+    color: white;
+}
+
+.drive-folder-btn.theme-style:hover {
+    background: #23263a;
+}
+
+.no-projects-message {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.no-projects-message p {
+    margin: 10px 0;
+    color: #666;
+}
+
+.no-projects-message p:first-child {
+    font-weight: 500;
+    color: #333;
 }
 

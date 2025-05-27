@@ -1,11 +1,10 @@
-
 /* Main Layout */
 .adminedit-content {
     display: flex;
     justify-content: center;
-    margin-top: 0; /* Change to precisely account for fixed header height (70px) plus a small gap */
+    margin-top: 0;
     font-family: 'Inter', sans-serif;
-    padding-left: 250px; /* Add padding to account for the sidebar width */
+    padding-left: 250px;
 }
 
 .adminedit-content form {
@@ -29,8 +28,9 @@
     border-radius: 20px;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
     padding: 2.5rem 2.5rem 2rem 2.5rem;
-    height: 590px;
-    overflow: hidden;
+    min-height: 590px; /* Changed from height to min-height */
+    max-height: none; /* Allow expansion */
+    overflow: visible; /* Changed from hidden */
     display: flex;
     flex-direction: column;
 }
@@ -76,7 +76,7 @@
 /* Project Details Section */
 .adminedit-details-section {
     margin-bottom: 1.2rem;
-    overflow: hidden; /* Change from overflow-y: auto to prevent scrolling */
+    overflow: visible; /* Changed from hidden to visible */
 }
 
 .adminedit-row {
@@ -86,6 +86,35 @@
     align-items: center;
     flex-wrap: wrap;
     margin-bottom: -5px;
+}
+
+/* Specific styling for date row */
+.adminedit-date-row {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.adminedit-date-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.adminedit-date-field .adminedit-label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.adminedit-date-input {
+    margin-left: 0 !important;
+    max-width: none !important;
+    width: 100%;
 }
 
 .adminedit-label {
@@ -108,9 +137,15 @@
     border: 2px dashed #bfc7d1;
     border-radius: 12px;
     padding: 1.1rem 1.2rem;
-    margin-bottom: 0.5rem; /* Reduced bottom margin */
+    margin-bottom: 0.5rem;
     overflow-y: auto;
     height: 70px;
+}
+
+.adminedit-files-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: #444;
 }
 
 .adminedit-file-list {
@@ -119,43 +154,181 @@
     margin: 0;
 }
 
-.adminedit-file-list li {
+.file-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
 }
 
-.adminedit-remove-file {
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #222;
+}
+
+.file-size {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.file-type {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.remove-file-btn {
+    background: none;
+    border: none;
     color: #c00;
-    font-size: 1.2rem;
     cursor: pointer;
-    margin-left: 1.5rem;
-    transition: color 0.2s;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
 }
 
-.adminedit-remove-file:hover {
-    color: #a00;
+.remove-file-btn:hover {
+    background: #ffebee;
+    color: #e53935;
+}
+
+.no-files {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+}
+
+/* Form Input Styles - Updated */
+.adminedit-input {
+    font-family: inherit;
+    font-size: 1rem;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: 340px;
+    background: #fafbfc;
+    color: #222;
+    box-sizing: border-box;
+    resize: vertical;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+/* Fixed date input styling */
+.adminedit-input[type="date"] {
+    font-family: inherit;
+    font-size: 1rem;
+    border: 1px solid #bfc7d1;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: 200px;
+    background: #fafbfc;
+    color: #222;
+    box-sizing: border-box;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.adminedit-input[type="date"]:focus {
+    outline: none;
+    border-color: #353A56;
+    box-shadow: 0 0 0 2px rgba(53, 58, 86, 0.1);
+}
+
+.adminedit-input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.adminedit-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Ensure other inputs are not affected */
+.adminedit-input:not([type="date"]) {
+    position: relative;
+    z-index: auto;
+}
+
+/* Fix for text inputs and textareas */
+.adminedit-input[type="text"],
+.adminedit-input[type="email"],
+.adminedit-input[type="password"],
+textarea.adminedit-input,
+select.adminedit-input {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.adminedit-team-list .adminedit-input {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+.adminedit-team-list .adminedit-input:last-child {
+    margin-bottom: 0;
+}
+
+.adminedit-details-section textarea.adminedit-input {
+    height: 144px;
+    max-width: 100%;
+    width: 100%;
+    min-height: unset;
+    resize: none;
+    margin-left: 0.5rem;
+}
+
+/* Ensure proper styling for text inputs in details section */
+.adminedit-details-section .adminedit-input[type="text"] {
+    margin-left: 0.5rem;
+    max-width: 340px;
 }
 
 /* Submit Button */
 .adminedit-submit-row {
     display: flex;
     justify-content: center;
+    margin-top: 20px;
 }
 
 .adminedit-submit-btn {
     background: #363c54;
     color: #fff;
     border: none;
-    margin: 0 0 0 396px;
     border-radius: 8px;
-    padding: 5px 12px;
+    padding: 12px 24px;
     font-size: 1.15rem;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
 }
 
 .adminedit-submit-btn:hover {
@@ -227,54 +400,17 @@
     padding-right: 5px;
 }
 
-/* Form Input Styles */
-.adminedit-input {
-    font-family: inherit;
-    font-size: 1rem;
-    border: 1px solid #bfc7d1;
-    border-radius: 8px;
-    padding: 0.4rem 0.7rem;
-    margin-left: 0.5rem;
-    margin-bottom: 0.5rem;
-    width: 100%;
-    max-width: 340px;
-    background: #fafbfc;
-    color: #222;
-    box-sizing: border-box;
-    resize: vertical;
-}
-
-.adminedit-row .adminedit-input[type="date"] {
-    max-width: 170px;
-}
-
-.adminedit-team-list .adminedit-input {
-    margin-bottom: 0.5rem;
-    width: 100%;
-    max-width: 100%;
-}
-
-.adminedit-team-list .adminedit-input:last-child {
-    margin-bottom: 0;
-}
-
-.adminedit-details-section textarea.adminedit-input {
-    height: 144px;
-    max-width: 100%;
-    width: 100%;
-    min-height: unset;
-    resize: none;
-}
-
 /* File upload styling */
 .file-upload-wrapper {
     display: flex;
     align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .file-upload-label {
     font-size: 0.98rem;
-    margin-right: 10px;
+    color: #444;
 }
 
 .file-upload-btn {
@@ -282,24 +418,20 @@
     color: white;
     border: none;
     border-radius: 6px;
-    padding: 5px 12px;
+    padding: 8px 16px;
     font-size: 0.9rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    gap: 6px;
     transition: background 0.2s;
-    margin-left: 0.5rem; /* Added margin to position the button */
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
 }
 
 .file-upload-btn:hover {
     background: #23263a;
-}
-
-.file-upload-btn::before {
-    content: "+";
-    margin-right: 5px;
-    font-size: 1.1rem;
-    font-weight: bold;
 }
 
 .file-upload-btn input[type="file"] {
@@ -311,19 +443,20 @@
     z-index: -1;
 }
 
+.file-upload-info {
+    margin-top: 5px;
+}
+
+.file-upload-info small {
+    color: #666;
+    font-size: 0.85rem;
+}
+
 /* Team Section Enhancements */
 .adminedit-team-card hr {
     margin: 0.8rem 0 1rem 0;
     border: none;
     border-top: 1px solid #e0e0e0;
-}
-
-.adminedit-team-list {
-    margin-top: 10px;
-    width: 100%;
-    overflow-y: auto;
-    max-height: 300px;
-    padding-right: 5px;
 }
 
 .adminedit-team-controls {
@@ -337,50 +470,70 @@
     color: #363c54;
     border: 1px solid #bfc7d1;
     border-radius: 6px;
-    padding: 6px 12px;
+    padding: 8px 14px;
     font-size: 0.95rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    gap: 6px;
     transition: all 0.2s;
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
 }
 
 .adminedit-add-member-btn:hover {
     background: #e5e9f0;
 }
 
-.adminedit-add-member-btn .add-icon {
-    margin-right: 5px;
-    font-size: 1.1rem;
+.add-icon-circle {
+    background: #363c54;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
     font-weight: bold;
 }
 
-.adminedit-team-list .member-row {
+.member-row {
     display: flex;
     align-items: center;
     margin-bottom: 8px;
-    position: relative;
+    gap: 8px;
 }
 
-.adminedit-team-list .remove-member-btn {
+.member-select {
+    flex: 1;
+    margin-left: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.remove-member-btn {
     background: none;
     color: #c00;
     border: none;
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
-    padding: 0;
+    padding: 4px;
     width: 24px;
     height: 24px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 8px;
     transition: all 0.2s;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
 }
 
-.adminedit-team-list .remove-member-btn:hover {
+.remove-member-btn:hover {
     background-color: #ffebee;
     color: #e53935;
 }
@@ -417,10 +570,57 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     padding-right: 30px;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
 }
 
 .adminedit-dropdown:focus {
     outline: none;
     border-color: #a1aab8;
     box-shadow: 0 0 0 2px rgba(54, 60, 84, 0.1);
+}
+
+/* Ensure buttons work properly */
+button {
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .adminedit-card-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .adminedit-details-card {
+        margin-left: 0;
+    }
+    
+    .adminedit-date-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .adminedit-date-field {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .adminedit-content {
+        padding-left: 0;
+        padding: 0 1rem;
+    }
+    
+    .adminedit-card {
+        margin-top: 100px;
+        padding: 1.5rem;
+        min-width: auto;
+        max-width: none;
+    }
 }

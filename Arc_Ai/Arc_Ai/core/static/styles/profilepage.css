@@ -394,3 +394,37 @@ html {
 .incomplete-profile a:hover {
     background-color: #2a2d47;
 }
+
+/* Add this to your profilepage.css file */
+.no-projects-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin: 20px;
+    min-height: 200px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.no-projects-message p {
+    margin: 10px 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.no-projects-message p:first-child {
+    font-weight: 500;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+/* Ensure the cardcont can handle the no-projects message properly */
+#cardcont:has(.no-projects-message) {
+    justify-content: center;
+    align-items: center;
+}

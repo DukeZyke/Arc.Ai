@@ -22,7 +22,7 @@
                 <div id="navigate">
                     <h1>Navigate</h1>
                     <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
-                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a>
                     <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
                 </div>
                 <div id="settings">
@@ -58,13 +58,20 @@
                         <img src="{% static 'Images/projunder.png' %}" alt="under image" class="background-image">
                     </div>
                     <div class="project-status-container">  
-                        <div class="project-logo">
-                            <img src="{% static 'Images/projlogo.png' %}" alt="Project Logo">
+                        <div class="project-logo-and-actions">
+                            <div class="project-logo">
+                                <img src="{% static 'Images/projlogo.png' %}" alt="Project Logo">
+                            </div>
+                            <div class="project-actions">
+                                <button class="drive-folder-btn" onclick="openProjectFolder('{{ top_project.id }}')">
+                                    <img src="{% static 'Images/arrow.webp' %}" alt="Drive Folder" class="folder-icon">
+                                </button>
+                            </div>
                         </div>
                         <div class="FileInfo">
                             <p><strong>{{top_project.name}}</strong></p>
                             <p>Project ID: {{top_project.project_id_str}}</p>
-                            <p class="space">Start Date: {{top_project.project_start_Date}}</p>
+                            <p class="space">Start Date: {{top_project.start_date}}</p>
                             <p>Finished Date: {{ top_project.finish_date|default:"-" }}</p>
                             <p class="status1">{{ top_project.project_status }}</p>
                         </div>
@@ -76,7 +83,11 @@
                         <p>{{top_project.project_desc}}</p>
                     </div>
                     <h3>Project Manager</h3>
-                    <p>{{top_project.project_manager}}
+                    <p>{{top_project.project_manager}}</p>
+                    
+                    <!-- Add the Drive Folder Button here -->
+
+                    
                     <h3>Team</h3>
                     <p>
                         {% with total=top_project.members.count %}
@@ -104,7 +115,10 @@
                 </div>
             </div>
             {% else %}
-            <p>No projects available.</p>
+            <div class="no-projects-message">
+                <p>You are not assigned to any projects yet.</p>
+                <p>Contact your project manager or supervisor to be added to a project.</p>
+            </div>
             {% endif %}
         </section>
         <div id="createalign">
@@ -223,6 +237,26 @@
         </section>
     </div> 
     <script>
+        // Function to open project folder
+        function openProjectFolder(projectId) {
+            fetch(`/get_project_folder/${projectId}/`)
+                .then(response => response.json())
+                .then data => {
+                    if (data.success && data.folder_url) {
+                        window.open(data.folder_url, '_blank');
+                    } else {
+                        // Show more specific error messages
+                        let errorMessage = data.error || 'Project folder not found or not accessible.';
+                        alert('Error: ' + errorMessage);
+                        console.error('Folder access error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching folder URL:', error);
+                    alert('Network error: Unable to access project folder. Please check your connection.');
+                });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.project-container').forEach(function(card) {
                 card.addEventListener('click', function() {
@@ -235,12 +269,23 @@
                                 // Update the Continue Working section
                                 document.querySelector('.FileInfo strong').textContent = p.name;
                                 document.querySelector('.FileInfo p:nth-child(2)').textContent = 'Project ID: ' + p.project_id_str;
-                                document.querySelector('.FileInfo p:nth-child(3)').textContent = 'Start Date: ' + p.start_date;
-                                document.querySelector('.FileInfo p:nth-child(4)').textContent = 'Finished Date: ' + p.finish_date;
+                                document.querySelector('.FileInfo p:nth-child(3)').textContent = 'Start Date: ' + (p.start_date || '-');
+                                document.querySelector('.FileInfo p:nth-child(4)').textContent = 'Finished Date: ' + (p.finish_date || '-');
                                 document.querySelector('.status1').textContent = p.project_status;
 
                                 document.querySelector('.project-description-container p').textContent = p.project_desc;
-                                document.querySelector('.project-details p').textContent = p.project_manager;
+                                
+                                // Find the project manager element more safely
+                                const projectManagerElement = document.querySelector('.project-details h3 + p');
+                                if (projectManagerElement) {
+                                    projectManagerElement.textContent = p.project_manager;
+                                }
+
+                                // Update the folder button with the new project ID
+                                const folderBtn = document.querySelector('.drive-folder-btn');
+                                if (folderBtn) {
+                                    folderBtn.setAttribute('onclick', `openProjectFolder('${p.id}')`);
+                                }
 
                                 // Team members
                                 let teamText = '';
@@ -251,17 +296,28 @@
                                 } else {
                                     teamText = p.members.slice(0, 3).join(', ') + ' and ' + (p.members.length - 3) + ' others';
                                 }
-                                document.querySelector('.project-details h3 + p + h3 + p').textContent = teamText;
+                                
+                                // Find team element more safely
+                                const teamElement = document.querySelector('.project-details h3:nth-of-type(3) + p');
+                                if (teamElement) {
+                                    teamElement.textContent = teamText;
+                                }
 
                                 // Start Date and Deadline
-                                document.querySelectorAll('.details-row p')[0].textContent = p.start_date;
-                                document.querySelectorAll('.details-row p')[1].textContent = p.finish_date;
+                                const detailsRowElements = document.querySelectorAll('.details-row p');
+                                if (detailsRowElements.length >= 2) {
+                                    detailsRowElements[0].textContent = p.start_date || '-';
+                                    detailsRowElements[1].textContent = p.finish_date || '-';
+                                }
                             }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching project details:', error);
                         });
                 });
             });
         });
-        </script>
+    </script>
     <script src="{% static 'js/org.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>
 </body>

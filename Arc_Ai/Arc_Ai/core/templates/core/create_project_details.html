@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin-Project Page</title>
+    <title>Create Project - ARC.AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
@@ -13,229 +13,407 @@
 <body>
 
 <div id="header">
-        <img src="{% static 'Images/Account.png' %}" alt="Account">
+    <img src="{% static 'Images/Account.png' %}" alt="Account">
+</div>
+<div id="sidebar">
+    <div id="logo">
+        <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+        <hr>
     </div>
-    <div id="sidebar">
-        <div id="logo">
-            <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
-            <hr>
+    <div id="sidebar_cont">
+        <div id="navigate">
+            <h1>Navigate</h1>
+            <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
+            <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+            <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
         </div>
-        <div id="sidebar_cont">
-            <div id="navigate">
-                <h1>Navigate</h1>
-                <a href="{% url 'core:home' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
-                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
-                <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
-            </div>
-            <div id="settings">
-                <h1>Settings</h1>
-                {% if request.user.is_authenticated %}
-                    <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
-                {% else %}
-                    <a href="{% url 'core:login' %}">Login</a>
-                {% endif %}
-            </div>
+        <div id="settings">
+            <h1>Settings</h1>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'core:profilepage' request.user.pk %}" class="{% if active_page == 'profilepage' %}active{% endif %}">Profile</a>
+            {% else %}
+                <a href="{% url 'core:login' %}">Login</a>
+            {% endif %}
         </div>
-        <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="logout">
-                <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
-                Log out
-            </button>
-        </form>
     </div>
-
-    <!-- Page Content Start -->
-    <div class="adminedit-content">
-        <form method="post" action="{% url 'core:create_project_details' %}" enctype="multipart/form-data">
+    <form id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
         {% csrf_token %}
-            <div class="adminedit-card-container">
-                <!-- Edit Project Details Card -->
-                <div class="adminedit-card adminedit-details-card">
-                    <div class="adminedit-card-header">
-                        <h2>Create New Project</h2>
-                        <a href="{% url 'core:organization' %}" class="adminedit-back-link">&#8592; Back</a>
+        <button type="submit" class="logout">
+            <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+            Log out
+        </button>
+    </form>
+</div>
+
+<!-- Page Content Start -->
+<div class="adminedit-content">
+    <form method="post" action="{% url 'core:create_project_details' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="adminedit-card-container">
+            <!-- Create Project Details Card -->
+            <div class="adminedit-card adminedit-details-card">
+                <div class="adminedit-card-header">
+                    <h2>Create New Project</h2>
+                    <a href="{% url 'core:organization' %}" class="adminedit-back-link">&#8592; Back</a>
+                </div>
+                <div class="adminedit-details-section">
+                    <div class="adminedit-row">
+                        <label class="adminedit-label" for="project_name">Project Name:</label>
+                        <input id="project_name" name="name" class="adminedit-input" type="text" required placeholder="Enter project name">
                     </div>
-                    <div class="adminedit-details-section">
-                        <div class="adminedit-row">
-                            <label class="adminedit-label" for="project_name">Project Name:</label>
-                            <input id="project_name" name="name" class="adminedit-input" type="text" value="{{project.name}}">
-                        </div>
-                        <hr>
-                        <div class="adminedit-row">
-                            <label class="adminedit-label" for="project_desc">Project Description:</label>
-                            <textarea id="project_desc" name="project_desc" class="adminedit-input" rows="2" maxlength="250">{{ project.project_desc }}</textarea>
-                        </div>
-                        <hr>
-                        <div class="adminedit-row">
+                    <hr>
+                    <div class="adminedit-row">
+                        <label class="adminedit-label" for="project_desc">Project Description:</label>
+                        <textarea id="project_desc" name="project_desc" class="adminedit-input" rows="2" maxlength="250" placeholder="Enter project description (optional)"></textarea>
+                    </div>
+                    <hr>
+                    <div class="adminedit-row adminedit-date-row">
+                        <div class="adminedit-date-field">
                             <label class="adminedit-label" for="start_date">Start Date:</label>
-                            <input id="start_date" name="start_date" class="adminedit-input" type="date" value="{{ project.start_date|date:'Y-m-d' }}">
-                            <label class="adminedit-label" style="margin-left:2rem;" for="deadline">Deadline:</label>
-                            <input id="deadline" name="finish_date" class="adminedit-input" type="date" value="{{ project.finish_date|date:'Y-m-d' }}">
+                            <input id="start_date" name="start_date" class="adminedit-input adminedit-date-input" type="date">
                         </div>
-                        <hr>
-                        <div class="adminedit-row">
-                            <label class="adminedit-label" value="Ongoing" for="project_status">Status:</label>
-                            <select id="project_status" name="project_status" class="adminedit-dropdown">
-                                <option value="Completed" {% if project.project_status == "Completed" %}selected{% endif %}>Completed</option>
-                                <option value="Ongoing" {% if project.project_status == "Ongoing" %}selected{% endif %}>Ongoing</option>
-                                <option value="Missing" {% if project.project_status == "Missing" %}selected{% endif %}>Missing</option>
-                            </select>
-                        </div>
-                        <hr>
-                        <div class="adminedit-row">
-                            <label class="adminedit-label" for="project_manager">Manager:</label>
-                            <input id="project_manager" name="project_manager" class="adminedit-input" type="text" value="{{ project.project_manager }}">
+                        <div class="adminedit-date-field">
+                            <label class="adminedit-label" for="deadline">Deadline:</label>
+                            <input id="deadline" name="finish_date" class="adminedit-input adminedit-date-input" type="date">
                         </div>
                     </div>
-                    <div class="adminedit-files-section">
-                        <ul class="adminedit-file-list">
-                            <li>
-                                <span>Document 1.docx</span>
-                                <span class="adminedit-remove-file" title="Remove">&#10006;</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="file-upload-wrapper">
-                        <label for="add_file" class="file-upload-label"></label>
-                        <label class="file-upload-btn">
-                            Add File
-                            <input type="file" id="add_file" name="add_file" multiple>
-                        </label>
-                        <div class="adminedit-submit-row">
-                        <button class="adminedit-submit-btn" type="submit">Submit</button>
-                    </div>
+                    <hr>
+                    <div class="adminedit-row">
+                        <label class="adminedit-label" for="project_status">Status:</label>
+                        <select id="project_status" name="project_status" class="adminedit-dropdown">
+                            <option value="Ongoing" selected>Ongoing</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Missing">Missing</option>
+                        </select>
                     </div>
                 </div>
                 
-                <!-- Project Team Card -->
-                <div class="adminedit-card adminedit-team-card">
-                    <div class="adminedit-card-header">
-                        <h2>Project Team</h2>
+                <!-- File Upload Section -->
+                <div class="adminedit-files-section">
+                    <h3>Project Files</h3>
+                    <ul class="adminedit-file-list" id="file-list">
+                        <!-- Files will be added here dynamically -->
+                    </ul>
+                </div>
+                <div class="file-upload-wrapper">
+                    <label for="add_file" class="file-upload-label">Upload Project Files:</label>
+                    <label class="file-upload-btn">
+                        <i class="bx bx-upload"></i> Add Files
+                        <input type="file" id="add_file" name="add_file" multiple onchange="displaySelectedFiles(this)">
+                    </label>
+                    <div class="file-upload-info">
+                        <small>Select multiple files to upload to the project folder</small>
                     </div>
-                    <div class="adminedit-team-section">
-                        <div class="adminedit-row">
-                            <div class="adminedit-team-label">Project Manager</div>
-                            <input type="text" class="adminedit-input" name="project_manager" value="{{project.project_manager}}" placeholder="Project Manager Name">
-                        </div>
-                        <hr>
-                        <div class="adminedit-team-members-row">
-                            <span class="adminedit-team-label">Project Team</span>
-                            <div>
-                                Team Members: 
-                                <span id="team_count_display" class="adminedit-team-count-display">5</span>
-                                <input type="hidden" name="team_count" id="team_count" value="5">
-                            </div>
-                        </div>
-                        <div class="adminedit-team-list" id="members">
-                            {% for member in members %}
-                                <div class="member-row">
-                                    <input type="text" name="member_names" class="adminedit-input" value="{{ member.member_name }}">
-                                    <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
-                                </div>
+                                <!-- Submit Button -->
+            <div class="adminedit-submit-row">
+                <button class="adminedit-submit-btn" type="submit">Create Project & Upload Files</button>
+            </div>
+                </div>
+            </div>
+            
+            <!-- Project Team Card -->
+            <div class="adminedit-card adminedit-team-card">
+                <div class="adminedit-card-header">
+                    <h2>Project Team</h2>
+                </div>
+                <div class="adminedit-team-section">
+                    <div class="adminedit-row">
+                        <div class="adminedit-team-label">Project Manager</div>
+                        <select class="adminedit-input" name="project_manager" required>
+                            <option value="" disabled selected>Select Project Manager</option>
+                            {% for user_detail in available_users %}
+                                <option value="{{ user_detail.first_name }} {{ user_detail.last_name }}">
+                                    {{ user_detail.first_name }} {{ user_detail.last_name }} 
+                                    ({{ user_detail.department|default:"No Dept" }} - {{ user_detail.position|default:"No Position" }})
+                                </option>
                             {% endfor %}
-                            <div class="member-row">
-                                <input type="text" name="member_names" class="adminedit-input" placeholder="Add new member">
-                                <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
-                            </div>
+                        </select>
+                    </div>
+                    <hr>
+                    <div class="adminedit-team-members-row">
+                        <span class="adminedit-team-label">Project Team</span>
+                        <div>
+                            Team Members: 
+                            <span id="team_count_display" class="adminedit-team-count-display">0</span>
+                            <input type="hidden" name="team_count" id="team_count" value="0">
                         </div>
-                        <div class="adminedit-team-controls">
-                            <button type="button" class="adminedit-add-member-btn" id="add_member_btn">
-                                <span class="add-icon-circle">+</span>
-                                <span>Add Team Member</span>
-                            </button>
-                        </div>
+                    </div>
+                    <div class="adminedit-team-list" id="members">
+                        <!-- Member dropdowns will be added here by JavaScript -->
+                    </div>
+                    <div class="adminedit-team-controls">
+                        <button type="button" class="adminedit-add-member-btn" id="add_member_btn">
+                            <span class="add-icon-circle">+</span>
+                            <span>Add Team Member</span>
+                        </button>
                     </div>
                 </div>
             </div>
-            </div>
-        </form>
-    </div>
-    <!-- Page Content End -->
+            
 
-    <script src="{% static 'js/sidebar.js' %}"></script>
-    <script src="{% static 'js/adminedit.js' %}"></script>
-    <script>function initTeamMemberFields() {
-    const teamCountInput = document.getElementById('team_count');
-    const teamList = document.getElementById('members');
+        </div>
+    </form>
+</div>
+<!-- Page Content End -->
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script>
+    // Check if we have users data from the backend
+    let availableUsersData = [];
     
-    if (teamCountInput && teamList) {
-        // Initialize remove member button event handlers
-        document.querySelectorAll('.remove-member-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                removeMember(this);
+    {% if available_users_json %}
+        try {
+            availableUsersData = {{ available_users_json|safe }};
+            console.log('Loaded users from JSON:', availableUsersData);
+        } catch (e) {
+            console.error('Error parsing user data:', e);
+            // Fallback to manual array construction
+            availableUsersData = [
+                {% for user_detail in available_users %}
+                {
+                    id: {{ user_detail.user.id }},
+                    name: "{{ user_detail.first_name|default:''|escapejs }} {{ user_detail.last_name|default:''|escapejs }}".trim(),
+                    department: "{{ user_detail.department|default:'No Dept'|escapejs }}",
+                    position: "{{ user_detail.position|default:'No Position'|escapejs }}"
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+        }
+    {% else %}
+        // Fallback if no JSON data provided
+        availableUsersData = [
+            {% for user_detail in available_users %}
+            {
+                id: {{ user_detail.user.id }},
+                name: "{{ user_detail.first_name|default:''|escapejs }} {{ user_detail.last_name|default:''|escapejs }}".trim(),
+                department: "{{ user_detail.department|default:'No Dept'|escapejs }}",
+                position: "{{ user_detail.position|default:'No Position'|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+    {% endif %}
+
+    // File upload functions
+    function displaySelectedFiles(input) {
+        const fileList = document.getElementById('file-list');
+        const files = input.files;
+        
+        fileList.innerHTML = '';
+        
+        if (files.length === 0) {
+            fileList.innerHTML = '<li class="no-files">No files selected</li>';
+            return;
+        }
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const listItem = document.createElement('li');
+            listItem.className = 'file-item';
+            
+            const fileSize = formatFileSize(file.size);
+            
+            listItem.innerHTML = `
+                <div class="file-info">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${fileSize}</span>
+                    <span class="file-type">${getFileType(file.type)}</span>
+                </div>
+                <button type="button" class="remove-file-btn" onclick="removeFile(this, ${i})" title="Remove file">
+                    <i class="bx bx-x"></i>
+                </button>
+            `;
+            
+            fileList.appendChild(listItem);
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function getFileType(mimeType) {
+        if (!mimeType) return 'File';
+        if (mimeType.includes('image')) return 'Image';
+        if (mimeType.includes('pdf')) return 'PDF';
+        if (mimeType.includes('document')) return 'Document';
+        if (mimeType.includes('spreadsheet')) return 'Spreadsheet';
+        if (mimeType.includes('presentation')) return 'Presentation';
+        return 'File';
+    }
+    
+    function removeFile(button, index) {
+        const input = document.getElementById('add_file');
+        const dt = new DataTransfer();
+        const files = input.files;
+        
+        for (let i = 0; i < files.length; i++) {
+            if (i !== index) {
+                dt.items.add(files[i]);
+            }
+        }
+        
+        input.files = dt.files;
+        displaySelectedFiles(input);
+    }
+
+    // Team member functions
+    function createMemberDropdown() {
+        console.log('Creating dropdown with data:', availableUsersData);
+        
+        const select = document.createElement('select');
+        select.name = 'member_user_ids';
+        select.className = 'adminedit-input member-select';
+        select.required = true;
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        defaultOption.textContent = 'Select Team Member';
+        select.appendChild(defaultOption);
+        
+        // Add user options
+        if (availableUsersData && Array.isArray(availableUsersData)) {
+            availableUsersData.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.name} (${user.department} - ${user.position})`;
+                select.appendChild(option);
+            });
+        } else {
+            console.error('No user data available for dropdown');
+        }
+        
+        return select;
+    }
+
+    // Global variable to prevent multiple executions
+    let isAddingMember = false;
+
+    function addMember() {
+        if (isAddingMember) {
+            console.log('Already adding member, skipping...');
+            return;
+        }
+        
+        isAddingMember = true;
+        console.log('Adding member...');
+        
+        const membersDiv = document.getElementById('members');
+        if (!membersDiv) {
+            console.error('Members div not found');
+            isAddingMember = false;
+            return;
+        }
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'member-row';
+        
+        const select = createMemberDropdown();
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-member-btn';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.title = 'Remove member';
+        removeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            removeMember(this);
+        });
+        
+        wrapper.appendChild(select);
+        wrapper.appendChild(removeBtn);
+        membersDiv.appendChild(wrapper);
+        
+        updateMemberCount();
+        
+        // Reset the flag after a short delay
+        setTimeout(() => {
+            isAddingMember = false;
+        }, 100);
+    }
+
+    function removeMember(btn) {
+        const row = btn.closest('.member-row');
+        if (row) {
+            row.remove();
+            updateMemberCount();
+        }
+    }
+    
+    function updateMemberCount() {
+        const memberSelects = document.querySelectorAll('select[name="member_user_ids"]');
+        const count = memberSelects.length;
+        const countDisplay = document.getElementById('team_count_display');
+        const countInput = document.getElementById('team_count');
+        
+        if (countDisplay) countDisplay.textContent = count;
+        if (countInput) countInput.value = count;
+        
+        console.log('Updated member count:', count);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing...');
+        console.log('Available users data:', availableUsersData);
+        
+        const fileInput = document.getElementById('add_file');
+        if (fileInput) {
+            displaySelectedFiles(fileInput);
+        }
+        
+        // Fix date input issues
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(input => {
+            // Prevent event bubbling on date inputs
+            input.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Prevent the calendar from opening when clicking elsewhere
+            input.addEventListener('blur', function() {
+                this.style.pointerEvents = 'auto';
+            });
+            
+            // Only show calendar when actually clicking the input or its icon
+            input.addEventListener('mousedown', function(e) {
+                e.stopPropagation();
             });
         });
-    }
-}
-
-/**
- * Add a new team member field
- */
-function addMember() {
-    const membersDiv = document.getElementById('members');
-    if (!membersDiv) return;
-    
-    // Create member row elements
-    const wrapper = document.createElement('div');
-    wrapper.className = 'member-row';
-    
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'member_names';
-    input.className = 'adminedit-input';
-    input.placeholder = 'Enter team member name';
-    
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'remove-member-btn';
-    removeBtn.innerHTML = '&times;';
-    removeBtn.title = 'Remove member';
-    removeBtn.addEventListener('click', function() {
-        removeMember(this);
+        
+        // Clear existing content
+        const membersDiv = document.getElementById('members');
+        if (membersDiv) {
+            membersDiv.innerHTML = '';
+            console.log('Cleared members div');
+        }
+        
+        // Remove any existing event listeners and add only one
+        const addMemberBtn = document.getElementById('add_member_btn');
+        if (addMemberBtn) {
+            // Clone the button to remove all event listeners
+            const newBtn = addMemberBtn.cloneNode(true);
+            addMemberBtn.parentNode.replaceChild(newBtn, addMemberBtn);
+            
+            // Add single event listener
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Button clicked');
+                addMember();
+            });
+            
+            console.log('Event listener added to add member button');
+        } else {
+            console.error('Add member button not found');
+        }
     });
-    
-    // Assemble and add to the DOM
-    wrapper.appendChild(input);
-    wrapper.appendChild(removeBtn);
-    membersDiv.appendChild(wrapper);
-    
-    // Update the counter
-    updateDropdownCount();
-}
-
-/**
- * Remove a team member field
- */
-function removeMember(btn) {
-    const row = btn.closest('.member-row') || btn.parentElement;
-    if (row) {
-        row.remove();
-        updateDropdownCount();
-    }
-}
-
-/**
- * Update team member fields based on count
- */
-function updateMemberFields() {
-    const membersDiv = document.getElementById('members');
-    if (!membersDiv) return;
-    
-    const count = parseInt(document.getElementById('team_count').value);
-    const currentInputs = membersDiv.querySelectorAll('input[name="member_names"]');
-    
-    // Store current values
-    const currentValues = Array.from(currentInputs).map(input => input.value);
-    
-    // Clear existing fields
-    membersDiv.innerHTML = '';
-    
-    // Add new fields based on count
-    for (let i = 0; i < count; i++) {
-        createMemberRow(membersDiv, currentValues[i] || '');
-    }
-}
 </script>
 </body>
 </html>

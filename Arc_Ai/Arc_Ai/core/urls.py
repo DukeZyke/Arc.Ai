@@ -31,6 +31,8 @@ urlpatterns = [
     path('admin_files_page/', views.admin_files_page, name='admin_files_page'),
 
     # Addtional paths
+    path('get_project_folder/<int:project_id>/', views.get_project_folder, name='get_project_folder'),
+    path('get_project_details/<int:project_id>/', views.get_project_details, name='get_project_details'),
     path('drive/auth/', views.google_drive_auth, name='google_drive_auth'),
     path('drive/callback/', views.google_drive_callback, name='google_drive_callback'),
     path('drive/upload/', views.upload_file_to_drive, name='upload_file_to_drive'),

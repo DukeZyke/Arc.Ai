@@ -121,17 +121,31 @@ class Notification(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=100)
     project_desc = models.CharField(max_length=100, blank=True, default='No description provided')
-    # Remove project_id field!
-    start_date = models.DateField(max_length=20)
-    finish_date = models.DateField(max_length=20)
+    project_id = models.CharField(max_length=20, unique=True, blank=True)  # Add this field
+    start_date = models.DateField(blank=True, null=True)  # Remove max_length, add blank and null
+    finish_date = models.DateField(blank=True, null=True)  # Remove max_length, add blank and null
     project_status = models.CharField(max_length=50)
     project_manager = models.CharField(max_length=100)
 
+    def save(self, *args, **kwargs):
+        if not self.project_id:
+            # Auto-generate project_id if not provided
+            last_project = Project.objects.order_by('-id').first()
+            if last_project and last_project.project_id:
+                try:
+                    last_number = int(last_project.project_id.split('-')[-1])
+                    next_number = last_number + 1
+                except:
+                    next_number = 1
+            else:
+                next_number = 1
+            self.project_id = f"{next_number:02d}"
+        super().save(*args, **kwargs)
+
     @property
     def project_id_str(self):
-        return f"HR-2024-ONB-{self.id:02d}"
+        return f"HR-2024-ONB-{self.project_id}"
     
-
     def __str__(self):
         return f"{self.name} {self.project_id_str}"
     

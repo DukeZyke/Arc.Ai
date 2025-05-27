@@ -23,7 +23,7 @@
                 <div id="navigate">
                     <h1>Navigate</h1>
                     <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
-                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a>
                     <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
                 </div>
                 <div id="settings">
@@ -107,7 +107,7 @@
                             </div>
                             <div class="info">
                                 <span class="label">Age:</span>
-                                <span class="value">{{signup_details.age}}</span>
+                                <span class="value>{{signup_details.age}}</span>
                             </div>
                             <div class="info">
                                 <span class="label">Gender:</span>
@@ -162,10 +162,10 @@
                             <div class="cardbody">
                                 <h1>{{project.name}}</h1>
                                 <div class="project-details">
-                                    <p><span class="label">Project ID:</span> <span class="value">{{project.project_id}}</span></p>
+                                    <p><span class="label">Project ID:</span> <span class="value">{{project.project_id_str}}</span></p>
                                     <div class="dategroup">
-                                        <p><span class="label">Start Date:</span> <span class="value">{{project.start_date}}</span></p>
-                                        <p><span class="label">Deadline:</span> <span class="value">{{project.finish_date}}</span></p>
+                                        <p><span class="label">Start Date:</span> <span class="value">{{project.start_date|default:"-"}}</span></p>
+                                        <p><span class="label">Deadline:</span> <span class="value">{{project.finish_date|default:"-"}}</span></p>
                                     </div>
                                 </div>
                                 {% if project.project_status == 'Completed' %}
@@ -176,6 +176,12 @@
                                 <p class="status" style="color: red">{{project.project_status}}</p>
                                 {% endif %}
                             </div>
+                        </div>
+                        {% empty %}
+                        <!-- Show this when user has no projects -->
+                        <div class="no-projects-message">
+                            <p>You are not assigned to any projects yet.</p>
+                            <p>Contact your project manager or supervisor to be added to a project.</p>
                         </div>
                         {% endfor %}
                     </div>

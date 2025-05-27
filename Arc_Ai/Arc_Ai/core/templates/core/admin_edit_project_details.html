@@ -30,7 +30,7 @@
             </div>
             <div id="settings">
                 <h1>User View</h1>
-                <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Organization</a>
+                    <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a>
             </div>
         </div>
         <form  id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
