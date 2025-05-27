@@ -106,8 +106,7 @@
                                 <input type="text" id="position" name="position" value="{{ signup_details.position }}" readonly>
                             </div>
                         </div>
-                        
-                        <button id="adminedit-submit-btn" type="submit">Save Changes</button>
+                        <button id="adminedit-submit-btn" type="submit">Save</button>
                         {% endif %}
                     </div>
                 </div>
@@ -123,9 +122,9 @@
                 <div class="profile_pic_cntr">
                     {% for i in range %}
                         <img class="profile_pic_option{% if signup_details.profile_avatar_id == i %} selected{% endif %}" 
-                             src="{% static 'Images/Profile' %}{{ i }}.png" 
-                             alt="Profile Picture {{ i }}" 
-                             onclick="selectProfilePicture(this, '{{ i }}')">
+                                src="{% static 'Images/Profile' %}{{ i }}.png" 
+                                alt="Profile Picture {{ i }}" 
+                                onclick="selectProfilePicture(this, '{{ i }}')">
                     {% endfor %}
                 </div>
             </div>

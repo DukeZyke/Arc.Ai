@@ -10,6 +10,13 @@
     <script src="{% static 'scripts/signup_details.js' %}" defer></script>
 </head>
 <body>
+    {% if messages %}
+        <div id="message-popup" class="message-popup">
+            {% for message in messages %}
+            <div class="message-content">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">

@@ -45,7 +45,7 @@
 
     <!-- Page Content Start -->
     <div class="adminedit-content">
-        <form method="post" action="{% url 'core:admin_edit_project_details' project.id %}">
+        <form method="post" action="{% url 'core:admin_edit_project_details' project.id %}" enctype="multipart/form-data">
         {% csrf_token %}
             <div class="adminedit-card-container">
                 <!-- Edit Project Details Card -->
@@ -87,22 +87,47 @@
                         </div>
                     </div>
                     <div class="adminedit-files-section">
+                        <h3>Project Files</h3>
                         <ul class="adminedit-file-list">
-                            <li>
-                                <span>Document 1.docx</span>
-                                <span class="adminedit-remove-file" title="Remove">&#10006;</span>
-                            </li>
+                            {% if project_files %}
+                                {% for file in project_files %}
+                                    <li class="file-item" data-file-id="{{ file.id }}">
+                                        <div class="file-info">
+                                            <img src="{% static file.icon %}" alt="File icon" class="file-icon">
+                                            <div class="file-details">
+                                                <span class="file-name">{{ file.name }}</span>
+                                                <span class="file-meta">{{ file.size }} • {{ file.date }} • Uploaded by {{ file.uploader }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="file-actions">
+                                            {% if file.webViewLink %}
+                                                <a href="{{ file.webViewLink }}" target="_blank" class="view-file-btn" title="View file">👁️</a>
+                                            {% endif %}
+                                            <button type="button" class="remove-file-btn" data-file-id="{{ file.id }}" title="Remove file">✕</button>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="no-files-message">
+                                    {% if project_folder %}
+                                        No files uploaded to this project yet.
+                                    {% else %}
+                                        No project folder found. Files will be uploaded to a new folder when you add them.
+                                    {% endif %}
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="file-upload-wrapper">
-                        <label for="add_file" class="file-upload-label"></label>
+                        <label for="add_file" class="file-upload-label">Upload files to project folder:</label>
                         <label class="file-upload-btn">
                             Add File
-                            <input type="file" id="add_file" name="add_file" multiple>
+                            <input type="file" id="add_file" name="add_file" multiple onchange="displaySelectedFiles(this)">
                         </label>
+                        <div id="file-list" class="selected-files-list"></div>
                         <div class="adminedit-submit-row">
-                        <button class="adminedit-submit-btn" type="submit">Save</button>
-                    </div>
+                            <button class="adminedit-submit-btn" type="submit">Save</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -121,21 +146,17 @@
                             <span class="adminedit-team-label">Project Team</span>
                             <div>
                                 Team Members: 
-                                <span id="team_count_display" class="adminedit-team-count-display">5</span>
-                                <input type="hidden" name="team_count" id="team_count" value="5">
+                                <span id="team_count_display" class="adminedit-team-count-display">{{ members.count }}</span>
+                                <input type="hidden" name="team_count" id="team_count" value="{{ members.count }}">
                             </div>
                         </div>
                         <div class="adminedit-team-list" id="members">
                             {% for member in members %}
                                 <div class="member-row">
                                     <input type="text" name="member_names" class="adminedit-input" value="{{ member.member_name }}">
-                                    <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
+                                    <button type="button" class="remove-member-btn" title="Remove member">&times;</button>
                                 </div>
                             {% endfor %}
-                            <div class="member-row">
-                                <input type="text" name="member_names" class="adminedit-input" placeholder="Add new member">
-                                <button type="button" class="remove-member-btn" onclick="removeMember(this)" title="Remove member">&times;</button>
-                            </div>
                         </div>
                         <div class="adminedit-team-controls">
                             <button type="button" class="adminedit-add-member-btn" id="add_member_btn">
@@ -151,6 +172,282 @@
     <!-- Page Content End -->
 
     <script src="{% static 'js/sidebar.js' %}"></script>
-    <script src="{% static 'js/adminedit.js' %}"></script>
+    <script>
+        // Load available users data from backend
+        let availableUsersData = [];
+        
+        {% if available_users_json %}
+            try {
+                availableUsersData = {{ available_users_json|safe }};
+                console.log('Loaded users from JSON:', availableUsersData);
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                availableUsersData = [
+                    {% for user_detail in available_users %}
+                    {
+                        id: {{ user_detail.user.id }},
+                        name: "{{ user_detail.first_name|default:''|escapejs }} {{ user_detail.last_name|default:''|escapejs }}".trim(),
+                        department: "{{ user_detail.department|default:'No Dept'|escapejs }}",
+                        position: "{{ user_detail.position|default:'No Position'|escapejs }}"
+                    }{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+            }
+        {% else %}
+            availableUsersData = [
+                {% for user_detail in available_users %}
+                {
+                    id: {{ user_detail.user.id }},
+                    name: "{{ user_detail.first_name|default:''|escapejs }} {{ user_detail.last_name|default:''|escapejs }}".trim(),
+                    department: "{{ user_detail.department|default:'No Dept'|escapejs }}",
+                    position: "{{ user_detail.position|default:'No Position'|escapejs }}"
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+        {% endif %}
+
+        // Create dropdown for team members
+        function createMemberDropdown(selectedMemberName = '') {
+            const select = document.createElement('select');
+            select.name = 'member_user_ids';
+            select.className = 'adminedit-input member-select';
+            
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.disabled = true;
+            defaultOption.textContent = 'Select Team Member';
+            select.appendChild(defaultOption);
+            
+            // Add user options
+            if (availableUsersData && Array.isArray(availableUsersData)) {
+                availableUsersData.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.name} (${user.department} - ${user.position})`;
+                    
+                    // Check if this user should be selected (for editing)
+                    if (selectedMemberName && user.name === selectedMemberName.trim()) {
+                        option.selected = true;
+                        defaultOption.disabled = false;
+                        defaultOption.selected = false;
+                    }
+                    
+                    select.appendChild(option);
+                });
+            }
+            
+            return select;
+        }
+
+        // Convert existing text inputs to dropdowns (for editing mode)
+        function convertExistingMembersToDropdowns() {
+            const memberRows = document.querySelectorAll('.member-row');
+            
+            memberRows.forEach(row => {
+                const textInput = row.querySelector('input[name="member_names"]');
+                if (textInput) {
+                    const currentValue = textInput.value;
+                    const select = createMemberDropdown(currentValue);
+                    
+                    // Replace text input with dropdown
+                    textInput.parentNode.replaceChild(select, textInput);
+                }
+            });
+        }
+
+        // Global variable to prevent multiple executions
+        let isAddingMember = false;
+
+        function addMember() {
+            if (isAddingMember) {
+                return;
+            }
+            
+            isAddingMember = true;
+            
+            const membersDiv = document.getElementById('members');
+            if (!membersDiv) {
+                isAddingMember = false;
+                return;
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'member-row';
+            
+            const select = createMemberDropdown();
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-member-btn';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.title = 'Remove member';
+            removeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                removeMember(this);
+            });
+            
+            wrapper.appendChild(select);
+            wrapper.appendChild(removeBtn);
+            membersDiv.appendChild(wrapper);
+            
+            updateMemberCount();
+            
+            setTimeout(() => {
+                isAddingMember = false;
+            }, 100);
+        }
+
+        function removeMember(btn) {
+            const row = btn.closest('.member-row');
+            if (row) {
+                row.remove();
+                updateMemberCount();
+            }
+        }
+        
+        function updateMemberCount() {
+            const memberSelects = document.querySelectorAll('select[name="member_user_ids"]');
+            const memberInputs = document.querySelectorAll('input[name="member_names"]');
+            const count = memberSelects.length + memberInputs.length;
+            
+            const countDisplay = document.getElementById('team_count_display');
+            const countInput = document.getElementById('team_count');
+            
+            if (countDisplay) countDisplay.textContent = count;
+            if (countInput) countInput.value = count;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing edit mode...');
+            
+            // Convert existing member text inputs to dropdowns
+            convertExistingMembersToDropdowns();
+            
+            // Update member count based on existing members
+            updateMemberCount();
+            
+            // Add event listener to add member button
+            const addMemberBtn = document.getElementById('add_member_btn');
+            if (addMemberBtn) {
+                // Remove existing listeners and add new one
+                const newBtn = addMemberBtn.cloneNode(true);
+                addMemberBtn.parentNode.replaceChild(newBtn, addMemberBtn);
+                
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addMember();
+                });
+            }
+            
+            // Add event listeners to existing remove buttons
+            document.querySelectorAll('.remove-member-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeMember(this);
+                });
+            });
+        });
+
+        // File handling functions
+        function displaySelectedFiles(input) {
+            const fileList = document.getElementById('file-list');
+            const files = input.files;
+            
+            fileList.innerHTML = '';
+            
+            if (files.length === 0) {
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'selected-file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-size">(${formatFileSize(file.size)})</span>
+                    </div>
+                    <button type="button" onclick="removeSelectedFile(this, ${i})" class="remove-selected-btn" title="Remove">&times;</button>
+                `;
+                fileList.appendChild(fileItem);
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function removeSelectedFile(button, index) {
+            const input = document.getElementById('add_file');
+            const dt = new DataTransfer();
+            const files = input.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(files[i]);
+                }
+            }
+            
+            input.files = dt.files;
+            displaySelectedFiles(input);
+        }
+
+        // Remove file from project (existing files)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for remove file buttons
+            document.querySelectorAll('.remove-file-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const fileId = this.getAttribute('data-file-id');
+                    const fileName = this.closest('.file-item').querySelector('.file-name').textContent;
+                    
+                    if (confirm(`Are you sure you want to remove "${fileName}" from this project?`)) {
+                        removeProjectFile(fileId);
+                    }
+                });
+            });
+        });
+
+        function removeProjectFile(fileId) {
+            // Send AJAX request to remove file from Google Drive
+            fetch(`{% url 'core:remove_project_file' %}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `file_id=${encodeURIComponent(fileId)}&project_id={{ project.id }}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the file item from the DOM
+                    const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
+                    if (fileItem) {
+                        fileItem.remove();
+                    }
+                    
+                    // Show success message
+                    alert(data.message || 'File removed successfully');
+                } else {
+                    alert(data.error || 'Failed to remove file');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while removing the file');
+            });
+        }
+    </script>
 </body>
 </html>

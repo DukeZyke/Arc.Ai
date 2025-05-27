@@ -7,6 +7,23 @@
     <title>Organization</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
     <link rel="stylesheet" href="{% static 'styles/org.css' %}">
+    <style>
+        .project-container.selected {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            border: 2px solid #007bff;
+        }
+        
+        .project-container {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .project-container:hover {
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
     <div id="header">
@@ -121,19 +138,26 @@
             </div>
             {% endif %}
         </section>
-        <div id="createalign">
-                    <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
-                </div>      
+             
     
         <section class="other-projects">
             <h1 class="Title">Project List</h1>
             <hr>
+            <div id="createalign">
+                <a id="create_project" href="{% url 'core:create_project_details' %}">Create Project</a>
+            </div> 
+            <div id="createalign">
+                <a id="edit_project" href="{% if top_project %}{% url 'core:user_edit_project_details' top_project.id %}{% else %}#{% endif %}" 
+                   {% if not top_project %}onclick="alert('No project selected. Please click on a project card first.'); return false;"{% endif %}>
+                   Edit Project
+                </a>
+            </div> 
             <div class="card-section">
                 <div class="card-container">
                     <!-- Repeat this card as needed -->
                     {% for project in projects %}
                     <!-- Repeat this card as needed -->
-                    <div class="project-container" data-project-id="{{ project.id }}">
+                    <div class="project-container" data-project-id="{{ project.id }}" style="cursor: pointer;">
                         <div class="project-card">  
                             <div class="card-header">
                             <img src="{% static 'Images/icon1.png' %}" alt="icon" />
@@ -241,11 +265,10 @@
         function openProjectFolder(projectId) {
             fetch(`/get_project_folder/${projectId}/`)
                 .then(response => response.json())
-                .then data => {
+                .then(data => {  // Fixed: Added missing parenthesis here
                     if (data.success && data.folder_url) {
                         window.open(data.folder_url, '_blank');
                     } else {
-                        // Show more specific error messages
                         let errorMessage = data.error || 'Project folder not found or not accessible.';
                         alert('Error: ' + errorMessage);
                         console.error('Folder access error:', data.error);
@@ -257,23 +280,112 @@
                 });
         }
 
+        // Track currently selected project ID for the edit button
+        let currentProjectId = {% if top_project %}{{ top_project.id }}{% else %}null{% endif %};
+
+        function updateEditProjectButton(projectId) {
+            // Use the correct ID selector for the edit button
+            const editButton = document.querySelector('#edit_project');
+            console.log('Updating edit button for project ID:', projectId);
+            console.log('Edit button found:', editButton);
+            
+            if (editButton) {
+                if (projectId) {
+                    // Update the href to point to the new project
+                    editButton.href = `/project/${projectId}/files/`;
+                    editButton.removeAttribute('onclick'); // Remove any existing onclick
+                    console.log('Edit button updated to:', editButton.href);
+                } else {
+                    editButton.href = '#';
+                    editButton.onclick = function(e) {
+                        e.preventDefault();
+                        alert('No project selected. Please click on a project card first.');
+                        return false;
+                    };
+                }
+            } else {
+                console.error('Edit button not found');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, setting up project card listeners');
+            
+            // Remove selection from all cards
+            function clearAllSelections() {
+                document.querySelectorAll('.project-container').forEach(c => c.classList.remove('selected'));
+            }
+
+            // If there's a top_project, mark it as selected initially
+            {% if top_project %}
+            const initialCard = document.querySelector('[data-project-id="{{ top_project.id }}"]');
+            if (initialCard) {
+                initialCard.classList.add('selected');
+            }
+            {% endif %}
+
             document.querySelectorAll('.project-container').forEach(function(card) {
-                card.addEventListener('click', function() {
+                console.log('Adding listener to card:', card.getAttribute('data-project-id'));
+                
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Card clicked:', this.getAttribute('data-project-id'));
+                    
+                    // Remove selection from all cards
+                    clearAllSelections();
+                    
+                    // Add selection to clicked card
+                    this.classList.add('selected');
+                    
                     const projectId = this.getAttribute('data-project-id');
+                    currentProjectId = projectId; // Update the current project ID
+                    
+                    console.log('Fetching project details for ID:', projectId);
+                    
                     fetch(`/get_project_details/${projectId}/`)
-                        .then(response => response.json())
+                        .then(response => {
+                            console.log('Response received:', response);
+                            return response.json();
+                        })
                         .then(data => {
+                            console.log('Project data received:', data);
                             if (data.success) {
                                 const p = data.project;
+                                
+                                // Show the continue-working section if it was hidden
+                                const continueSection = document.getElementById('continue-working');
+                                const continueCard = document.querySelector('.continue-card');
+                                const noProjectsMessage = document.querySelector('.no-projects-message');
+                                
+                                if (noProjectsMessage) {
+                                    noProjectsMessage.style.display = 'none';
+                                }
+                                
+                                if (continueCard) {
+                                    continueCard.style.display = 'block';
+                                } else {
+                                    // If no continue card exists, we might need to create it or reload the page
+                                    console.log('No continue card found, consider page reload');
+                                }
+                                
                                 // Update the Continue Working section
-                                document.querySelector('.FileInfo strong').textContent = p.name;
-                                document.querySelector('.FileInfo p:nth-child(2)').textContent = 'Project ID: ' + p.project_id_str;
-                                document.querySelector('.FileInfo p:nth-child(3)').textContent = 'Start Date: ' + (p.start_date || '-');
-                                document.querySelector('.FileInfo p:nth-child(4)').textContent = 'Finished Date: ' + (p.finish_date || '-');
-                                document.querySelector('.status1').textContent = p.project_status;
+                                const nameElement = document.querySelector('.FileInfo strong');
+                                if (nameElement) nameElement.textContent = p.name;
+                                
+                                const projectIdElement = document.querySelector('.FileInfo p:nth-child(2)');
+                                if (projectIdElement) projectIdElement.textContent = 'Project ID: ' + p.project_id_str;
+                                
+                                const startDateElement = document.querySelector('.FileInfo p:nth-child(3)');
+                                if (startDateElement) startDateElement.textContent = 'Start Date: ' + (p.start_date || '-');
+                                
+                                const finishDateElement = document.querySelector('.FileInfo p:nth-child(4)');
+                                if (finishDateElement) finishDateElement.textContent = 'Finished Date: ' + (p.finish_date || '-');
+                                
+                                const statusElement = document.querySelector('.status1');
+                                if (statusElement) statusElement.textContent = p.project_status;
 
-                                document.querySelector('.project-description-container p').textContent = p.project_desc;
+                                const descElement = document.querySelector('.project-description-container p');
+                                if (descElement) descElement.textContent = p.project_desc;
                                 
                                 // Find the project manager element more safely
                                 const projectManagerElement = document.querySelector('.project-details h3 + p');
@@ -287,14 +399,19 @@
                                     folderBtn.setAttribute('onclick', `openProjectFolder('${p.id}')`);
                                 }
 
+                                // Update the Edit Project button with the new project ID - THIS IS THE KEY FIX
+                                updateEditProjectButton(p.id);
+
                                 // Team members
                                 let teamText = '';
-                                if (p.members.length === 0) {
+                                if (p.members && p.members.length === 0) {
                                     teamText = 'No members assigned.';
-                                } else if (p.members.length <= 3) {
+                                } else if (p.members && p.members.length <= 3) {
                                     teamText = p.members.join(', ');
-                                } else {
+                                } else if (p.members && p.members.length > 3) {
                                     teamText = p.members.slice(0, 3).join(', ') + ' and ' + (p.members.length - 3) + ' others';
+                                } else {
+                                    teamText = 'No members assigned.';
                                 }
                                 
                                 // Find team element more safely
@@ -303,20 +420,36 @@
                                     teamElement.textContent = teamText;
                                 }
 
-                                // Start Date and Deadline
+                                // Start Date and Deadline in details row
                                 const detailsRowElements = document.querySelectorAll('.details-row p');
                                 if (detailsRowElements.length >= 2) {
                                     detailsRowElements[0].textContent = p.start_date || '-';
                                     detailsRowElements[1].textContent = p.finish_date || '-';
                                 }
+                                
+                                console.log('Successfully updated project details');
+                                console.log('Edit button should now point to project:', p.id);
+                            } else {
+                                console.error('API returned error:', data.error);
+                                alert('Error loading project details: ' + (data.error || 'Unknown error'));
                             }
                         })
                         .catch(error => {
                             console.error('Error fetching project details:', error);
+                            alert('Network error: Unable to fetch project details');
                         });
                 });
             });
         });
+        
+        // Test the edit button functionality
+        const editBtn = document.querySelector('#edit_project');
+        if (editBtn) {
+            editBtn.addEventListener('click', function(e) {
+                console.log('Edit button clicked, current href:', this.href);
+                console.log('Current project ID:', currentProjectId);
+            });
+        }
     </script>
     <script src="{% static 'js/org.js' %}"></script>
     <script src="{% static 'js/sidebar.js' %}"></script>

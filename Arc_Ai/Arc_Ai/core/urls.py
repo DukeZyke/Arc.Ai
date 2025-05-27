@@ -47,7 +47,8 @@ urlpatterns = [
     path('delete_folders/', views.delete_folders, name='delete_folders'),
     path('delete_user/', views.delete_user, name='delete_user'),
     path('logout/', views.logout_view, name='logout'),   
-    
+    path('remove-project-file/', views.remove_project_file, name='remove_project_file'),
+    path('project/<int:project_id>/files/', views.user_edit_project_details, name='user_edit_project_details'),
     # FOR EDITING PROJECTS
     path('core/project/<int:project_id>/edit/', views.admin_edit_project_details, name='admin_edit_project_details'),
     # FOR DELETING PROJECTS

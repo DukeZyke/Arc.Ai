@@ -1,12 +1,18 @@
-
 const container = document.querySelector('.card-container');  // cards
 
 let isDown = false;
 let startX;
 let scrollLeft;
+let hasMoved = false; // Add this flag to track if the mouse has moved
 
 container.addEventListener('mousedown', (e) => {
+    // Don't start dragging if clicking on a project card
+    if (e.target.closest('.project-container')) {
+        return;
+    }
+    
     isDown = true;
+    hasMoved = false; // Reset the flag
     container.classList.add('active');
     startX = e.pageX - container.offsetLeft;
     scrollLeft = container.scrollLeft;
@@ -19,15 +25,22 @@ container.addEventListener('mouseleave', () => {
     document.body.style.userSelect = '';
 });
 
-container.addEventListener('mouseup', () => {
+container.addEventListener('mouseup', (e) => {
     isDown = false;
     container.classList.remove('active');
-  document.body.style.userSelect = ''; // Fix added here
+    document.body.style.userSelect = '';
+    
+    // If we haven't moved and we're clicking on a project card, don't prevent the click
+    if (!hasMoved && e.target.closest('.project-container')) {
+        // Let the project card click handler run
+        return;
+    }
 });
 
 container.addEventListener('mousemove', (e) => {
     if (!isDown) return;
     e.preventDefault();
+    hasMoved = true; // Set the flag when mouse moves
     const x = e.pageX - container.offsetLeft;
     const walk = (x - startX) * 1; // Adjust scroll speed here
     container.scrollLeft = scrollLeft - walk;

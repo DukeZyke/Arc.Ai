@@ -32,44 +32,90 @@ folderItems.addEventListener('mousemove', (e) => {
   folderItems.scrollLeft = scrollLeft - walk; // Scroll horizontally
 });
 
+function toggleDropdownFiles() {
+    const dropdown = document.getElementById("myDropdown");
+    dropdown.classList.toggle("show");
+}
+
+function toggleDropdownFolders() {
+    const dropdown = document.getElementById("myDropdownFolders");
+    dropdown.classList.toggle("show");
+}
+
 function toggleDropdownTrash() {
     document.getElementById("trashDropdown").classList.toggle("show");
 }
 
-
-window.addEventListener('click', function(event) {
-    // Handle dropdowns
-    if (!event.target.matches('.dropdown-icon')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            const openDropdown = dropdowns[i];
-            if (openDropdown.classList.contains('show')) {
-                openDropdown.classList.remove('show');
-            }
+// Enhanced dropdown closing functionality
+document.addEventListener('click', function(event) {
+    // Get all dropdown elements
+    const fileDropdown = document.getElementById("myDropdown");
+    const folderDropdown = document.getElementById("myDropdownFolders");
+    const trashDropdown = document.getElementById("trashDropdown");
+    
+    // Get all dropdown trigger icons
+    const dropdownIcons = document.querySelectorAll('.dropdown-icon');
+    
+    // Check if the click was on any dropdown icon or inside any dropdown
+    let clickedOnDropdownArea = false;
+    
+    // Check if clicked on dropdown icons
+    dropdownIcons.forEach(icon => {
+        if (icon.contains(event.target)) {
+            clickedOnDropdownArea = true;
         }
+    });
+    
+    // Check if clicked inside any dropdown content
+    const allDropdowns = [fileDropdown, folderDropdown, trashDropdown].filter(dropdown => dropdown);
+    allDropdowns.forEach(dropdown => {
+        if (dropdown && dropdown.contains(event.target)) {
+            clickedOnDropdownArea = true;
+        }
+    });
+    
+    // If clicked outside dropdown area, close all dropdowns
+    if (!clickedOnDropdownArea) {
+        if (fileDropdown && fileDropdown.classList.contains('show')) {
+            fileDropdown.classList.remove('show');
+        }
+        if (folderDropdown && folderDropdown.classList.contains('show')) {
+            folderDropdown.classList.remove('show');
+        }
+        if (trashDropdown && trashDropdown.classList.contains('show')) {
+            trashDropdown.classList.remove('show');
+        }
+    }
+    
+    // Handle file options dropdown (three-dot menu)
+    if (!event.target.matches('.action-button')) {
+        const fileOptionsDropdowns = document.querySelectorAll('.file-options-dropdown');
+        fileOptionsDropdowns.forEach(dropdown => {
+            dropdown.style.display = 'none';
+        });
     }
     
     // Handle checkboxes and delete button
     if (checkboxesVisible) {
         const deleteToggleButton = document.querySelector('[onclick="toggleCheckboxes()"]');
-        const moveToTrashButton = document.getElementById('delete-selected-btn');
+        const actionButtonsGroup = document.getElementById('action-buttons-group');
         const checkboxes = document.querySelectorAll('.file-checkbox');
         
         // Check if click is on relevant elements
         const isClickOnToggle = deleteToggleButton && deleteToggleButton.contains(event.target);
         const isClickOnCheckbox = Array.from(checkboxes).some(checkbox => checkbox.contains(event.target));
-        const isClickOnButton = moveToTrashButton && moveToTrashButton.contains(event.target);
+        const isClickOnActionButtons = actionButtonsGroup && actionButtonsGroup.contains(event.target);
         
         // If click is outside our elements, hide everything
-        if (!isClickOnToggle && !isClickOnCheckbox && !isClickOnButton) {
+        if (!isClickOnToggle && !isClickOnCheckbox && !isClickOnActionButtons) {
             // Hide checkboxes
             checkboxes.forEach(checkbox => {
                 checkbox.style.display = 'none';
             });
             
-            // Hide the delete button
-            if (moveToTrashButton) {
-                moveToTrashButton.style.display = 'none';
+            // Hide the action buttons group
+            if (actionButtonsGroup) {
+                actionButtonsGroup.style.display = 'none';
             }
             
             checkboxesVisible = false;
@@ -77,22 +123,11 @@ window.addEventListener('click', function(event) {
     }
 });
 
-function toggleDropdownFolders(event) {
-    const dropdown = document.getElementById("myDropdownFolders");
-    dropdown.classList.toggle("show");
-
-    // Prevent the dropdown from closing when clicking inside the dropdown
-    dropdown.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-}
-
-
 let checkboxesVisible = false; // Track the visibility state of checkboxes
 
 function toggleCheckboxes() {
     const checkboxes = document.querySelectorAll('.file-checkbox');
-   const actionButtonsGroup = document.getElementById('action-buttons-group');
+    const actionButtonsGroup = document.getElementById('action-buttons-group');
     
     // Check if checkboxes are currently hidden
     const isHidden = checkboxes.length > 0 && checkboxes[0].style.display === 'none';
@@ -104,7 +139,16 @@ function toggleCheckboxes() {
     });
     
     // Toggle action buttons group visibility
-    actionButtonsGroup.style.display = isHidden ? 'flex' : 'none'; 
+    actionButtonsGroup.style.display = isHidden ? 'flex' : 'none';
+    
+    // Update the visibility state
+    checkboxesVisible = isHidden;
+    
+    // Close the dropdown after toggling checkboxes
+    const fileDropdown = document.getElementById("myDropdown");
+    if (fileDropdown && fileDropdown.classList.contains('show')) {
+        fileDropdown.classList.remove('show');
+    }
 }
 
 // New function to update button visibility
@@ -117,7 +161,6 @@ function updateDeleteButtonVisibility() {
         deleteButton.style.display = checkedBoxes.length > 0 ? 'block' : 'none';
     }
 }
-
 
 let trashCheckboxesVisible = false;
 
@@ -139,4 +182,9 @@ function toggleTrashCheckboxes() {
         restoreButton.style.display = trashCheckboxesVisible ? 'block' : 'none';
     }
 }
+
+// Move these functions from HTML to JS file to avoid conflicts
+window.toggleDropdownFiles = toggleDropdownFiles;
+window.toggleDropdownFolders = toggleDropdownFolders;
+window.toggleCheckboxes = toggleCheckboxes;
 

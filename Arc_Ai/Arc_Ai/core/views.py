@@ -16,7 +16,7 @@ from django.db import models
 
 
 # MODELS
-from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, DriveFolder
+from .models import Email, Project, PersonalInformation, EmployeeAward, DriveFile, SignupDetails, DriveFolder, ProjectMember
 from google_auth_oauthlib.flow import Flow
 import os
 from django.conf import settings
@@ -509,14 +509,77 @@ def admin_users_page(request):
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, ProjectMember
 
-
 def admin_edit_project_details(request, project_id):
+    import json
+    from django.core.serializers.json import DjangoJSONEncoder
+    
     project = get_object_or_404(Project, pk=project_id)
     members = project.members.all()
+    
+    # Get all users with signup details for the dropdown (same as create_project_details)
+    available_users = SignupDetails.objects.select_related('user').all().order_by('first_name', 'last_name')
+    
+    # Create a safe JSON version of the data
+    available_users_json = []
+    for user_detail in available_users:
+        available_users_json.append({
+            'id': user_detail.user.id,
+            'name': f"{user_detail.first_name} {user_detail.last_name}",
+            'department': user_detail.department or "No Dept",
+            'position': user_detail.position or "No Position"
+        })
+
+    # Get project files from the associated folder
+    project_files = []
+    project_folder = None
+    
+    try:
+        # Find the associated drive folder
+        project_folder = DriveFolder.objects.get(name=project.name)
+        
+        # Check if user has Google Drive credentials
+        creds_data = request.session.get('credentials')
+        if creds_data:
+            creds = Credentials(**creds_data)
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Get files in the project folder
+            file_results = service.files().list(
+                q=f"'{project_folder.folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+                pageSize=100,
+                fields="files(id, name, mimeType, size, createdTime, webViewLink)"
+            ).execute()
+            
+            drive_files = file_results.get('files', [])
+            
+            # Get database files for uploader mapping
+            db_files = DriveFile.objects.select_related('user').all()
+            file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
+            
+            # Process each file
+            for file in drive_files:
+                project_files.append({
+                    'id': file['id'],
+                    'name': file['name'],
+                    'size': f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown',
+                    'date': datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S') if 'createdTime' in file else 'Unknown',
+                    'uploader': file_id_to_uploader.get(file['id'], "Unknown User"),
+                    'webViewLink': file.get('webViewLink', ''),
+                    'icon': get_file_icon(file.get('mimeType', ''))
+                })
+                
+    except DriveFolder.DoesNotExist:
+        print(f"No folder found for project: {project.name}")
+    except Exception as e:
+        print(f"Error fetching project files: {str(e)}")
 
     if request.method == 'POST':
+        # Store old project name for folder renaming
+        old_project_name = project.name
+        new_project_name = request.POST.get('name')
+        
         # Update project fields
-        project.name = request.POST.get('name')
+        project.name = new_project_name
         project.project_desc = request.POST.get('project_desc')
         project.start_date = request.POST.get('start_date')
         project.finish_date = request.POST.get('finish_date')   
@@ -524,20 +587,416 @@ def admin_edit_project_details(request, project_id):
         project.project_manager = request.POST.get('project_manager')
         project.save()
 
-        # Update members
+        # Handle both member_names (text inputs) and member_user_ids (dropdowns)
         member_names = request.POST.getlist('member_names')
-        # Remove all old members and add new ones
+        member_user_ids = request.POST.getlist('member_user_ids')
+        
+        # Remove all old members
         project.members.all().delete()
+        
+        # Add members from text inputs (for any remaining text inputs)
         for name in member_names:
             if name.strip():
                 ProjectMember.objects.create(project=project, member_name=name.strip())
+        
+        # Add members from dropdowns (user IDs)
+        for user_id in member_user_ids:
+            if user_id and user_id.strip():
+                try:
+                    user = User.objects.get(id=user_id)
+                    signup_details = user.signup_details
+                    member_name = f"{signup_details.first_name} {signup_details.last_name}"
+                    ProjectMember.objects.create(project=project, member_name=member_name)
+                except (User.DoesNotExist, SignupDetails.DoesNotExist):
+                    continue
 
-        return redirect('core:admin_project_page')  # or wherever you want to go after saving
+        # Handle file uploads to Google Drive
+        uploaded_files = request.FILES.getlist('add_file')
+        if uploaded_files:
+            try:
+                creds_data = request.session.get('credentials')
+                if not creds_data:
+                    messages.error(request, "You must authorize Google Drive access to upload files.")
+                    return redirect('core:google_drive_auth')
+                
+                creds = Credentials(**creds_data)
+                service = build('drive', 'v3', credentials=creds)
+                
+                # Get or create project folder
+                if not project_folder:
+                    # Create project folder if it doesn't exist
+                    PROJECT_PARENT_FOLDER_ID = '11tTPVSxTq87eF_pp9BQ3ud-XAsHw86mM'
+                    
+                    folder_metadata = {
+                        'name': project.name,
+                        'mimeType': 'application/vnd.google-apps.folder',
+                        'parents': [PROJECT_PARENT_FOLDER_ID]
+                    }
+
+                    created_folder = service.files().create(
+                        body=folder_metadata,
+                        fields='id, name'
+                    ).execute()
+
+                    # Get current user's level and department for folder tracking
+                    try:
+                        signup_details = request.user.signup_details
+                        user_level = signup_details.user_level
+                        user_department = signup_details.department
+                    except SignupDetails.DoesNotExist:
+                        user_level = 1
+                        user_department = "Not specified"
+
+                    # Save project folder to database
+                    project_folder = DriveFolder.objects.create(
+                        user=request.user,
+                        name=created_folder['name'],
+                        folder_id=created_folder['id'],
+                        parent_folder_id=PROJECT_PARENT_FOLDER_ID,
+                        creator_user_level=user_level,
+                        creator_department=user_department
+                    )
+                    
+                    messages.info(request, f"Created new project folder: {project.name}")
+                
+                # Upload files to the project folder
+                uploaded_count = 0
+                for uploaded_file in uploaded_files:
+                    try:
+                        # Upload to project folder
+                        file_metadata = {
+                            'name': uploaded_file.name,
+                            'parents': [project_folder.folder_id]
+                        }
+                        
+                        media = MediaIoBaseUpload(
+                            BytesIO(uploaded_file.read()),
+                            mimetype=uploaded_file.content_type,
+                            resumable=True
+                        )
+                        
+                        uploaded_drive_file = service.files().create(
+                            body=file_metadata,
+                            media_body=media,
+                            fields='id'
+                        ).execute()
+                        
+                        # Get current user's level and department
+                        try:
+                            signup_details = request.user.signup_details
+                            user_level = signup_details.user_level
+                            user_department = signup_details.department
+                        except SignupDetails.DoesNotExist:
+                            user_level = 1
+                            user_department = "Not specified"
+                        
+                        # Save to database
+                        DriveFile.objects.create(
+                            user=request.user,
+                            name=uploaded_file.name,
+                            file_id=uploaded_drive_file.get('id'),
+                            uploader_user_level=user_level,
+                            uploader_department=user_department
+                        )
+                        
+                        uploaded_count += 1
+                        
+                    except Exception as e:
+                        print(f"Error uploading file {uploaded_file.name}: {str(e)}")
+                        messages.error(request, f"Error uploading {uploaded_file.name}: {str(e)}")
+                        continue
+                        
+                if uploaded_count > 0:
+                    messages.success(request, f"Successfully uploaded {uploaded_count} file(s) to project folder!")
+                    
+            except Exception as e:
+                print(f"Error during file upload: {str(e)}")
+                messages.error(request, f"Error uploading files: {str(e)}")
+
+        # Update Google Drive folder name if project name changed
+        if old_project_name != new_project_name and new_project_name and new_project_name.strip():
+            try:
+                if project_folder:
+                    # Check if user has Google Drive credentials
+                    creds_data = request.session.get('credentials')
+                    if creds_data:
+                        creds = Credentials(**creds_data)
+                        service = build('drive', 'v3', credentials=creds)
+                        
+                        # Update folder name in Google Drive
+                        folder_metadata = {
+                            'name': new_project_name.strip()
+                        }
+                        
+                        updated_folder = service.files().update(
+                            fileId=project_folder.folder_id,
+                            body=folder_metadata,
+                            fields='id, name'
+                        ).execute()
+                        
+                        # Update folder name in database
+                        project_folder.name = new_project_name.strip()
+                        project_folder.save()
+                        
+                        messages.success(request, f"Project and folder name updated to '{new_project_name}' successfully!")
+                    else:
+                        messages.warning(request, "Project updated but folder name could not be changed. Please authorize Google Drive access.")
+                        
+            except Exception as e:
+                print(f"Error updating folder name: {str(e)}")
+                messages.warning(request, f"Project updated but folder rename failed: {str(e)}")
+
+        return redirect('core:admin_project_page')
 
     return render(request, 'core/admin_edit_project_details.html', {
         'project': project,
         'members': members,
+        'available_users': available_users,
+        'available_users_json': json.dumps(available_users_json),
+        'project_files': project_files,
+        'project_folder': project_folder,
     })
+
+
+
+@login_required
+def user_edit_project_details(request, project_id):
+    """
+    User version of project editing - only allows file upload and removal
+    Users can only edit projects they are part of (manager or team member)
+    """
+    from django.core.serializers.json import DjangoJSONEncoder
+    
+    project = get_object_or_404(Project, pk=project_id)
+    
+    # Check if user has access to this project
+    try:
+        user_signup_details = request.user.signup_details
+        user_full_name = f"{user_signup_details.first_name} {user_signup_details.last_name}"
+    except SignupDetails.DoesNotExist:
+        messages.error(request, "Please complete your profile first.")
+        return redirect('core:signup_details')
+    
+    # Check if user is project manager or team member
+    is_project_manager = project.project_manager == user_full_name
+    is_team_member = ProjectMember.objects.filter(
+        project=project,
+        member_name=user_full_name
+    ).exists()
+    
+    if not (is_project_manager or is_team_member):
+        messages.error(request, "You don't have permission to edit this project.")
+        return redirect('core:organization')
+
+    # Get project files from the associated folder (same logic as admin)
+    project_files = []
+    project_folder = None
+    
+    try:
+        # Find the associated drive folder
+        project_folder = DriveFolder.objects.get(name=project.name)
+        
+        # Check if user has Google Drive credentials
+        creds_data = request.session.get('credentials')
+        if creds_data:
+            creds = Credentials(**creds_data)
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Get files in the project folder
+            file_results = service.files().list(
+                q=f"'{project_folder.folder_id}' in parents and mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+                pageSize=100,
+                fields="files(id, name, mimeType, size, createdTime, webViewLink)"
+            ).execute()
+            
+            drive_files = file_results.get('files', [])
+            
+            # Get database files for uploader mapping
+            db_files = DriveFile.objects.select_related('user').all()
+            file_id_to_uploader = {file.file_id: file.user.username for file in db_files}
+            
+            # Process each file
+            for file in drive_files:
+                project_files.append({
+                    'id': file['id'],
+                    'name': file['name'],
+                    'size': f"{int(file.get('size', 0)) / 1024:.2f} KB" if 'size' in file else 'Unknown',
+                    'date': datetime.fromisoformat(file['createdTime'][:-1]).strftime('%Y-%m-%d %H:%M:%S') if 'createdTime' in file else 'Unknown',
+                    'uploader': file_id_to_uploader.get(file['id'], "Unknown User"),
+                    'webViewLink': file.get('webViewLink', ''),
+                    'icon': get_file_icon(file.get('mimeType', ''))
+                })
+                
+    except DriveFolder.DoesNotExist:
+        print(f"No folder found for project: {project.name}")
+    except Exception as e:
+        print(f"Error fetching project files: {str(e)}")
+
+    if request.method == 'POST':
+        # Handle only file uploads (no project details editing)
+        uploaded_files = request.FILES.getlist('add_file')
+        
+        if uploaded_files:
+            try:
+                creds_data = request.session.get('credentials')
+                if not creds_data:
+                    messages.error(request, "You must authorize Google Drive access to upload files.")
+                    return redirect('core:google_drive_auth')
+                
+                creds = Credentials(**creds_data)
+                service = build('drive', 'v3', credentials=creds)
+                
+                # Get or create project folder
+                if not project_folder:
+                    # Create project folder if it doesn't exist
+                    PROJECT_PARENT_FOLDER_ID = '11tTPVSxTq87eF_pp9BQ3ud-XAsHw86mM'
+                    
+                    folder_metadata = {
+                        'name': project.name,
+                        'mimeType': 'application/vnd.google-apps.folder',
+                        'parents': [PROJECT_PARENT_FOLDER_ID]
+                    }
+
+                    created_folder = service.files().create(
+                        body=folder_metadata,
+                        fields='id, name'
+                    ).execute()
+
+                    # Get current user's level and department for folder tracking
+                    try:
+                        signup_details = request.user.signup_details
+                        user_level = signup_details.user_level
+                        user_department = signup_details.department
+                    except SignupDetails.DoesNotExist:
+                        user_level = 1
+                        user_department = "Not specified"
+
+                    # Save project folder to database
+                    project_folder = DriveFolder.objects.create(
+                        user=request.user,
+                        name=created_folder['name'],
+                        folder_id=created_folder['id'],
+                        parent_folder_id=PROJECT_PARENT_FOLDER_ID,
+                        creator_user_level=user_level,
+                        creator_department=user_department
+                    )
+                    
+                    messages.info(request, f"Created new project folder: {project.name}")
+                
+                # Upload files to the project folder
+                uploaded_count = 0
+                for uploaded_file in uploaded_files:
+                    try:
+                        file_metadata = {
+                            'name': uploaded_file.name,
+                            'parents': [project_folder.folder_id]
+                        }
+                        
+                        media = MediaIoBaseUpload(
+                            BytesIO(uploaded_file.read()),
+                            mimetype=uploaded_file.content_type,
+                            resumable=True
+                        )
+                        
+                        uploaded_drive_file = service.files().create(
+                            body=file_metadata,
+                            media_body=media,
+                            fields='id'
+                        ).execute()
+
+                        # Save file record to database
+                        try:
+                            signup_details = request.user.signup_details
+                            user_level = signup_details.user_level
+                            user_department = signup_details.department
+                        except SignupDetails.DoesNotExist:
+                            user_level = 1
+                            user_department = "Not specified"
+
+                        DriveFile.objects.create(
+                            user=request.user,
+                            name=uploaded_file.name,
+                            file_id=uploaded_drive_file.get('id'),
+                            uploader_user_level=user_level,
+                            uploader_department=user_department
+                        )
+                        
+                        uploaded_count += 1
+                        
+                    except Exception as e:
+                        print(f"Error uploading file {uploaded_file.name}: {str(e)}")
+                        messages.error(request, f"Error uploading {uploaded_file.name}: {str(e)}")
+                        
+                if uploaded_count > 0:
+                    messages.success(request, f"Successfully uploaded {uploaded_count} file(s) to project folder!")
+                    
+            except Exception as e:
+                print(f"Error during file upload: {str(e)}")
+                messages.error(request, f"Error uploading files: {str(e)}")
+
+        return redirect('core:user_edit_project_details', project_id=project.id)
+
+    return render(request, 'core/user_edit_project_details.html', {
+        'project': project,
+        'project_files': project_files,
+        'project_folder': project_folder,
+        'active_page': 'organization',
+    })
+
+
+# Add a new view to handle file removal
+@login_required
+def remove_project_file(request):
+    if request.method == 'POST':
+        file_id = request.POST.get('file_id')
+        project_id = request.POST.get('project_id')
+        
+        if not file_id or not project_id:
+            return JsonResponse({'success': False, 'error': 'Missing file_id or project_id'})
+        
+        try:
+            # Check if user has Google Drive credentials
+            creds_data = request.session.get('credentials')
+            if not creds_data:
+                return JsonResponse({'success': False, 'error': 'Google Drive authorization required'})
+            
+            creds = Credentials(**creds_data)
+            service = build('drive', 'v3', credentials=creds)
+            
+            # Get file info first
+            try:
+                file_info = service.files().get(fileId=file_id, fields='name,owners').execute()
+                file_name = file_info.get('name', 'Unknown')
+                
+                # Permanently delete the file from Google Drive
+                service.files().delete(fileId=file_id).execute()
+                
+                # Remove from database
+                try:
+                    drive_file = DriveFile.objects.get(file_id=file_id)
+                    drive_file.delete()
+                except DriveFile.DoesNotExist:
+                    pass  # File not in database, but still removed from Drive
+                
+                return JsonResponse({
+                    'success': True, 
+                    'message': f'File "{file_name}" permanently deleted successfully'
+                })
+                
+            except HttpError as e:
+                if e.resp.status == 404:
+                    return JsonResponse({'success': False, 'error': 'File not found'})
+                elif e.resp.status == 403:
+                    return JsonResponse({'success': False, 'error': 'Permission denied - you may not have permission to delete this file'})
+                else:
+                    return JsonResponse({'success': False, 'error': f'Google Drive error: {str(e)}'})
+            
+        except Exception as e:
+            print(f"Error removing file: {str(e)}")
+            return JsonResponse({'success': False, 'error': f'Error removing file: {str(e)}'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 
 # =================================== FOR EDITING OF PROJECTS ===================================
 
@@ -667,6 +1126,10 @@ def profilepage(request, pk):
     
     employee_awards = EmployeeAward.objects.all()
     personal_information = PersonalInformation.objects.first()
+
+    if request.method == 'POST':
+        avatar_id = request.POST.get('profile_avatar_id', 1)
+        signup_details.profile_avatar_id = int(avatar_id)
 
     return render(request, 'core/profilepage.html', {
         'projects': user_projects,  # Changed from all projects to user's projects only
@@ -1757,6 +2220,7 @@ def load_user_map(request):
         'connections': []
     })
 
+
 @login_required
 @require_POST
 def delete_user(request):
@@ -1788,14 +2252,7 @@ def delete_user(request):
         was_active = user_to_delete.is_active
         username = user_to_delete.username
         
-        # Delete user
-        user_to_delete.delete()
-        
-        # Log the deletion
-       
-        username = user_to_delete.username
-        
-        # Delete user
+        # Delete user (this will also cascade delete related SignupDetails)
         user_to_delete.delete()
         
         # Log the deletion

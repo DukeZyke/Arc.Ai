@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Files - {{ project.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/adminedit.css' %}">
+</head>
+<body>
+
+<div id="header">
+    <img src="{% static 'Images/Account.png' %}" alt="Account">
+</div>
+<div id="sidebar">
+    <div id="logo">
+        <img src="{% static 'Images/Logo_LandingPage.png' %}" alt="ARC.AI Logo">
+        <hr>
+    </div>
+
+    <div id="sidebar_cont">
+        <div id="navigate">
+            <h1>Navigate</h1>
+            <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a>
+            <a href="{% url 'core:saved' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
+        </div>
+        <div id="settings">
+            <h1>Admin View</h1>
+            {% if user.is_staff %}
+                <a href="{% url 'core:admin_project_page' %}" class="{% if active_page == 'admin_project_page' %}active{% endif %}">Admin Projects</a>
+            {% endif %}
+        </div>
+    </div>
+    <form id="logoutform" method="post" action="{% url 'core:logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="logout">
+            <img src="{% static 'Images/Logout.png' %}" alt="Logout icon">
+            Log out
+        </button>
+    </form>
+</div>
+
+<!-- Page Content Start -->
+<div class="adminedit-content">
+    <form method="post" action="{% url 'core:user_edit_project_details' project.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="adminedit-card-container">
+            <!-- Project Files Management Card -->
+            <div class="adminedit-card adminedit-details-card">
+                <div class="adminedit-card-header">
+                    <h2>{{ project.name }} - Project Files</h2>
+                    <a href="{% url 'core:organization' %}" class="adminedit-back-link">&#8592; Back to Projects</a>
+                </div>
+                
+                <!-- Project Info Display (Read-only) -->
+                <div class="adminedit-details-section">
+                    <div class="adminedit-row">
+                        <label class="adminedit-label">Project Description:</label>
+                        <p class="project-info-display">{{ project.project_desc|default:"No description available" }}</p>
+                    </div>
+                    <hr>
+                    <div class="adminedit-row">
+                        <label class="adminedit-label">Project Manager:</label>
+                        <p class="project-info-display">{{ project.project_manager }}</p>
+                    </div>
+                    <hr>
+                    <div class="adminedit-row">
+                        <label class="adminedit-label">Status:</label>
+                        <span class="project-status-badge status-{{ project.project_status|lower }}">
+                            {{ project.project_status }}
+                        </span>
+                    </div>
+                    <hr>
+                    <div class="adminedit-row">
+                        <label class="adminedit-label">Timeline:</label>
+                        <p class="project-info-display">
+                            {% if project.start_date %}{{ project.start_date|date:'M d, Y' }}{% else %}Not set{% endif %}
+                            -
+                            {% if project.finish_date %}{{ project.finish_date|date:'M d, Y' }}{% else %}Not set{% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Project Files Section -->
+                <div class="adminedit-files-section">
+                    <h3>Project Files</h3>
+                    <ul class="adminedit-file-list">
+                        {% if project_files %}
+                            {% for file in project_files %}
+                                <li class="file-item" data-file-id="{{ file.id }}">
+                                    <div class="file-info">
+                                        <img src="{% static file.icon %}" alt="File icon" class="file-icon">
+                                        <div class="file-details">
+                                            <span class="file-name">{{ file.name }}</span>
+                                            <span class="file-meta">{{ file.size }} • {{ file.date }} • Uploaded by {{ file.uploader }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="file-actions">
+                                        {% if file.webViewLink %}
+                                            <a href="{{ file.webViewLink }}" target="_blank" class="view-file-btn" title="View file">👁️</a>
+                                        {% endif %}
+                                        <button type="button" class="remove-file-btn" data-file-id="{{ file.id }}" title="Remove file">✕</button>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="no-files-message">
+                                {% if project_folder %}
+                                    No files uploaded to this project yet.
+                                {% else %}
+                                    No project folder found. Files will be uploaded to a new folder when you add them.
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- File Upload Section -->
+                <div class="file-upload-wrapper">
+                    <label for="add_file" class="file-upload-label">Upload files to project folder:</label>
+                    <label class="file-upload-btn">
+                        Add File
+                        <input type="file" id="add_file" name="add_file" multiple onchange="displaySelectedFiles(this)">
+                    </label>
+                    <div id="file-list" class="selected-files-list"></div>
+                    <div class="adminedit-submit-row">
+                        <button class="adminedit-submit-btn" type="submit">Upload Files</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- Page Content End -->
+
+<script src="{% static 'js/sidebar.js' %}"></script>
+<script>
+    // File handling functions (same as admin_edit_project_details)
+    function displaySelectedFiles(input) {
+        const fileList = document.getElementById('file-list');
+        const files = input.files;
+        
+        fileList.innerHTML = '';
+        
+        if (files.length === 0) {
+            return;
+        }
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const fileItem = document.createElement('div');
+            fileItem.className = 'selected-file-item';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">(${formatFileSize(file.size)})</span>
+                </div>
+                <button type="button" onclick="removeSelectedFile(this, ${i})" class="remove-selected-btn" title="Remove">&times;</button>
+            `;
+            fileList.appendChild(fileItem);
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function removeSelectedFile(button, index) {
+        const input = document.getElementById('add_file');
+        const dt = new DataTransfer();
+        const files = input.files;
+        
+        for (let i = 0; i < files.length; i++) {
+            if (i !== index) {
+                dt.items.add(files[i]);
+            }
+        }
+        
+        input.files = dt.files;
+        displaySelectedFiles(input);
+    }
+
+    // Remove file from project (existing files) - same logic as admin
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners for remove file buttons
+        document.querySelectorAll('.remove-file-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const fileId = this.getAttribute('data-file-id');
+                const fileName = this.closest('.file-item').querySelector('.file-name').textContent;
+                
+                if (confirm(`Are you sure you want to remove "${fileName}" from this project?`)) {
+                    removeProjectFile(fileId);
+                }
+            });
+        });
+    });
+
+    function removeProjectFile(fileId) {
+        // Send AJAX request to remove file from Google Drive (same as admin logic)
+        fetch(`{% url 'core:remove_project_file' %}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `file_id=${encodeURIComponent(fileId)}&project_id={{ project.id }}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the file item from the DOM
+                const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
+                if (fileItem) {
+                    fileItem.remove();
+                }
+                
+                // Show success message
+                alert(data.message || 'File removed successfully');
+                
+                // Check if no files left, show appropriate message
+                const remainingFiles = document.querySelectorAll('.file-item');
+                if (remainingFiles.length === 0) {
+                    const fileList = document.querySelector('.adminedit-file-list');
+                    fileList.innerHTML = '<li class="no-files-message">No files uploaded to this project yet.</li>';
+                }
+            } else {
+                alert(data.error || 'Failed to remove file');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while removing the file');
+        });
+    }
+</script>
+
+<style>
+    /* Additional styles for read-only project info */
+    .project-info-display {
+        margin: 0;
+        padding: 8px 12px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        color: #495057;
+        font-size: 14px;
+    }
+    
+    .project-status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .status-ongoing {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    .status-missing {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .selected-file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        margin: 4px 0;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    
+    .file-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    
+    .file-name {
+        font-weight: 500;
+        color: #495057;
+    }
+    
+    .file-size {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .remove-selected-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+    }
+    
+    .remove-selected-btn:hover {
+        background: #c82333;
+    }
+</style>
+
+</body>
+</html>

@@ -9,9 +9,17 @@
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/aduserpage.css' %}">
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/popuperror.css' %}?v=1.0">
 </head>
 <body>
 {% csrf_token %}
+    {% if messages %}
+    <div id="message-popup" class="message-popup">
+        {% for message in messages %}
+        <div class="message-content">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
 <div id="header">
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
@@ -29,6 +37,7 @@
                     <a href="{% url 'core:admin_files_page' %}" class="{% if active_page == 'saved' %}active{% endif %}">Files</a>
                 </div>
                 <div id="settings">
+                    <a href="{% url 'core:user_involved_map' %}" class="{% if active_page == 'home' %}active{% endif %}">Home</a>
                     <h1>User View</h1>
                     <a href="{% url 'core:organization' %}" class="{% if active_page == 'organization' %}active{% endif %}">Projects</a>
                 </div>
@@ -95,7 +104,7 @@
                     <span>Level:</span>
                     <div class="level-control">
                         <span class="level-value">{{ user_data.user_level }}</span>
-                        <span class="level-label">
+                        <!-- <span class="level-label">
                             {% if user_data.user_level == 4 %}
                                 (Executive)
                             {% elif user_data.user_level == 3 %}
@@ -105,19 +114,20 @@
                             {% else %}
                                 (Employee)
                             {% endif %}
-                        </span>
+                        </span> -->
                     </div>
                 </div>
                 <div class="user-actions">
-                    <button class="edit-btn" data-user-id="{{ user_data.user.id }}" title="Edit User">
+                    <!-- <button class="edit-btn" data-user-id="{{ user_data.user.id }}" title="Edit User">
                         <i class="bx bx-edit"></i>
-                    </button>
+                    </button> -->
+                    {% csrf_token %}
                     <button class="delete-btn" data-user-id="{{ user_data.user.id }}" title="Delete User">
                         <i class="bx bx-trash"></i>
                     </button>
-                    <button class="view-btn" data-user-id="{{ user_data.user.id }}" title="View Profile">
+                    <!-- <button class="view-btn" data-user-id="{{ user_data.user.id }}" title="View Profile">
                         <i class="bx bx-user"></i>
-                    </button>
+                    </button> -->
                 </div>
             </div>
             {% endfor %}

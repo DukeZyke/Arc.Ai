@@ -14,9 +14,13 @@
     
 </head>
 <body>
-      {% for message in messages %}
-        <h5 style="color: red; margin: auto;">{{message}}</h5>
-      {% endfor %}
+    {% if messages %}
+    <div id="message-popup" class="message-popup">
+        {% for message in messages %}
+        <div class="message-content">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div id="login_cntr">
         <div id="container">
             <div id="form_container">

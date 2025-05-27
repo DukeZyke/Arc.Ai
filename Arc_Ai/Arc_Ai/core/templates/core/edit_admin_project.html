@@ -17,10 +17,22 @@
     <label>Project Members:</label>
     <div id="members">
         {% for member in members %}
-            <input type="text" name="member_names" value="{{ member.member_name }}">
+            <select name="member_names">
+                <option value="">Select a member</option>
+                {% for user in all_users %}
+                    <option value="{{ user.username }}" {% if user.username == member.member_name %}selected{% endif %}>
+                        {{ user.username }}
+                    </option>
+                {% endfor %}
+            </select>
         {% endfor %}
-        <!-- Empty field for adding a new member -->
-        <input type="text" name="member_names" placeholder="Add new member">
+        <!-- Empty dropdown for adding a new member -->
+        <select name="member_names">
+            <option value="">Select a member</option>
+            {% for user in all_users %}
+                <option value="{{ user.username }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
     </div>
     <button type="button" onclick="addMember()">Add Another Member</button>
     <br>
@@ -30,10 +42,23 @@
 <script>
 function addMember() {
     var membersDiv = document.getElementById('members');
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'member_names';
-    input.placeholder = 'Add new member';
-    membersDiv.appendChild(input);
+    var select = document.createElement('select');
+    select.name = 'member_names';
+    
+    // Add default option
+    var defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a member';
+    select.appendChild(defaultOption);
+    
+    // Add user options (you'll need to pass all_users to JavaScript or use a different approach)
+    {% for user in all_users %}
+        var option = document.createElement('option');
+        option.value = '{{ user.username }}';
+        option.textContent = '{{ user.username }}';
+        select.appendChild(option);
+    {% endfor %}
+    
+    membersDiv.appendChild(select);
 }
 </script>

@@ -30,6 +30,133 @@ document.addEventListener('DOMContentLoaded', function() {
         debounceTimer = setTimeout(performSearch, 300);
     });
     
+    // DELETE USER FUNCTIONALITY - MAIN IMPLEMENTATION
+    setupDeleteUserButtons();
+    
+    function setupDeleteUserButtons() {
+        console.log('Setting up delete buttons...');
+        
+        // Add event listeners to all delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        console.log('Found delete buttons:', deleteButtons.length);
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Delete button clicked');
+                
+                const userId = this.getAttribute('data-user-id');
+                const userCard = this.closest('.user-card');
+                const userName = userCard.querySelector('.user-info h3').textContent;
+                
+                console.log('User ID:', userId, 'User name:', userName);
+                
+                // Confirm deletion
+                if (confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+                    deleteUser(userId, userCard);
+                }
+            });
+        });
+    }
+    
+    function deleteUser(userId, userCard) {
+        console.log('Deleting user:', userId);
+        
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        console.log('CSRF token:', csrfToken ? 'Found' : 'Not found');
+        
+        // Show loading state
+        const deleteBtn = userCard.querySelector('.delete-btn');
+        const originalHTML = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i>';
+        deleteBtn.disabled = true;
+        
+        // Send delete request
+        fetch('/delete_user/', {
+            method: 'POST',
+            body: new URLSearchParams({
+                'user_id': userId,
+                'csrfmiddlewaretoken': csrfToken
+            }),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            
+            if (data.success) {
+                // Remove user card with animation
+                userCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                userCard.style.opacity = '0';
+                userCard.style.transform = 'translateX(-100px)';
+                
+                setTimeout(() => {
+                    userCard.remove();
+                    updateUserCounts(data.was_active);
+                    showMessage(data.message, 'success');
+                }, 300);
+            } else {
+                // Reset button state
+                deleteBtn.innerHTML = originalHTML;
+                deleteBtn.disabled = false;
+                showMessage(data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            // Reset button state
+            deleteBtn.innerHTML = originalHTML;
+            deleteBtn.disabled = false;
+            showMessage('An error occurred while deleting the user.', 'error');
+        });
+    }
+    
+    function updateUserCounts(wasActive) {
+        // Update total users count
+        const totalUsersElement = document.getElementById('total-users');
+        const currentTotal = parseInt(totalUsersElement.textContent);
+        totalUsersElement.textContent = currentTotal - 1;
+        
+        // Update active users count if the deleted user was active
+        if (wasActive) {
+            const activeUsersElement = document.getElementById('active-users');
+            const currentActive = parseInt(activeUsersElement.textContent);
+            activeUsersElement.textContent = currentActive - 1;
+        }
+    }
+    
+    function showMessage(message, type) {
+        // Create message popup
+        const messagePopup = document.createElement('div');
+        messagePopup.className = `message-popup ${type}`;
+        messagePopup.innerHTML = `<div class="message-content">${message}</div>`;
+        
+        // Add to body
+        document.body.appendChild(messagePopup);
+        
+        // Show with animation
+        setTimeout(() => {
+            messagePopup.classList.add('show');
+        }, 100);
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            messagePopup.classList.remove('show');
+            setTimeout(() => {
+                if (messagePopup.parentNode) {
+                    messagePopup.parentNode.removeChild(messagePopup);
+                }
+            }, 300);
+        }, 3000);
+    }
+    
     // Function to perform the search
     function performSearch() {
         const searchTerm = searchInput.value.toLowerCase().trim();
@@ -147,104 +274,66 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Add event listeners to all delete buttons
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userId = this.getAttribute('data-user-id');
-            deleteUser(userId, this);
-        });
-    });
-    
-    // Function to handle user deletion
-    function deleteUser(userId, buttonElement) {
-        // Show confirmation dialog
-        if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
-            return;
-        }
-
-        // Use getCookie function that's already defined in your code
-        const csrftoken = getCookie('csrftoken');
+    // Search functionality (if not already implemented)
+    function setupSearch() {
+        const searchInput = document.getElementById('search-users');
+        const searchButton = document.getElementById('search-button');
         
-        // Create form data for the request
-        const formData = new FormData();
-        formData.append('user_id', userId);
-
-        // Send delete request to the proper endpoint
-        fetch('/delete_user/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Remove the user card with animation
-                const userCard = buttonElement.closest('.user-card');
-                userCard.style.opacity = '0';
-                setTimeout(() => {
-                    userCard.remove();
+        if (searchInput && searchButton) {
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const userCards = document.querySelectorAll('.user-card');
+                let visibleCount = 0;
+                
+                userCards.forEach(card => {
+                    const userName = card.querySelector('.user-info h3').textContent.toLowerCase();
+                    const userEmail = card.querySelector('.user-email').textContent.toLowerCase();
+                    const userDepartment = card.querySelector('.department span').textContent.toLowerCase();
+                    const userPosition = card.querySelector('.position span').textContent.toLowerCase();
                     
-                    // Update user counts
-                    const totalUsersElement = document.getElementById('total-users');
-                    const activeUsersElement = document.getElementById('active-users');
+                    const isMatch = userName.includes(searchTerm) || 
+                                   userEmail.includes(searchTerm) || 
+                                   userDepartment.includes(searchTerm) || 
+                                   userPosition.includes(searchTerm);
                     
-                    if (totalUsersElement) {
-                        totalUsersElement.textContent = parseInt(totalUsersElement.textContent) - 1;
+                    if (isMatch) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
                     }
-                    
-                    if (activeUsersElement && data.was_active) {
-                        activeUsersElement.textContent = parseInt(activeUsersElement.textContent) - 1;
-                    }
-                    
-                    // Show success message
-                    alert('User successfully deleted');
-                }, 300);
-            } else {
-                alert(`Error: ${data.error || 'Failed to delete user'}`);
+                });
+                
+                // Update search results indicator
+                updateSearchResults(visibleCount, searchTerm);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(`An error occurred: ${error.message}`);
-        });
+            
+            searchInput.addEventListener('input', performSearch);
+            searchButton.addEventListener('click', performSearch);
+            
+            // Enter key support
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
     }
     
-    // Real-time search functionality
-    const userCards = document.querySelectorAll('.user-card');
-    
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        let visibleCount = 0;
-        
-        userCards.forEach(card => {
-            const userName = card.querySelector('.user-info h3').textContent.toLowerCase();
-            const userEmail = card.querySelector('.user-email').textContent.toLowerCase();
-            const department = card.querySelector('.department span').textContent.toLowerCase();
-            const position = card.querySelector('.position span').textContent.toLowerCase();
-            
-            const matches = userName.includes(searchTerm) || 
-                          userEmail.includes(searchTerm) || 
-                          department.includes(searchTerm) || 
-                          position.includes(searchTerm);
-            
-            if (matches) {
-                card.style.display = 'flex';
-                visibleCount++;
+    function updateSearchResults(count, searchTerm) {
+        const searchIndicator = document.querySelector('.search-indicator');
+        if (searchIndicator) {
+            if (searchTerm) {
+                searchIndicator.textContent = `(${count} results)`;
+                searchIndicator.style.display = 'inline';
             } else {
-                card.style.display = 'none';
+                searchIndicator.style.display = 'none';
             }
-        });
-        
-        // Update the search results count
-        document.getElementById('active-users').textContent = visibleCount;
-    });
+        }
+    }
+    
+    // Initialize search when page loads
+    document.addEventListener('DOMContentLoaded', setupSearch);
 });
 
 // Function to get CSRF token from cookies

@@ -52,7 +52,7 @@
                 <div id="MainProfile">
                     {% if signup_details %}
                     <div class="avatar">
-                        <img src="{% static 'Images/Profile1.png' %}" alt="{{ signup_details.first_name }} {{ signup_details.last_name }}">
+                    <img id="selected_profile_pic" src="{% static 'Images/Profile' %}{{ signup_details.profile_avatar_id|default:1 }}.png" alt="Selected Profile Picture">
                     </div>
                     <div id="userInfo">
                         <h1 class="username">{{ signup_details.first_name }} {{ signup_details.middle_name|slice:"1" }}. {{ signup_details.last_name }}</h1>

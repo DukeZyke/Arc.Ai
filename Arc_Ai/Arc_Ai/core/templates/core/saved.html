@@ -7,9 +7,17 @@
     <title>Saved</title>
     <link rel="stylesheet" href="{% static 'styles/styles.css' %}?v=1.0">
     <link rel="stylesheet" href="{% static 'styles/saved.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'styles/popuperror.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
+    {% if messages %}
+            <div id="message-popup" class="message-popup">
+            {% for message in messages %}
+            <div class="message-content">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div id="header">
         <img src="{% static 'Images/Account.png' %}" alt="Account">
     </div>
@@ -83,17 +91,17 @@
             <img src="{% static 'Images/dots copy.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownFolders()" style="width: 40px; height: 40px; cursor: pointer;">
             <div class="dropdown-content" id="myDropdownFolders">
                 <!-- Folder Creation -->
-                <form action="{% url 'core:create_folder_in_drive' %}" method="post">
+                <form action="{% url 'core:create_folder_in_drive' %}" method="post" onclick="event.stopPropagation();">
                     {% csrf_token %}
                     <input class="Fn" type="text" name="folder_name" placeholder="Folder Name" required>
-                     <hr class="dropdown-divider">
+                    <hr class="dropdown-separator">
                     <button class="create" type="submit">Create</button>
                 </form>
-                <hr class="dropdown-divider">
+                <hr class="dropdown-separator">
 
                 <!-- DELETE Button -->
-                <button class="delete"  onclick="toggleFolderCheckboxes()">DELETE</button>
-                 <hr class="dropdown-divider">
+                <button class="delete" onclick="toggleFolderCheckboxes(); event.stopPropagation();">DELETE</button>
+                <hr class="dropdown-separator">
             </div>
         </div>
 
@@ -140,17 +148,18 @@
                     <img src="{% static 'Images/dots.png' %}" alt="Dropdown Icon" class="dropdown-icon" onclick="toggleDropdownFiles()" style="width: 40px; height: 40px; cursor: pointer;">
                     <div class="dropdown-content2" id="myDropdown">
                         <!-- File Upload -->
-                        <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data">
+                        <form action="{% url 'core:upload_file_to_drive' %}" method="post" enctype="multipart/form-data" onclick="event.stopPropagation();">
                             {% csrf_token %}
                             <input type="hidden" name="folder_id" value="{{ folder_id|default:ROOT_FOLDER_ID }}">
-                            <input  style=" margin: 10px auto auto 5px; padding: 8px 16px; width:auto;"type="file" name="file" multiple required>
-                            <hr class="dropdown-divider">
+                            <input style="margin: 10px auto auto 5px; padding: 8px 16px; width:auto;" type="file" name="file" multiple required>
+                            <hr class="dropdown-separator">
                             <button class="upload" type="submit">Upload</button>
                         </form>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-separator">
 
-                        <!-- DELETE Button --> <button class="trash" onclick="toggleCheckboxes()">DELETE</button>
-                          <hr class="dropdown-divider">
+                        <!-- DELETE Button --> 
+                        <button class="trash" onclick="toggleCheckboxes(); event.stopPropagation();">DELETE</button>
+                        <hr class="dropdown-separator">
                     </div>
                 </div>
 

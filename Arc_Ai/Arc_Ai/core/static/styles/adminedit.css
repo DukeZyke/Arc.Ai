@@ -143,9 +143,9 @@
 }
 
 .adminedit-files-section h3 {
-    margin: 0 0 10px 0;
+    margin-bottom: 1rem;
+    color: #333;
     font-size: 1.1rem;
-    color: #444;
 }
 
 .adminedit-file-list {
@@ -156,61 +156,119 @@
 
 .file-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background: #fff;
+    align-items: center;
+    padding: 0.75rem;
     border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    background-color: #f9f9f9;
 }
 
 .file-info {
     display: flex;
     align-items: center;
-    gap: 10px;
     flex: 1;
+}
+
+.file-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.75rem;
+}
+
+.file-details {
+    display: flex;
+    flex-direction: column;
 }
 
 .file-name {
     font-weight: 500;
-    color: #222;
+    color: #333;
+    margin-bottom: 0.25rem;
 }
 
-.file-size {
-    color: #666;
+.file-meta {
     font-size: 0.85rem;
+    color: #666;
 }
 
-.file-type {
-    background: #e3f2fd;
-    color: #1976d2;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
 }
 
-.remove-file-btn {
+.view-file-btn, .remove-file-btn {
     background: none;
     border: none;
-    color: #c00;
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s;
+    padding: 0.25rem;
+    border-radius: 3px;
+    font-size: 1rem;
+}
+
+.view-file-btn:hover {
+    background-color: #e3f2fd;
 }
 
 .remove-file-btn:hover {
-    background: #ffebee;
-    color: #e53935;
+    background-color: #ffebee;
+    color: #d32f2f;
 }
 
-.no-files {
-    color: #999;
+.no-files-message {
+    color: #666;
     font-style: italic;
     text-align: center;
-    padding: 10px;
+    padding: 2rem;
+}
+
+.selected-files-list {
+    margin-top: 1rem;
+}
+
+.selected-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #f0f8ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.selected-file-item .file-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.selected-file-item .file-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.selected-file-item .file-size {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.remove-selected-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.remove-selected-btn:hover {
+    background: #ff3742;
 }
 
 /* Form Input Styles - Updated */
@@ -414,33 +472,24 @@ select.adminedit-input {
 }
 
 .file-upload-btn {
-    background: #363c54;
+    background: #007bff;
     color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: background 0.2s;
+    display: inline-block;
+    transition: background-color 0.3s;
     position: relative;
     z-index: 3;
     pointer-events: auto;
 }
 
 .file-upload-btn:hover {
-    background: #23263a;
+    background: #0056b3;
 }
 
 .file-upload-btn input[type="file"] {
-    position: absolute;
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    z-index: -1;
+    display: none;
 }
 
 .file-upload-info {

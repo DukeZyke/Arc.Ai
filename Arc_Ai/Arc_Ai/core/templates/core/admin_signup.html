@@ -14,6 +14,13 @@
     <link rel="stylesheet" href="{% static 'styles/admin_signup.css' %}?v=1.0">
 </head>
 <body>
+    {% if messages %}
+    <div id="message-popup" class="message-popup">
+        {% for message in messages %}
+        <div class="message-content">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
     <div id="login_cntr">
         <div id="container">
             <div id="logo_container" class="gap">
