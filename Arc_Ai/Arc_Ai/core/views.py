@@ -1305,8 +1305,8 @@ def organization(request):
     # Get the most recent project for "Continue Working" section
     top_project = user_projects.first() if user_projects.exists() else None
     
-    # Get all projects for the project list (excluding the top project)
-    other_projects = user_projects.exclude(id=top_project.id) if top_project else user_projects
+    # Show ALL projects in the project list (don't exclude the top project)
+    other_projects = user_projects
     
     context = {
         'top_project': top_project,
