@@ -73,19 +73,24 @@
     font-size: 1.1rem;
 }
 
-/* Project Details Section */
-.adminedit-details-section {
-    margin-bottom: 1.2rem;
-    overflow: visible; /* Changed from hidden to visible */
-}
 
 .adminedit-row {
     font-size: 1.08rem;
     color: #444;
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: -5px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.adminedit-row hr {
+    margin: 10px 0;
+}
+
+#adminedit-row-status {
+    display: flex;
+    gap: 10px;
 }
 
 /* Specific styling for date row */
@@ -118,18 +123,15 @@
 }
 
 .adminedit-label {
+
     font-weight: 500;
+
 }
 
 .adminedit-value {
     font-weight: 400;
 }
 
-.adminedit-details-section hr {
-    margin: 0.5rem 0 1.1rem 0;
-    border: none;
-    border-top: 1px solid #e0e0e0;
-}
 
 /* Files Section */
 .adminedit-files-section {
